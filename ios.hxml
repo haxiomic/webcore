@@ -1,0 +1,31 @@
+--library hxcpp:4.0.52
+
+# Build a static library as the output
+-D HXCPP_CPP11
+-D static_link
+
+# leaving SDK empty should map to the default
+# if you have errors about missing SDK then explicitly set the SDK version on your system (e.g. -D IPHONE_VER=12.2)
+-D IPHONE_VER=
+
+# Disable debug macros in generated C++ for easier readability
+-D no-debug
+# Uncomment for more debug information
+# -D HXCPP-DEBUGGER
+# -D annotate-source
+
+--each
+
+# Build an ios ARM64 binary
+-D iphoneos
+-D HXCPP_ARM64
+
+--next
+
+# Build a x64 binary for the simulator
+
+-D simulator
+-D HXCPP_M64
+
+# Once the two architectures are built we can combine them into a single static library
+--cmd lipo bin/ios/liboutput.iphoneos-64.a bin/ios/liboutput.a -create -output bin/ios/libMinimalGL.a
