@@ -1,11 +1,15 @@
+# Build MinimalGL without an entrypoint
+MinimalGL
+-cpp bin/ios
+
 --class-path src
 --class-path lib/gluon
 
 --library hxcpp:4.0.52
 
 # Build a static library as the output
--D HXCPP_CPP11
 -D static_link
+-D HXCPP_CPP11
 
 # leaving SDK empty should map to the default
 # if you have errors about missing SDK then explicitly set the SDK version on your system (e.g. -D IPHONE_VER=12.2)
