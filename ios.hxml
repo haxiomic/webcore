@@ -1,3 +1,6 @@
+--class-path src
+--class-path lib/gluon
+
 --library hxcpp:4.0.52
 
 # Build a static library as the output
@@ -13,6 +16,8 @@
 # Uncomment for more debug information
 # -D HXCPP-DEBUGGER
 # -D annotate-source
+
+-dce full
 
 --each
 
