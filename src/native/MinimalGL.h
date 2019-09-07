@@ -9,8 +9,9 @@
 extern "C" {
 #endif
 
-	void* minimalGLCreate(int width, int height);
+	void* minimalGLCreate();
 	void minimalGLDestroy(void* ptr);
+
 	void minimalGLFrame(void* ptr);
 
 #ifdef __cplusplus
