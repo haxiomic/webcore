@@ -1,10 +1,12 @@
 # Minimal Haxe OpenGL Example
 
-This example generates cross-platform native libraries that execute OpenGL commands when given an OpenGL context. The source code does not define an entry point (`static function main`), instead, it exposes a C-API that is used to initialize and communicate with the haxe code from the native platform
+This example generates cross-platform native libraries that execute OpenGL commands when given an OpenGL context. The source code does not define an entry point (i.e. `static function main`), instead, it exposes a C-API that is used to initialize and communicate with the haxe code from the native platform
 
-The host app is written natively for each platform, which for this example is just an empty app with an OpenGL view
+The host app is written natively for each platform, which for this example is just an empty app with an OpenGL view. All the native host apps are stored in the `targets` directory
 
-[Unified OpenGL API, gluon, which implements a typedarray implementation for the C++ target and normalizes]
+Using OpenGL requires linking with different libraries, using different headers and a slightly different API on different platforms. To handle these differences this example uses [gluon](https://github.com/haxiomic/gluon) as a unified OpenGL ES 2.0 interface. It normalizes API differences, handles linking with system libraries when building with hxcpp and adds a layer of haxe-strict-typing to the OpenGL API. It provides a C++ implementation of JavaScripts TypedArrays as unified buffer type
+
+
 
 ## Build Instructions
 
