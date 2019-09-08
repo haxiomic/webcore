@@ -18,7 +18,7 @@ If you forget to clone with submodules you can pull and update submodules at any
 
 ### iOS
 
-The iOS build is distributed as a framework and a demo app using the framework. Open the Xcode project in `targets/ios/MinimalGLDemo` and build to see it running. During the app build process it will trigger the haxe to be compiled
+Open the Xcode project in `targets/ios/MinimalGLApp` and build to see it running. During the app build process it will trigger the haxe to be recompiled via a Build Phase run script in `targets/ios/MinimalGLFramework`.
 
 ### Android
 
