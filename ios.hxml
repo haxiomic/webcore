@@ -1,5 +1,5 @@
 # Build MinimalGL without an entrypoint
-MinimalGL
+native.MinimalGLNative
 -cpp bin/ios
 
 --class-path src

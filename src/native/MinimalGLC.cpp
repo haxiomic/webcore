@@ -2,7 +2,7 @@
  * Implementation of C-API. It is here we directly comminicate with the generated hxcpp C++
  */
 
-#include "MinimalGL.h"
+#include "MinimalGLC.h"
 
 #include <stdio.h>
 

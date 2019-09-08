@@ -1,9 +1,24 @@
 package native;
 
+#if !macro
+@:nativeGen
+@:structAccess
+@:build(native.MinimalGLNative.Macro.addCApi('MinimalGLC.h', 'MinimalGLC.cpp'))
+class MinimalGLNative {
+
+	@:keep static public function create(): IMinimalGL {
+		var glContext = new gluon.es2.impl.ES2Context();
+		return new MinimalGL(glContext);
+	}
+
+}
+
+#else
+
 import haxe.macro.Context;
 import haxe.io.Path;
 
-class NativeMacro {
+class Macro {
 
 	/**
 		Add a header file and C++ implementation to the hxcpp build xml
@@ -30,3 +45,5 @@ class NativeMacro {
 	}
 
 }
+
+#end
