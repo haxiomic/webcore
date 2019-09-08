@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BE1CFE932325722B0085E7FF /* MinimalGLViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1CFE922325722B0085E7FF /* MinimalGLViewController.swift */; };
 		BE35669B23255E8F00F0CD08 /* MinimalGLFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = BE35669923255E8F00F0CD08 /* MinimalGLFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BE3566A42325647E00F0CD08 /* MinimalGLC.h in Headers */ = {isa = PBXBuildFile; fileRef = BE3566A32325647E00F0CD08 /* MinimalGLC.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BE3566A6232564EC00F0CD08 /* MinimalGL.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3566A5232564EC00F0CD08 /* MinimalGL.swift */; };
@@ -15,6 +16,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		BE1CFE922325722B0085E7FF /* MinimalGLViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinimalGLViewController.swift; sourceTree = "<group>"; };
 		BE35669623255E8F00F0CD08 /* MinimalGLFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MinimalGLFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE35669923255E8F00F0CD08 /* MinimalGLFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MinimalGLFramework.h; sourceTree = "<group>"; };
 		BE35669A23255E8F00F0CD08 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -58,6 +60,7 @@
 			isa = PBXGroup;
 			children = (
 				BE35669923255E8F00F0CD08 /* MinimalGLFramework.h */,
+				BE1CFE922325722B0085E7FF /* MinimalGLViewController.swift */,
 				BE3566A32325647E00F0CD08 /* MinimalGLC.h */,
 				BE3566A5232564EC00F0CD08 /* MinimalGL.swift */,
 				BE35669A23255E8F00F0CD08 /* Info.plist */,
@@ -176,6 +179,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BE3566A6232564EC00F0CD08 /* MinimalGL.swift in Sources */,
+				BE1CFE932325722B0085E7FF /* MinimalGLViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
