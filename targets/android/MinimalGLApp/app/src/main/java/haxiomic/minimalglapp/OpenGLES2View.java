@@ -35,10 +35,7 @@ package haxiomic.minimalglapp;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.opengl.GLSurfaceView;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -64,16 +61,16 @@ import javax.microedition.khronos.opengles.GL10;
  *   that matches it exactly (with regards to red/green/blue/alpha channels
  *   bit depths). Failure to do so would result in an EGL_BAD_MATCH error.
  */
-class MinimalGLAppView extends GLSurfaceView {
+class OpenGLES2View extends GLSurfaceView {
     private static String TAG = "MinimalGLAppView";
     private static final boolean DEBUG = false;
 
-    public MinimalGLAppView(Context context) {
+    public OpenGLES2View(Context context) {
         super(context);
         init(false, 0, 0);
     }
 
-    public MinimalGLAppView(Context context, boolean translucent, int depth, int stencil) {
+    public OpenGLES2View(Context context, boolean translucent, int depth, int stencil) {
         super(context);
         init(translucent, depth, stencil);
     }
@@ -325,11 +322,11 @@ class MinimalGLAppView extends GLSurfaceView {
 
     private static class Renderer implements GLSurfaceView.Renderer {
         public void onDrawFrame(GL10 gl) {
-            MinimalGLAppLib.step();
+            NativeLib.step();
         }
 
         public void onSurfaceChanged(GL10 gl, int width, int height) {
-            MinimalGLAppLib.init(width, height);
+            NativeLib.init(width, height);
         }
 
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {

@@ -21,6 +21,10 @@ If you forget to clone with submodules you can pull and update submodules at any
 Open the Xcode project in `targets/ios/MinimalGLApp` and build to see it running. During the app build process it will trigger the haxe to be recompiled via a Build Phase run script in `targets/ios/MinimalGLFramework`.
 
 ### Android
+With Android Studio SDK manager
+- SDK 28?
+- cmake
+- NDK 20
 
 ### Desktop
 

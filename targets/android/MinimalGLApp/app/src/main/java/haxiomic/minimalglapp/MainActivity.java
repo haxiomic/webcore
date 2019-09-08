@@ -18,19 +18,15 @@ package haxiomic.minimalglapp;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.WindowManager;
-
-import java.io.File;
 
 
-public class MinimalGLAppActivity extends Activity {
+public class MainActivity extends Activity {
 
-	MinimalGLAppView mView;
+	OpenGLES2View mView;
 
 	@Override protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
-		mView = new MinimalGLAppView(getApplication());
+		mView = new OpenGLES2View(getApplication());
 		setContentView(mView);
 	}
 

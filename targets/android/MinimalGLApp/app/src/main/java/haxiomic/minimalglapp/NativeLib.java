@@ -18,7 +18,7 @@ package haxiomic.minimalglapp;
 
 // Wrapper for native library
 
-public class MinimalGLAppLib {
+public class NativeLib {
 
      static {
          System.loadLibrary("gl2jni");
