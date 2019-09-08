@@ -30,7 +30,7 @@ public class MinimalGLAppActivity extends Activity {
 
 	@Override protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
-		MinimalGLAppView(getApplication());
+		mView = new MinimalGLAppView(getApplication());
 		setContentView(mView);
 	}
 
