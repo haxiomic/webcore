@@ -154,8 +154,7 @@ class OpenGLES2View extends GLSurfaceView {
 
         public EGLConfig chooseConfig(EGL10 egl, EGLDisplay display) {
 
-            /* Get the number of minimally matching EGL configurations
-             */
+            // Get the number of minimally matching EGL configurations
             int[] num_config = new int[1];
             egl.eglChooseConfig(display, s_configAttribs2, null, 0, num_config);
 
@@ -165,16 +164,15 @@ class OpenGLES2View extends GLSurfaceView {
                 throw new IllegalArgumentException("No configs match configSpec");
             }
 
-            /* Allocate then read the array of minimally matching EGL configs
-             */
+            // Allocate then read the array of minimally matching EGL configs
             EGLConfig[] configs = new EGLConfig[numConfigs];
             egl.eglChooseConfig(display, s_configAttribs2, configs, numConfigs, num_config);
 
             if (DEBUG) {
                  printConfigs(egl, display, configs);
             }
-            /* Now return the "best" one
-             */
+
+            // Now return the "best" one
             return chooseConfig(egl, display, configs);
         }
 
