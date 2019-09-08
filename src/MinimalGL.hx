@@ -2,7 +2,7 @@ import haxe.Timer;
 import gluon.es2.GLContext;
 
 @:expose
-class MinimalGL implements IMinimalGL {
+class MinimalGL implements MinimalGLNativeInterface {
 
 	var gl: GLContext;
 
@@ -18,5 +18,15 @@ class MinimalGL implements IMinimalGL {
 		gl.clearColor(Math.sin(t_s * 0.1), Math.cos(t_s * 0.5), Math.sin(t_s * 0.3), 1);
 		gl.clear(COLOR_BUFFER_BIT);
 	}
+
+}
+
+/**
+	This interface defines the native C++ API exposed by the component
+**/
+@:nativeGen
+interface MinimalGLNativeInterface {
+
+	@:keep public function frame(): Void;
 
 }

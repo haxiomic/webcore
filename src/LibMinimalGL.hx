@@ -1,12 +1,15 @@
-package native;
+/**
+	
+**/
 
 #if !macro
+
 @:nativeGen
 @:structAccess
-@:build(native.MinimalGLNative.Macro.addCApi('MinimalGLC.h', 'MinimalGLC.cpp'))
-class MinimalGLNative {
+@:build(LibMinimalGL.Macro.addCApi('native/MinimalGLC.h', 'native/MinimalGLC.cpp'))
+class LibMinimalGL {
 
-	@:keep static public function create(): IMinimalGL {
+	@:keep static public function create(): MinimalGL.MinimalGLNativeInterface {
 		var glContext = new gluon.es2.impl.ES2Context();
 		return new MinimalGL(glContext);
 	}

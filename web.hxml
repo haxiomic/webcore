@@ -1,8 +1,8 @@
 # Build MinimalGL without an entrypoint
 MinimalGL
--js targets/web/minimalgl.js
+-js minimalgl.js
 
---class-path src
---class-path lib/gluon
+--class-path ../../src
+--class-path ../../lib/gluon
 
 -dce full
