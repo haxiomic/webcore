@@ -18,6 +18,9 @@ package haxiomic.minimalglapp;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.opengl.GLSurfaceView;
+import javax.microedition.khronos.opengles.GL10;
+import javax.microedition.khronos.egl.EGLConfig;
 
 
 public class MainActivity extends Activity {
@@ -28,6 +31,8 @@ public class MainActivity extends Activity {
 		super.onCreate(icicle);
 		mView = new OpenGLES2View(getApplication());
 		setContentView(mView);
+
+		mView.setRenderer(new Renderer());
 	}
 
 	@Override protected void onPause() {
@@ -38,5 +43,22 @@ public class MainActivity extends Activity {
 	@Override protected void onResume() {
 		super.onResume();
 		mView.onResume();
+	}
+
+	private static class Renderer implements GLSurfaceView.Renderer {
+
+		MinimalGL minimalGL;
+
+		public void onDrawFrame(GL10 gl) {
+			minimalGL.frame();
+		}
+
+		public void onSurfaceChanged(GL10 gl, int width, int height) {
+			minimalGL = new MinimalGL(width, height);
+		}
+
+		public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+		}
+
 	}
 }

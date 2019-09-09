@@ -99,9 +99,6 @@ class OpenGLES2View extends GLSurfaceView {
         setEGLConfigChooser( translucent ?
                              new ConfigChooser(8, 8, 8, 8, depth, stencil) :
                              new ConfigChooser(5, 6, 5, 0, depth, stencil) );
-
-        /* Set the renderer responsible for frame rendering */
-        setRenderer(new Renderer());
     }
 
     private static class ContextFactory implements GLSurfaceView.EGLContextFactory {
@@ -316,19 +313,5 @@ class OpenGLES2View extends GLSurfaceView {
         protected int mDepthSize;
         protected int mStencilSize;
         private int[] mValue = new int[1];
-    }
-
-    private static class Renderer implements GLSurfaceView.Renderer {
-        public void onDrawFrame(GL10 gl) {
-            NativeLib.step();
-        }
-
-        public void onSurfaceChanged(GL10 gl, int width, int height) {
-            NativeLib.init(width, height);
-        }
-
-        public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-            // Do nothing.
-        }
     }
 }
