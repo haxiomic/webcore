@@ -8,32 +8,34 @@ set(HXCPP_BIN_DIR ${APP_PROJECT_DIR}/../_hxcpp-bin)
 # Hxcpp names architectures slightly differently to the Android build toolchain 
 if( ANDROID_ABI STREQUAL "armeabi-v7a" )
     set(HXCPP_LIB_SUFFIX "v7")
+    set(HXCPP_ARCH "HXCPP_ARMV7")
 elseif( ANDROID_ABI STREQUAL "arm64-v8a" )
     set(HXCPP_LIB_SUFFIX "64")
+    set(HXCPP_ARCH "HXCPP_ARM64")
+elseif( ANDROID_ABI STREQUAL "x86")
+    set(HXCPP_LIB_SUFFIX "x86")
+    set(HXCPP_ARCH "HXCPP_X86")
+elseif( ANDROID_ABI STREQUAL "x86_64")
+    set(HXCPP_LIB_SUFFIX "x86_64")
+    set(HXCPP_ARCH "HXCPP_X86_64")
 else()
+    message(SEND_ERROR "Unknown ABI for HXCPP ${ANDROID_ABI}")
     set(HXCPP_LIB_SUFFIX ${ANDROID_ABI})
+    set(HXCPP_ARCH "")
 endif()
 
 # This variable references the hxcpp generated lib file
 set(HXCPP_LIB_FILE ${HXCPP_BIN_DIR}/lib${HXCPP_LIB_NAME}-${HXCPP_LIB_SUFFIX}.a)
 
-# Add a custom command to rebuild the hxcpp generated library
-add_custom_command(
-    OUTPUT ${HXCPP_LIB_FILE}
-    COMMENT "Hxcpp building ${HXCPP_LIB_FILE}"
-    WORKING_DIRECTORY ${APP_PROJECT_DIR}/../../../
-    COMMAND haxe android.hxml
-    USES_TERMINAL
-)
-add_custom_target(
-    HxcppBuild
-    DEPENDS ${HXCPP_LIB_FILE}
+# Tigger rebuild with hxcpp
+execute_process(
+    WORKING_DIRECTORY ${APP_PROJECT_DIR}/..
+    COMMAND haxe -D ${HXCPP_ARCH} target.hxml 
 )
 
 # Add the hxcpp generated lib file as a static library
 add_library(HxcppLib STATIC IMPORTED GLOBAL)
 set_target_properties(HxcppLib PROPERTIES IMPORTED_LOCATION ${HXCPP_LIB_FILE})
-add_dependencies(HxcppLib HxcppBuild)
 
 # To use the generated lib, we need to use a Java Native Interface wrapper
 # We create a new shared library to do this

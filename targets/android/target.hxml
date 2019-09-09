@@ -1,0 +1,23 @@
+# When HXCPP builds for android, is has to use the android toolchain
+# This complicates things because the toolchain must be installed separately
+# The simplest thing to do is to download Android Studio and install the SDK and NDK from:
+#   Preferences -> Appearance & Behavior -> System Settings -> Android SDK -> SDK Tools
+# This example was build with NDK 20.0.5594570, it should work with older versions, however newer versions that arrive in the future might require updates to HXCPP
+
+LibMinimalGL
+
+# C++ Android Target
+-cpp _hxcpp-bin
+-D android
+
+--class-path ../../src
+--class-path ../../lib/gluon
+
+--library hxcpp:4.0.52
+
+# Build a static library as the output
+-D static_link
+
+-D HAXE_OUTPUT_PART=MinimalGL
+
+-dce full
