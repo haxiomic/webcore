@@ -7,7 +7,7 @@
 LibMinimalGL
 
 # C++ Android Target
--cpp bin/android
+-cpp targets/android/_hxcpp-bin
 -D android
 
 --class-path src
@@ -18,15 +18,14 @@ LibMinimalGL
 # Build a static library as the output
 -D static_link
 
+-D HAXE_OUTPUT_PART=MinimalGL
 
-# Compile multiple architectures and name each with the standard android arch names (this makes using them easier)
+# Compile multiple architectures
 --each
 -D HXCPP_X86_64
 --next
 -D HXCPP_X86
 --next
 -D HXCPP_ARM64
--D HAXE_OUTPUT_FILE=libMinimalGL-arm64-v8a.a
 --next
 -D HXCPP_ARMV7
--D HAXE_OUTPUT_FILE=libMinimalGL-armeabi-v7a.a
