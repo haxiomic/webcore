@@ -10,9 +10,9 @@
 		BE1CFE932325722B0085E7FF /* MinimalGLViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1CFE922325722B0085E7FF /* MinimalGLViewController.swift */; };
 		BE35669B23255E8F00F0CD08 /* MinimalGLFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = BE35669923255E8F00F0CD08 /* MinimalGLFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BE3566A42325647E00F0CD08 /* MinimalGLC.h in Headers */ = {isa = PBXBuildFile; fileRef = BE3566A32325647E00F0CD08 /* MinimalGLC.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		BE3566A923256D5A00F0CD08 /* libMinimalGL.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE3566A823256D5A00F0CD08 /* libMinimalGL.a */; };
 		BE3566AB23256FC300F0CD08 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BE3566AA23256FC300F0CD08 /* libc++.tbd */; };
 		BEA0D5512326CDB200984B67 /* MinimalGL.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA0D5502326CDB200984B67 /* MinimalGL.swift */; };
+		BEA0D5532326CFB400984B67 /* libMinimalGL.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BEA0D5522326CFB400984B67 /* libMinimalGL.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,9 +21,9 @@
 		BE35669923255E8F00F0CD08 /* MinimalGLFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MinimalGLFramework.h; sourceTree = "<group>"; };
 		BE35669A23255E8F00F0CD08 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BE3566A32325647E00F0CD08 /* MinimalGLC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MinimalGLC.h; path = ../../../../src/native/MinimalGLC.h; sourceTree = "<group>"; };
-		BE3566A823256D5A00F0CD08 /* libMinimalGL.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMinimalGL.a; path = "../hxcpp-bin/libMinimalGL.a"; sourceTree = "<group>"; };
 		BE3566AA23256FC300F0CD08 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		BEA0D5502326CDB200984B67 /* MinimalGL.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MinimalGL.swift; sourceTree = "<group>"; };
+		BEA0D5522326CFB400984B67 /* libMinimalGL.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMinimalGL.a; path = "../_hxcpp-bin/libMinimalGL.a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,7 +32,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BE3566AB23256FC300F0CD08 /* libc++.tbd in Frameworks */,
-				BE3566A923256D5A00F0CD08 /* libMinimalGL.a in Frameworks */,
+				BEA0D5532326CFB400984B67 /* libMinimalGL.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -71,8 +71,8 @@
 		BE3566A723256D5A00F0CD08 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BEA0D5522326CFB400984B67 /* libMinimalGL.a */,
 				BE3566AA23256FC300F0CD08 /* libc++.tbd */,
-				BE3566A823256D5A00F0CD08 /* libMinimalGL.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
