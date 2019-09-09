@@ -1,36 +1,62 @@
 cmake_minimum_required(VERSION 3.4.1)
 
-# now build app's shared lib
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
-
 # Add the hxcpp generated lib
+set(HXCPP_LIB_NAME MinimalGL)
 set(APP_PROJECT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
 set(HXCPP_BIN_DIR ${APP_PROJECT_DIR}/../_hxcpp-bin)
-set(LIB_SUFFIX ${ANDROID_ABI})
 
-add_library(MinimalGL STATIC IMPORTED)
-set_target_properties(MinimalGL PROPERTIES IMPORTED_LOCATION ${HXCPP_BIN_DIR}/libMinimalGL-${LIB_SUFFIX}.a)
+# Hxcpp names architectures slightly differently to the Android build toolchain 
+if( ANDROID_ABI STREQUAL "armeabi-v7a" )
+    set(HXCPP_LIB_SUFFIX "v7")
+elseif( ANDROID_ABI STREQUAL "arm64-v8a" )
+    set(HXCPP_LIB_SUFFIX "64")
+else()
+    set(HXCPP_LIB_SUFFIX ${ANDROID_ABI})
+endif()
+
+# This variable references the hxcpp generated lib file
+set(HXCPP_LIB_FILE ${HXCPP_BIN_DIR}/lib${HXCPP_LIB_NAME}-${HXCPP_LIB_SUFFIX}.a)
+
+# Add a custom command to rebuild the hxcpp generated library
+add_custom_command(
+    OUTPUT ${HXCPP_LIB_FILE}
+    COMMENT "Hxcpp building ${HXCPP_LIB_FILE}"
+    WORKING_DIRECTORY ${APP_PROJECT_DIR}/../../../
+    COMMAND haxe android.hxml
+    USES_TERMINAL
+)
+add_custom_target(
+    HxcppBuild
+    DEPENDS ${HXCPP_LIB_FILE}
+)
+
+# Add the hxcpp generated lib file as a static library
+add_library(HxcppLib STATIC IMPORTED GLOBAL)
+set_target_properties(HxcppLib PROPERTIES IMPORTED_LOCATION ${HXCPP_LIB_FILE})
+add_dependencies(HxcppLib HxcppBuild)
 
 # To use the generated lib, we need to use a Java Native Interface wrapper
+# We create a new shared library to do this
 add_library(
-    MinimalGLJNI SHARED
+    MinimalGLJNIWrapper SHARED
     src/main/cpp/MinimalGLJNI.cpp
 )
 # Add the hxcpp generated include directory so we can call methods of the hxcpp generated lib
 target_include_directories(
-    MinimalGLJNI PRIVATE
+    MinimalGLJNIWrapper PRIVATE
     ${HXCPP_BIN_DIR}/include
 )
+# Set flags for building the wrapper
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
 
 # Link the JNI interface with our hxcpp library and android system libraries
 target_link_libraries(
-    MinimalGLJNI
+    MinimalGLJNIWrapper
     # Hxcpp generated
-    MinimalGL
+    HxcppLib
     # System libraries
     EGL
     GLESv2
     android
     log
 )
-

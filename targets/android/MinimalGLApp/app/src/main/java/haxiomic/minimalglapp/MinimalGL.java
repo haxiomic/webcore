@@ -5,7 +5,7 @@ package haxiomic.minimalglapp;
 public class MinimalGL {
 
     static {
-        System.loadLibrary("MinimalGLJNI");
+        System.loadLibrary("MinimalGLJNIWrapper");
     }
 
     long ptr;
