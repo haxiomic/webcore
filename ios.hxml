@@ -1,6 +1,6 @@
 LibMinimalGL
 
--cpp bin/ios
+-cpp targets/ios/_hxcpp-bin
 
 --class-path src
 --class-path lib/gluon
@@ -31,4 +31,4 @@ LibMinimalGL
 -D HXCPP_M64
 
 # Once the two architectures are built we can combine them into a single static library
---cmd lipo bin/ios/liboutput.iphoneos-64.a bin/ios/liboutput.a -create -output bin/ios/libMinimalGL.a
+--cmd lipo targets/ios/_hxcpp-bin/liboutput.iphoneos-64.a targets/ios/_hxcpp-bin/liboutput.a -create -output targets/ios/_hxcpp-bin/libMinimalGL.a
