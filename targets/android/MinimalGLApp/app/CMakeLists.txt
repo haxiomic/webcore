@@ -3,7 +3,7 @@
 # - Compiles the Java Native Interface wrapper that talks to the haxe native lib
 # - Links the wrapper with the haxe native lib and the required system libraries
 
-cmake_minimum_required(VERSION 3.4.1)
+cmake_minimum_required(VERSION 3.10.2)
 
 # Setup some variables to use later
 set(HXCPP_LIB_NAME MinimalGL)
@@ -30,17 +30,23 @@ else()
 endif()
 
 # This variable references the hxcpp generated lib file
-set(HXCPP_LIB_FILE ${HXCPP_BIN_DIR}/lib${HXCPP_LIB_NAME}-${HXCPP_LIB_SUFFIX}.a)
+set(HXCPP_LIB_FILENAME lib${HXCPP_LIB_NAME}-${HXCPP_LIB_SUFFIX}.a)
 
-# Tigger rebuild with hxcpp
-execute_process(
+# Add the hxcpp bin directory to library search path
+link_directories(${HXCPP_BIN_DIR})
+
+# To tigger rebuild with haxe and hxcpp we create a custom file generation command and custom target
+# then we add this target as a dependency of the main target
+add_custom_command(
+    OUTPUT ${HXCPP_LIB_FILENAME}
+    COMMAND haxe -D ${HXCPP_ARCH} build-lib.hxml
     WORKING_DIRECTORY ${APP_PROJECT_DIR}/..
-    COMMAND haxe -D ${HXCPP_ARCH} build-lib.hxml 
+    USES_TERMINAL
 )
-
-# Add the hxcpp generated lib file as a static library
-add_library(HxcppLib STATIC IMPORTED GLOBAL)
-set_target_properties(HxcppLib PROPERTIES IMPORTED_LOCATION ${HXCPP_LIB_FILE})
+add_custom_target(
+    CompileHaxeCode ALL
+    DEPENDS ${HXCPP_LIB_FILENAME}
+)
 
 # To use the generated lib, we need to use a Java Native Interface wrapper
 # We create a new shared library to do this
@@ -55,12 +61,14 @@ target_include_directories(
 )
 # Set flags for building the wrapper
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
+# Make CompileHaxeCode get executed when building by adding it as a dependency
+add_dependencies(MinimalGLJNIWrapper CompileHaxeCode)
 
 # Link the JNI interface with our hxcpp library and android system libraries
 target_link_libraries(
     MinimalGLJNIWrapper
     # Hxcpp generated
-    HxcppLib
+    ${HXCPP_LIB_FILENAME}
     # System libraries
     EGL
     GLESv2
