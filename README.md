@@ -31,7 +31,7 @@ If you forget to clone with submodules you can pull and update submodules at any
 
 #### Build & Run
 - Install Android Studio (I used 3.5)
-- Set the SDK directory to `~/SDKs/android-sdk/` on macOS & Linux and `C:\SDKs\android-sdk\`. If you want to place this elsewhere, see [Using a custom Android SDK location](using-a-custom-android-sdk-location).
+- Set the SDK directory to `~/SDKs/android-sdk/` on macOS & Linux and `C:\SDKs\android-sdk\`. If you want to place this elsewhere, see [Using a custom Android SDK location](#using-a-custom-android-sdk-location).
 - Install NDK 20 and CMake:
   - With Android Studio open to any project, click Tools > SDK Manager
   - Make sure an SDK platform is install (I used Android 9.0 but any should do)
