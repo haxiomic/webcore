@@ -22,9 +22,9 @@ If you forget to clone with submodules you can pull and update submodules at any
 
 #### Implementation Breakdown
 - A framework is used to create a Swift module wrapper for the static library see `platform/ios/MinimalGLFramework`
-- A Run Script in the framework is used to trigger a haxe rebuild of the static lib for the current architecture (x86_64 for simulator and arm64 for device)
-- The framework's Library Search Paths are set to point to the generated libs (and differ for iOS and simulator builds)
-- The framework link's with the haxe generated static library
+- A *Run Script* in the framework is used to trigger a haxe rebuild of the static lib for the current architecture (x86_64 for simulator and arm64 for device)
+- The framework's *Library Search Paths* are set to point to the generated libs (and differ for iOS and simulator builds)
+- The framework links with the haxe generated static library
 - The host app project embeds the framework project, this means the framework project (and haxe code) is recompiled when rebuilding the app (see `platform/ios/MinimalGLApp`)
 
 ### Android
@@ -34,7 +34,7 @@ If you forget to clone with submodules you can pull and update submodules at any
 - Set the SDK directory to `~/SDKs/android-sdk/` on macOS & Linux and `C:\SDKs\android-sdk\`. If you want to place this elsewhere, see [Using a custom Android SDK location](#using-a-custom-android-sdk-location).
 - Install NDK 20 and CMake:
   - With Android Studio open to any project, click Tools > SDK Manager
-  - Make sure an SDK platform is install (I used Android 9.0 but any should do)
+  - Make sure an SDK platform is installed (I used Android 9.0 but any should do)
   - From the SDK Tools tab check **NDK** and **CMake**
 
 - Open `platform/android/MinimalGLApp` with Android Studio (wait for gradle sync) and click Run (selecting either device or emulator)
@@ -47,7 +47,7 @@ If you forget to clone with submodules you can pull and update submodules at any
 
 ### Web
 
-Run `haxe web.hxml` then open `platform/web/index.html` to see the output
+- Run `haxe web.hxml` then open `platform/web/index.html` to see the output :)
 
 ## FAQ
 
