@@ -1,13 +1,13 @@
 /**
-	
+	This class adds the C-API to the hxcpp build
 **/
 
 #if !macro
 
 @:nativeGen
 @:structAccess
-@:build(LibMinimalGL.Macro.addCApi('native/MinimalGLC.h', 'native/MinimalGLC.cpp'))
-class LibMinimalGL {
+@:build(NativeApi.Macro.addCApi('native/MinimalGLC.h', 'native/MinimalGLC.cpp'))
+class NativeApi {
 
 	@:keep static public function create(): MinimalGL.MinimalGLNativeInterface {
 		var glContext = new gluon.es2.impl.ES2Context();

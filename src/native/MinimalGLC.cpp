@@ -8,7 +8,7 @@
 
 // hx/Native.h allows us to interface with the HXCPP generated code
 #include <hx/Native.h>
-#include <LibMinimalGL.h>
+#include <NativeApi.h>
 #include <MinimalGLNativeInterface.h>
 
 bool hxcppInitialized = false;
@@ -18,6 +18,7 @@ struct RefWrapper {
 };
 
 void* minimalGLCreate() {
+    // initialize the hxcpp GC if it's not already initialized
     if (!hxcppInitialized) {
         const char *result = hx::Init();
         if (result != 0) {
@@ -29,7 +30,7 @@ void* minimalGLCreate() {
     }
 
     hx::NativeAttach autoAttach;
-    hx::Native<MinimalGLNativeInterface*> component = LibMinimalGL::create();
+    hx::Native<MinimalGLNativeInterface*> component = NativeApi::create();
 
     RefWrapper* ptr = new RefWrapper();
     ptr->ref = component;

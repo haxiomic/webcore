@@ -5,7 +5,7 @@
 # This file is called by a 'Run Script' in MinimalGLFramework.xcodeproj > Build Phases > Run Script
 # When compiling, the required architecture flags are passed in by the Run Script
 
-LibMinimalGL
+NativeApi
 
 -cpp _hxcpp-bin
 

@@ -9,7 +9,7 @@
 # This file is called by CMakeLists.txt in MinimalGLApp/app
 # When compiling, the required architecture flag is passed in by CMakeList.txt
 
-LibMinimalGL
+NativeApi
 
 # C++ Android Target
 -cpp _hxcpp-bin
