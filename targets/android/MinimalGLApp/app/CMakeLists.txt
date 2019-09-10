@@ -6,9 +6,9 @@
 cmake_minimum_required(VERSION 3.10.2)
 
 # Setup some variables to use later
-set(HXCPP_LIB_NAME MinimalGL)
-set(APP_PROJECT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
-set(HXCPP_BIN_DIR ${APP_PROJECT_DIR}/../_hxcpp-bin)
+set(HXCPP_LIB_NAME MinimalGL) # this should match `HAXE_OUTPUT_PART` in the hxml
+set(PROJECT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
+set(HXCPP_BIN_DIR ${PROJECT_DIR}/../_hxcpp-bin)
 
 # Hxcpp names architectures slightly differently to the Android build toolchain so here we map between them
 if( ANDROID_ABI STREQUAL "armeabi-v7a" )
@@ -40,7 +40,7 @@ link_directories(${HXCPP_BIN_DIR})
 add_custom_command(
     OUTPUT ${HXCPP_LIB_FILENAME}
     COMMAND haxe -D ${HXCPP_ARCH} build-lib.hxml
-    WORKING_DIRECTORY ${APP_PROJECT_DIR}/..
+    WORKING_DIRECTORY ${PROJECT_DIR}/..
     USES_TERMINAL
 )
 add_custom_target(
@@ -48,22 +48,24 @@ add_custom_target(
     DEPENDS ${HXCPP_LIB_FILENAME}
 )
 
-# To use the generated lib, we need to use a Java Native Interface wrapper
-# We create a new shared library to do this
+# To use the generated lib, we need to use a Java Native Interface wrapper (we can't just call C functions directly like Swift can)
+# we create a new shared library to do this:
 add_library(
     MinimalGLJNIWrapper SHARED
     src/main/cpp/MinimalGLJNI.cpp
 )
-# Add the hxcpp generated include directory so we can call methods of the hxcpp generated lib
+# Make CompileHaxeCode get executed when building by adding it as a dependency
+add_dependencies(MinimalGLJNIWrapper CompileHaxeCode)
+# Add the hxcpp generated include directory so we can see methods of the hxcpp generated lib
 target_include_directories(
     MinimalGLJNIWrapper PRIVATE
     ${HXCPP_BIN_DIR}/include
 )
-# Set flags for building the wrapper
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
-# Make CompileHaxeCode get executed when building by adding it as a dependency
-add_dependencies(MinimalGLJNIWrapper CompileHaxeCode)
-
+# Set compiler flags for building the wrapper
+target_compile_options(
+    MinimalGLJNIWrapper PRIVATE
+    -std=c++11 -Wall
+)
 # Link the JNI interface with our hxcpp library and android system libraries
 target_link_libraries(
     MinimalGLJNIWrapper
