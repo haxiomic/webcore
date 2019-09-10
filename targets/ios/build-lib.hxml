@@ -27,7 +27,8 @@ LibMinimalGL
 
 -dce full
 
-# Finally we want to alias the lib into separate folders for simulator and iOS so that it's easy to select between them in Xcode
+# Finally we want to alias the libs into separate folders for simulator and iOS so that it's easy to select between them in Xcode
+# In Xcode, we change the Library Search Paths to simulator/ or ios/ depending on what's being built 
 -cmd mkdir -p _hxcpp-bin/simulator _hxcpp-bin/ios
 -cmd ln -sf ../libMinimalGL.iphoneos-64.a _hxcpp-bin/ios/libMinimalGL.a
 -cmd ln -sf ../libMinimalGL.iphonesim-64.a _hxcpp-bin/simulator/libMinimalGL.a
