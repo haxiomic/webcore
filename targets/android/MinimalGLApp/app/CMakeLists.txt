@@ -1,11 +1,16 @@
+# This CMake file does the following:
+# - Trigger haxe to recompile the lib
+# - Compiles the Java Native Interface wrapper that talks to the haxe native lib
+# - Links the wrapper with the haxe native lib and the required system libraries
+
 cmake_minimum_required(VERSION 3.4.1)
 
-# Add the hxcpp generated lib
+# Setup some variables to use later
 set(HXCPP_LIB_NAME MinimalGL)
 set(APP_PROJECT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
 set(HXCPP_BIN_DIR ${APP_PROJECT_DIR}/../_hxcpp-bin)
 
-# Hxcpp names architectures slightly differently to the Android build toolchain 
+# Hxcpp names architectures slightly differently to the Android build toolchain so here we map between them
 if( ANDROID_ABI STREQUAL "armeabi-v7a" )
     set(HXCPP_LIB_SUFFIX "v7")
     set(HXCPP_ARCH "HXCPP_ARMV7")

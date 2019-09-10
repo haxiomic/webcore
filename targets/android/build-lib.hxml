@@ -1,8 +1,13 @@
-# When HXCPP builds for android, is has to use the android toolchain
-# This complicates things because the toolchain must be installed separately
-# The simplest thing to do is to download Android Studio and install the SDK and NDK from:
-#   Preferences -> Appearance & Behavior -> System Settings -> Android SDK -> SDK Tools
-# This example was build with NDK 20.0.5594570, it should work with older versions, however newer versions that arrive in the future might require updates to HXCPP
+# Compile static libs for Android (using the Android NDK toolchain)
+# Tested with NDK 20.0.5594570 (newer versions may require a newer version of hxcpp)
+# For different architectures add the following:
+# `-D HXCPP_X86_64` for x86_64
+# `-D HXCPP_X86` for x86
+# `-D HXCPP_ARM64` for arm64-v8a
+# `-D HXCPP_ARMV7` for armeabi-v7a
+
+# This file is called by CMakeLists.txt in MinimalGLApp/app
+# When compiling, the required architecture flag is passed in by CMakeList.txt
 
 LibMinimalGL
 

@@ -1,3 +1,16 @@
+# This file primarily exists to help autocompletion
+# The main iOS hxml is targets/ios/build-lib.hxml and is called by the Xcode project when compiling
+# To use this file to generate output uncomment lines at the bottom
+
 --cwd targets/ios
 
 build-lib.hxml
+
+# Uncomment the following build libs for multiple architectures: iOS (arm64) and simulator (x86_64)
+# This is commented out because haxe autocomplete doesn't yet handle --next (see https://github.com/vshaxe/vshaxe/issues/378)
+# --each
+# -D iphoneos
+# -D HXCPP_ARM64
+# --next
+# -D iphonesim
+# -D HXCPP_M64

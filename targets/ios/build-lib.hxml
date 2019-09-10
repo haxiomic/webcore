@@ -2,6 +2,9 @@
 #   Add `-D iphoneos -D HXCPP_ARM64` to build for iOS devices
 #   Add `-D iphonesim -D HXCPP_M64` to build for iOS simulator
 
+# This file is called by a 'Run Script' in MinimalGLFramework.xcodeproj > Build Phases > Run Script
+# When compiling, the required architecture flags are passed in by the Run Script
+
 LibMinimalGL
 
 -cpp _hxcpp-bin
@@ -24,7 +27,7 @@ LibMinimalGL
 
 -dce full
 
-# Finally we want to alias the lib into separate folders for simulator and ios so that it's easy to select between them in Xcode
+# Finally we want to alias the lib into separate folders for simulator and iOS so that it's easy to select between them in Xcode
 -cmd mkdir -p _hxcpp-bin/simulator _hxcpp-bin/ios
 -cmd ln -sf ../libMinimalGL.iphoneos-64.a _hxcpp-bin/ios/libMinimalGL.a
 -cmd ln -sf ../libMinimalGL.iphonesim-64.a _hxcpp-bin/simulator/libMinimalGL.a
