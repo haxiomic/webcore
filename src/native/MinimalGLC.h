@@ -12,7 +12,7 @@ extern "C" {
 	void* minimalGLCreate();
 	void minimalGLDestroy(void* ptr);
 
-	void minimalGLFrame(void* ptr);
+	void minimalGLDrawFrame(void* ptr);
 
 #ifdef __cplusplus
 }

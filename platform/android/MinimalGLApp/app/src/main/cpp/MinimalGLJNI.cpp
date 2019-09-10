@@ -9,7 +9,7 @@
 
 extern "C" {
     JAVA_METHOD(jlong, create) (JNIEnv * env, jobject obj,  jint width, jint height);
-    JAVA_METHOD(void, frame) (JNIEnv * env, jobject obj, jlong ptr);
+    JAVA_METHOD(void, drawFrame) (JNIEnv * env, jobject obj, jlong ptr);
     JAVA_METHOD(void, destroy) (JNIEnv * env, jobject obj, jlong ptr);
 };
 
@@ -18,8 +18,8 @@ JAVA_METHOD(jlong, create) (JNIEnv * env, jobject obj,  jint width, jint height)
     return (jlong) minimalGLCreate();
 }
 
-JAVA_METHOD(void, frame) (JNIEnv * env, jobject obj, jlong ptr) {
-    minimalGLFrame((void*) ptr);
+JAVA_METHOD(void, drawFrame) (JNIEnv * env, jobject obj, jlong ptr) {
+    minimalGLDrawFrame((void*) ptr);
 }
 
 JAVA_METHOD(void, destroy) (JNIEnv * env, jobject obj, jlong ptr) {

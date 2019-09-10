@@ -59,7 +59,7 @@ public class MinimalGLViewController: GLKViewController {
         
         // let frameTime_s = CACurrentMediaTime()
         
-        minimalGL!.frame()
+        minimalGL!.drawFrame()
     }
     
     override public func viewDidLoad() {

@@ -18,8 +18,8 @@ public class MinimalGL {
         minimalGLDestroy(ptr)
     }
 
-    public func frame() {
-        minimalGLFrame(self.ptr)
+    public func drawFrame() {
+        minimalGLDrawFrame(self.ptr)
     }
     
 }

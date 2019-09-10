@@ -57,7 +57,7 @@ public class MainActivity extends Activity {
 		}
 
 		public void onDrawFrame(GL10 gl) {
-			minimalGL.frame();
+			minimalGL.drawFrame();
 		}
 
 	}

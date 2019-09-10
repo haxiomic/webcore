@@ -14,8 +14,8 @@ public class MinimalGL {
         ptr = create(width, height);
     }
 
-    public void frame() {
-        frame(ptr);
+    public void drawFrame() {
+        drawFrame(ptr);
     }
 
     public void destroy() {
@@ -24,7 +24,7 @@ public class MinimalGL {
 
     // these static methods are implemented in C++
     static native long create(int width, int height);
-    static native void frame(long ptr);
+    static native void drawFrame(long ptr);
     static native void destroy(long ptr);
 
 }

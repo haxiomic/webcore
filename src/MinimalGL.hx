@@ -11,7 +11,7 @@ class MinimalGL implements MinimalGLNativeInterface {
 		trace('MinimalGL created');
 	}
 
-	public function frame() {
+	public function drawFrame() {
 		var t_s = haxe.Timer.stamp();
 
 		// execute commands on the OpenGL context
@@ -27,6 +27,6 @@ class MinimalGL implements MinimalGLNativeInterface {
 @:nativeGen
 interface MinimalGLNativeInterface {
 
-	@:keep public function frame(): Void;
+	@:keep public function drawFrame(): Void;
 
 }

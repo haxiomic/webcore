@@ -43,6 +43,6 @@ void minimalGLDestroy(void* ptr) {
     delete ((RefWrapper*)ptr);
 }
 
-void minimalGLFrame(void* ptr) {
-    ((RefWrapper*)ptr)->ref->frame();
+void minimalGLDrawFrame(void* ptr) {
+    ((RefWrapper*)ptr)->ref->drawFrame();
 }
