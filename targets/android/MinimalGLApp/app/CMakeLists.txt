@@ -30,7 +30,7 @@ set(HXCPP_LIB_FILE ${HXCPP_BIN_DIR}/lib${HXCPP_LIB_NAME}-${HXCPP_LIB_SUFFIX}.a)
 # Tigger rebuild with hxcpp
 execute_process(
     WORKING_DIRECTORY ${APP_PROJECT_DIR}/..
-    COMMAND haxe -D ${HXCPP_ARCH} target.hxml 
+    COMMAND haxe -D ${HXCPP_ARCH} build-lib.hxml 
 )
 
 # Add the hxcpp generated lib file as a static library

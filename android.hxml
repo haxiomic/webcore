@@ -1,13 +1,13 @@
 --cwd targets/android
 
-target.hxml
+build-lib.hxml
 
 # Compile multiple architectures
---each
--D HXCPP_X86_64
---next
--D HXCPP_X86
---next
--D HXCPP_ARM64
---next
--D HXCPP_ARMV7
+# --each
+# -D HXCPP_X86_64
+# --next
+# -D HXCPP_X86
+# --next
+# -D HXCPP_ARM64
+# --next
+# -D HXCPP_ARMV7

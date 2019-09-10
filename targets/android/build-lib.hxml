@@ -18,6 +18,7 @@ LibMinimalGL
 # Build a static library as the output
 -D static_link
 
+# Name the lib
 -D HAXE_OUTPUT_PART=MinimalGL
 
 -dce full
