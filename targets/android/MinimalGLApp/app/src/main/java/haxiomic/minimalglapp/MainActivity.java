@@ -49,15 +49,15 @@ public class MainActivity extends Activity {
 
 		MinimalGL minimalGL;
 
-		public void onDrawFrame(GL10 gl) {
-			minimalGL.frame();
+		public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 		}
 
 		public void onSurfaceChanged(GL10 gl, int width, int height) {
 			minimalGL = new MinimalGL(width, height);
 		}
 
-		public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+		public void onDrawFrame(GL10 gl) {
+			minimalGL.frame();
 		}
 
 	}
