@@ -1,6 +1,8 @@
 # Let's just ignore the .idea folder completely for now
 .idea/
 
+.cxx/
+
 # Built application files
 *.apk
 *.ap_
