@@ -169,7 +169,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Run haxe ios.hxml to update the haxe-compiled native library\nset -x\n\ncd \"$PROJECT_DIR/../../../\"\n\nhaxe ios.hxml\n";
+			shellScript = "# Run haxe to update the haxe-compiled native library\nset -x\n\ncd \"$PROJECT_DIR/..\"\n\nif [ \"$ARCHS\" == \"arm64\" ]; then\n    haxe build-lib.hxml -D iphoneos -D HXCPP_ARM64\nelif [ \"$ARCHS\" == \"x86_64\" ]; then\n    haxe build-lib.hxml -D iphonesim -D HXCPP_M64\nelse\n    echo 'Haxe build script: unsupported arch \"$ARCHS\"'\n    exit 1\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -327,7 +327,9 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/../_hxcpp-bin";
+				LIBRARY_SEARCH_PATHS = "";
+				"LIBRARY_SEARCH_PATHS[sdk=iphoneos*]" = "$(PROJECT_DIR)/../_hxcpp-bin/ios";
+				"LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*]" = "$(PROJECT_DIR)/../_hxcpp-bin/simulator";
 				PRODUCT_BUNDLE_IDENTIFIER = haxiomic.MinimalGLFramework;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -355,7 +357,9 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/../_hxcpp-bin";
+				LIBRARY_SEARCH_PATHS = "";
+				"LIBRARY_SEARCH_PATHS[sdk=iphoneos*]" = "$(PROJECT_DIR)/../_hxcpp-bin/ios";
+				"LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*]" = "$(PROJECT_DIR)/../_hxcpp-bin/simulator";
 				PRODUCT_BUNDLE_IDENTIFIER = haxiomic.MinimalGLFramework;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
