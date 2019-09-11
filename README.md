@@ -49,6 +49,12 @@ If you forget to clone with submodules you can pull and update submodules at any
 
 - Run `haxe web.hxml` then open `platform/web/index.html` to see the output :)
 
+## Next Steps
+
+- Forward touch events
+- Handle display resize
+- Use a macro to generate the platform interface (i.e, generate Swift and Java interfaces for the C-API)
+
 ## FAQ
 
 ### Using a custom Android SDK location
