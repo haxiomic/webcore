@@ -1,4 +1,4 @@
-# Minimal Haxe OpenGL Example
+# Haxe Minimal Cross-Platform OpenGL Example
 
 **Core idea**: The haxe code compiles into a static library with a C-API. The haxe code's responsibility is to interface with cross-platform libraries to draw graphics and trigger audio and it doesn't need to be aware of the platform it's running on. For each target platform a host app is created in the platform's native toolkit. The host app links with the generated haxe library like any other native library and so is decoupled from the haxe source. Platform-specific code stays in the platform's native language, for example touch events are forwarded the haxe code via the C-API.
 
