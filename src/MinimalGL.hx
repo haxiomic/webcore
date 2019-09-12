@@ -21,7 +21,7 @@ class MinimalGL implements MinimalGLNativeInterface {
 			var vertexShader = compileShader(vertexShaderSource, VERTEX_SHADER);
 			var fragmentShader = compileShader(fragmentShaderSource, FRAGMENT_SHADER);
 			linkProgram(vertexShader, fragmentShader);
-		} catch (e: Any) {
+		} catch (e: String) {
 			trace(e);
 			NONE;
 		}
