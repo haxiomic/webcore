@@ -27,10 +27,11 @@ class MinimalGL implements MinimalGLNativeInterface {
 		}
 
 		// create triangle buffer
+		var angle = Math.PI * 2 / 3;
 		var trianglePositionArray = new Float32Array([
-			 0,  1,
-			 1, -1,
-			-1, -1,
+			Math.sin(angle * 0), Math.cos(angle * 0),
+			Math.sin(angle * 1), Math.cos(angle * 1),
+			Math.sin(angle * 2), Math.cos(angle * 2),
 		]);
 
 		triangleBuffer = gl.createBuffer();
@@ -92,7 +93,7 @@ class MinimalGL implements MinimalGLNativeInterface {
 		return program;
 	}
 
-	var vertexShaderSource = '
+	static var vertexShaderSource = '
 		attribute vec2 position;
 
 		varying vec2 vPosition;
@@ -103,13 +104,13 @@ class MinimalGL implements MinimalGLNativeInterface {
 		}
 	';
 
-	var fragmentShaderSource = '
+	static var fragmentShaderSource = '
 		precision highp float;
 
 		varying vec2 vPosition;
 
 		void main() {
-			gl_FragColor = vec4(abs(vPosition), 0., 1.);
+			gl_FragColor = vec4(abs(vPosition), 0.5, 1.);
 		}
 	';
 
