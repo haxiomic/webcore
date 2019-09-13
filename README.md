@@ -9,7 +9,7 @@ Using OpenGL requires linking with different libraries, using different headers 
 
 ## Getting Started
 
-- Install haxe 4, tested with [Haxe 4.0.0-rc.4](https://haxe.org/download/version/4.0.0-rc.4/)
+- Install haxe 4, tested with [Haxe 4.0.0-rc.5](https://haxe.org/download/version/4.0.0-rc.5/)
 - Clone this repository **with submodules**:  `git clone --recursive https://github.com/haxiomic/teach-your-monster-minimal-gl`
 
 If you forget to clone with submodules you can pull and update submodules at any time with `git submodule update --init --recursive`
