@@ -1,20 +1,17 @@
-# This file primarily exists to help autocompletion
 # The main android hxml is targets/android/build-lib.hxml and is called by CMake when compiling the android app
-# To use this file to generate output uncomment lines at the bottom
+# Running this file will generate lib files for all supported architectures in platform/android
 
 --cwd platform/android
 
 build-lib.hxml
 
--D HXCPP_X86_64
-
 # Compile for multiple architectures
 # This is commented out because haxe autocomplete doesn't yet handle --next (see https://github.com/vshaxe/vshaxe/issues/378)
-# --each
-# -D HXCPP_X86_64
-# --next
-# -D HXCPP_X86
-# --next
-# -D HXCPP_ARM64
-# --next
-# -D HXCPP_ARMV7
+--each
+-D HXCPP_X86_64
+--next
+-D HXCPP_X86
+--next
+-D HXCPP_ARM64
+--next
+-D HXCPP_ARMV7
