@@ -1,5 +1,6 @@
 # The main android hxml is targets/android/build-lib.hxml and is called by CMake when compiling the android app
 # Running this file will generate lib files for all supported architectures in platform/android
+# To see the app, open run the Android Studio project in platform/android
 
 --cwd platform/android
 

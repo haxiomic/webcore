@@ -1,5 +1,6 @@
 # The main iOS hxml is targets/ios/build-lib.hxml and is called by the Xcode project when compiling
 # Running this file will generate lib files for device and simulator in platform/ios
+# To see the app, open run the Xcode app project in platform/ios
 
 --cwd platform/ios
 
