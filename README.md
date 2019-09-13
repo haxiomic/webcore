@@ -1,5 +1,7 @@
 # Haxe Minimal Cross-Platform OpenGL Example
 
+<img src="https://user-images.githubusercontent.com/3742992/64806667-8fb9ce00-d58b-11e9-9f4a-bf82f83eeba9.png">
+
 **Core idea**: The haxe code compiles into a static library with a C-API. The haxe code's responsibility is to interface with cross-platform libraries to draw graphics and trigger audio and it doesn't need to be aware of the platform it's running on. For each target platform a host app is created in the platform's native toolkit. The host app links with the generated haxe library like any other native library and so is decoupled from the haxe source. Platform-specific code stays in the platform's native language, for example touch events are forwarded the haxe code via the C-API.
 
 In this example project, the host apps are empty apps with an OpenGL view. Each frame the host app calls `drawFrame()` on the generated lib's C-API, this triggers the haxe code to execute OpenGL commands. The host apps for each platform is stored in `platform/`. To compile the haxe code and run the app, open the host app project (in Xcode or Android Studio) and click run, this will trigger haxe to rebuild the static library.
