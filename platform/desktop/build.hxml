@@ -1,0 +1,13 @@
+--library hxcpp:4.0.52
+
+# MinimalGL source
+--class-path ../../lib/gluon
+--class-path ../../src
+
+--class-path lib/glfw
+--class-path src
+
+--main Main
+--cpp _hxcpp-bin
+
+-dce full

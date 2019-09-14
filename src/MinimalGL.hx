@@ -105,7 +105,10 @@ class MinimalGL implements MinimalGLNativeInterface {
 	';
 
 	static var fragmentShaderSource = '
+		#ifdef GL_ES
 		precision highp float;
+		precision highp sampler2D;
+		#endif
 
 		varying vec2 vPosition;
 
