@@ -5,7 +5,6 @@
 #if !macro
 
 @:nativeGen
-@:structAccess
 @:build(NativeApi.Macro.addCApi('native/MinimalGLC.h', 'native/MinimalGLC.cpp'))
 class NativeApi {
 
