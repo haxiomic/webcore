@@ -1,9 +1,9 @@
 import typedarray.Float32Array;
 import gluon.es2.GLBuffer;
 import gluon.es2.GLProgram;
-import haxe.Timer;
 import gluon.es2.GLShader;
 import gluon.es2.GLContext;
+import haxe.Timer;
 
 @:expose
 class MinimalGL implements MinimalGLNativeInterface {
