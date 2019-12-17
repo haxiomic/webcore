@@ -1,5 +1,5 @@
 # Build app without an entrypoint
-DemoApp
+MinimalGL
 -js platform/web/app.js
 
 --class-path src
