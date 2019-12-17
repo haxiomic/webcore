@@ -1,6 +1,6 @@
-# Build MinimalGL without an entrypoint
-MinimalGL
--js platform/web/minimalgl.js
+# Build app without an entrypoint
+DemoApp
+-js platform/web/app.js
 
 --class-path src
 --class-path lib/gluon

@@ -15,7 +15,7 @@
 		</style>
 	</head>
 	<body>
-		<script src="minimalgl.js"></script>
+		<script src="app.js"></script>
 		<script>
 			let pixelRatio = window.devicePixelRatio != null ? window.devicePixelRatio : 1;
 
@@ -63,12 +63,12 @@
 			canvas.addEventListener('webglcontextrestored', function() { console.log('webglcontextrestored') });
 
 			// initialize our minimal-gl example, supplying it with the OpenGL context
-			let minimalGl = new MinimalGL(gl);
+			let demoApp = new DemoApp(gl);
 
 			// native browser frame-loop
 			function frameLoop(t_ms) {
-				// tell MinimalGL to draw a frame 
-				minimalGl.drawFrame();
+				// tell app to draw a frame 
+				demoApp.drawFrame();
 
 				window.requestAnimationFrame(frameLoop);
 			}
