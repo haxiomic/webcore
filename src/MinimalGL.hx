@@ -1,3 +1,5 @@
+import audio.AudioNode.AudioBufferSourceNode;
+import audio.AudioContext;
 import typedarray.Float32Array;
 import gluon.es2.GLBuffer;
 import gluon.es2.GLProgram;
@@ -11,6 +13,10 @@ class MinimalGL implements MinimalGLNativeInterface {
 	final gl: GLContext;
 	final program: GLProgram;
 	final triangleBuffer: GLBuffer;
+
+	final audioContext: AudioContext;
+
+	final testBufferSource: AudioBufferSourceNode;
 
 	public function new(gl) {
 		this.gl = gl;
@@ -39,6 +45,24 @@ class MinimalGL implements MinimalGLNativeInterface {
 		gl.bufferData(ARRAY_BUFFER, trianglePositionArray, STATIC_DRAW);
 
 		gl.disable(CULL_FACE);
+
+		// test audio
+
+
+		var soundBytes = haxe.crypto.Base64.decode(audio.TestCase.base64);
+		
+		audioContext = new audio.AudioContext();
+		testBufferSource = audioContext.createBufferSource();
+
+		audioContext.decodeAudioData(soundBytes.getData(), (audioBuffer) -> {
+			trace('decoded audio buffer', audioBuffer);
+
+			testBufferSource.buffer = audioBuffer;
+			testBufferSource.connect(audioContext.destination);
+			testBufferSource.onended = () -> {
+				trace('testBufferSource.onended');
+			}
+		});	
 	}
 
 	public function drawFrame() {
@@ -53,6 +77,11 @@ class MinimalGL implements MinimalGLNativeInterface {
 		gl.vertexAttribPointer(0, 2, FLOAT, false, 0, 0);
 		gl.useProgram(program);
 		gl.drawArrays(TRIANGLES, 0, 3);
+	}
+
+	public function playAudio() {
+		trace('playAudio()');
+		testBufferSource.start();
 	}
 	
 	/**

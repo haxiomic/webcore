@@ -63,18 +63,22 @@
 			canvas.addEventListener('webglcontextrestored', function() { console.log('webglcontextrestored') });
 
 			// initialize our minimal-gl example, supplying it with the OpenGL context
-			let demoApp = new DemoApp(gl);
+			let haxeApp = new MinimalGL(gl);
 
 			// native browser frame-loop
 			function frameLoop(t_ms) {
 				// tell app to draw a frame 
-				demoApp.drawFrame();
+				haxeApp.drawFrame();
 
 				window.requestAnimationFrame(frameLoop);
 			}
 
 			// start the frame loop
 			frameLoop(window.performance.now());
+
+			document.body.addEventListener('click', () => {
+				haxeApp.playAudio();
+			});
 		</script>
 	</body>
 </html>
