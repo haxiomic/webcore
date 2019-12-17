@@ -6,7 +6,7 @@
 
 build-lib.hxml
 
-# Compile for multiple architectures
+# Build libs for multiple architectures: iOS (arm64) and simulator (x86_64)
 --each
 -D iphoneos
 -D HXCPP_ARM64
