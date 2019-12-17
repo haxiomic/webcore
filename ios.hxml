@@ -6,8 +6,7 @@
 
 build-lib.hxml
 
-# Uncomment the following build libs for multiple architectures: iOS (arm64) and simulator (x86_64)
-# This is commented out because haxe autocomplete doesn't yet handle --next (see https://github.com/vshaxe/vshaxe/issues/378)
+# Compile for multiple architectures
 --each
 -D iphoneos
 -D HXCPP_ARM64
