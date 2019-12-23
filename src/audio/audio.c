@@ -8,31 +8,29 @@
 #include "./miniaudio/miniaudio.h"
 
 /**
- * AudioDevice Implementation
+ * AudioOut Implementation
  */
 
 // called from audio thread
-void AudioDevice_dataCallback(ma_device* maDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
+void AudioOut_dataCallback(ma_device* maDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
     printf("data_callback %u \n", frameCount);
 
-    AudioDevice* device = (AudioDevice*) maDevice->pUserData;
+    AudioOut* audioOut = (AudioOut*) maDevice->pUserData;
 
     // @! we should copy out the callback pointers to minimize time with mutex held
-    ma_mutex_lock(&device->sourceListLock);
+    ma_mutex_lock(&audioOut->sourceListLock);
     {
+        AudioSourceListNode* currentSourceListNode = audioOut->sourceNext;
+        while (currentSourceListNode != NULL) {
+            // currentSourceListNode->source->readFramesCallback()
+            currentSourceListNode = currentSourceListNode->next;
+        }
     }
-    ma_mutex_unlock(&device->sourceListLock);
-
-    // @! need to account for thread-safe access of source list
-    // AudioSourceListNode* currentSourceListNode = device->sourceNext;
-    // while (currentSourceListNode != NULL) {
-    //     // currentSourceListNode->source->readFramesCallback()
-    //     currentSourceListNode = currentSourceListNode->next;
-    // }
+    ma_mutex_unlock(&audioOut->sourceListLock);
 }
 
-AudioDevice* AudioDevice_create(ma_result* pResult) {
-    AudioDevice* audioDevice = NULL;
+AudioOut* AudioOut_create(ma_result* pResult) {
+    AudioOut* audioOut = NULL;
     ma_device* maDevice = NULL;
 
     maDevice = (ma_device*)ma_malloc(sizeof(*maDevice));
@@ -42,20 +40,20 @@ AudioDevice* AudioDevice_create(ma_result* pResult) {
     }
     ma_zero_object(maDevice);
 
-    audioDevice = (AudioDevice*)ma_malloc(sizeof(*audioDevice));
-    if (audioDevice == NULL) {
+    audioOut = (AudioOut*)ma_malloc(sizeof(*audioOut));
+    if (audioOut == NULL) {
         *pResult = MA_OUT_OF_MEMORY;
         return NULL;
     }
-    ma_zero_object(audioDevice);
+    ma_zero_object(audioOut);
 
-    // initialize a miniaudio device
+    // initialize a miniaudio audioOut
     ma_device_config deviceConfig;
     deviceConfig = ma_device_config_init(ma_device_type_playback);
     // deviceConfig.playback.format = sampleFormat;
     // deviceConfig.playback.channels = channelCount;
     // deviceConfig.sampleRate = sampleRate;
-    deviceConfig.dataCallback = AudioDevice_dataCallback;
+    deviceConfig.dataCallback = AudioOut_dataCallback;
     deviceConfig.pUserData = NULL;
 
     (*pResult) = ma_device_init(NULL, &deviceConfig, maDevice);
@@ -63,31 +61,28 @@ AudioDevice* AudioDevice_create(ma_result* pResult) {
         return NULL;
     }
 
-    // setup audioDevice fields
-    audioDevice->maDevice = maDevice;
-    maDevice->pUserData = audioDevice;
-    (*pResult) = ma_mutex_init(maDevice->pContext, &audioDevice->sourceListLock);
+    // setup audioOut fields
+    audioOut->maDevice = maDevice;
+    maDevice->pUserData = audioOut;
+    (*pResult) = ma_mutex_init(maDevice->pContext, &audioOut->sourceListLock);
     if ((*pResult) != MA_SUCCESS) {
         return NULL;
     }
     
-    return audioDevice;
+    return audioOut;
 }
 
-void AudioDevice_destroy(AudioDevice* device) {
-    if (device != NULL) {
-        ma_device_uninit(device->maDevice);
-        ma_mutex_uninit(&device->sourceListLock);
+void AudioOut_destroy(AudioOut* audioOut) {
+    if (audioOut != NULL) {
+        ma_device_uninit(audioOut->maDevice);
+        ma_mutex_uninit(&audioOut->sourceListLock);
 
-        ma_free(device->maDevice);
-        ma_free(device);
+        ma_free(audioOut->maDevice);
+        ma_free(audioOut);
     }
 }
 
-/**
- * ! need to account for thread safe access of source list
- */
-ma_result AudioDevice_addSource(AudioDevice* device, AudioSource* source) {
+ma_result AudioOut_addSource(AudioOut* audioOut, AudioSource* source) {
     ma_result result = MA_SUCCESS;
 
     // create an empty list node
@@ -99,26 +94,26 @@ ma_result AudioDevice_addSource(AudioDevice* device, AudioSource* source) {
     ma_zero_object(newListNode);
     newListNode->source = source;
 
-    ma_mutex_lock(&device->sourceListLock);
+    ma_mutex_lock(&audioOut->sourceListLock);
     {
         // find last next-item pointer
-        AudioSourceListNode** currentSourceListNodePtr = &(device->sourceNext);
+        AudioSourceListNode** currentSourceListNodePtr = &(audioOut->sourceNext);
         while ((*currentSourceListNodePtr) != NULL) {
             currentSourceListNodePtr = &((*currentSourceListNodePtr)->next);
         }
         (*currentSourceListNodePtr) = newListNode;
     }
-    ma_mutex_unlock(&device->sourceListLock);
+    ma_mutex_unlock(&audioOut->sourceListLock);
 
     return result;
 }
 
-void AudioDevice_removeSource(AudioDevice* device, AudioSource* source) {
-    ma_mutex_lock(&device->sourceListLock);
+void AudioOut_removeSource(AudioOut* audioOut, AudioSource* source) {
+    ma_mutex_lock(&audioOut->sourceListLock);
     {
         // iterate list searching for source and remove when found
-        AudioSourceListNode** parentSourceListNodePtr = &(device->sourceNext);
-        AudioSourceListNode* currentSourceListNode = device->sourceNext;
+        AudioSourceListNode** parentSourceListNodePtr = &(audioOut->sourceNext);
+        AudioSourceListNode* currentSourceListNode = audioOut->sourceNext;
         while (currentSourceListNode != NULL) {
 
             if (currentSourceListNode->source == source) {
@@ -132,21 +127,21 @@ void AudioDevice_removeSource(AudioDevice* device, AudioSource* source) {
             currentSourceListNode = currentSourceListNode->next;
         }
     }
-    ma_mutex_unlock(&device->sourceListLock);
+    ma_mutex_unlock(&audioOut->sourceListLock);
 }
 
-int AudioDevice_sourceCount(AudioDevice* device) {
+int AudioOut_sourceCount(AudioOut* audioOut) {
     int count = 0;
 
-    ma_mutex_lock(&device->sourceListLock);
+    ma_mutex_lock(&audioOut->sourceListLock);
     {
-        AudioSourceListNode* currentSourceListNode = device->sourceNext;
+        AudioSourceListNode* currentSourceListNode = audioOut->sourceNext;
         while (currentSourceListNode != NULL) {
             count++;
             currentSourceListNode = currentSourceListNode->next;
         }
     }
-    ma_mutex_unlock(&device->sourceListLock);
+    ma_mutex_unlock(&audioOut->sourceListLock);
 
     return count;
 }

@@ -28,23 +28,23 @@ typedef struct AudioSourceListNode {
 } AudioSourceListNode;
 
 /**
- * AudioDevice Structure
+ * AudioOut Structure
  */
 typedef struct {
     ma_device* maDevice;
     ma_mutex sourceListLock; // acquire when accessing sourceNext list
     AudioSourceListNode* sourceNext;
-} AudioDevice;
+} AudioOut;
 
 /**
- * AudioDevice Methods
+ * AudioOut Methods
  */
-AudioDevice* AudioDevice_create(ma_result* result);
-void AudioDevice_destroy(AudioDevice* device);
+AudioOut* AudioOut_create(ma_result* result);
+void AudioOut_destroy(AudioOut* output);
 
-ma_result AudioDevice_addSource(AudioDevice* device, AudioSource* source);
-void AudioDevice_removeSource(AudioDevice* device, AudioSource* source);
-int AudioDevice_sourceCount(AudioDevice* device);
+ma_result AudioOut_addSource(AudioOut* output, AudioSource* source);
+void AudioOut_removeSource(AudioOut* output, AudioSource* source);
+int AudioOut_sourceCount(AudioOut* output);
 
 #ifdef __cplusplus
 }
