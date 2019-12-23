@@ -57,10 +57,10 @@ extern enum abstract Format(MaFormat) {
     I like to keep these explicitly defined because they're used as a key into a lookup table. When items are
     added to this, make sure there are no gaps and that they're added to the lookup table in ma_get_bytes_per_sample().
     */
-    @:native('ma_format_unknown') var FORMAT_UNKNOWN;     /* Mainly used for indicating an error, but also used as the default for the output format for decoders. */
+    @:native('ma_format_unknown') var FORMAT_UNKNOWN; /* Mainly used for indicating an error, but also used as the default for the output format for decoders. */
     @:native('ma_format_u8') var FORMAT_U8;     
-    @:native('ma_format_s16') var FORMAT_S16;         /* Seems to be the most widely supported format. */
-    @:native('ma_format_s24') var FORMAT_S24;         /* Tightly packed. 3 bytes per sample. */
+    @:native('ma_format_s16') var FORMAT_S16; /* Seems to be the most widely supported format. */
+    @:native('ma_format_s24') var FORMAT_S24; /* Tightly packed. 3 bytes per sample. */
     @:native('ma_format_s32') var FORMAT_S32;    
     @:native('ma_format_f32') var FORMAT_F32;    
     @:native('ma_format_count') var FORMAT_COUNT;
@@ -69,6 +69,17 @@ extern enum abstract Format(MaFormat) {
 @:sourceFile('./miniaudio_implementation.c')
 @:native('ma_format') @:unreflective
 private extern class MaFormat {}
+
+extern enum abstract DeviceType(MaDeviceType) {
+    @:native('ma_device_type_playback') var PLAYBACK;
+    @:native('ma_device_type_capture') var CAPTURE;
+    @:native('ma_device_type_duplex') var DUPLEX;
+    @:native('ma_device_type_loopback') var LOOPBACK;
+}
+@:include('./miniaudio_include.h')
+@:sourceFile('./miniaudio_implementation.c')
+@:native('ma_device_type') @:unreflective
+private extern class MaDeviceType {}
 
 @:include('./miniaudio_include.h')
 @:sourceFile('./miniaudio_implementation.c')
@@ -191,17 +202,17 @@ extern class Context {
     // ma_log_proc logCallback;
     var threadPriority: ThreadPriority;
     var pUserData: Star<cpp.Void>;
-    var deviceEnumLock: Mutex;               /* Used to make ma_context_get_devices() thread safe. */
-    var deviceInfoLock: Mutex;               /* Used to make ma_context_get_device_info() thread safe. */
-    var deviceInfoCapacity: UInt32;          /* Total capacity of pDeviceInfos. */
+    var deviceEnumLock: Mutex; /* Used to make ma_context_get_devices() thread safe. */
+    var deviceInfoLock: Mutex; /* Used to make ma_context_get_device_info() thread safe. */
+    var deviceInfoCapacity: UInt32; /* Total capacity of pDeviceInfos. */
     var playbackDeviceInfoCount: UInt32;
     var captureDeviceInfoCount: UInt32;
-    var pDeviceInfos: Star<DeviceInfo>;      /* Playback devices first, then capture. */
-    var isBackendAsynchronous: Bool;   /* Set when the context is initialized. Set to 1 for asynchronous backends such as Core Audio and JACK. Do not modify. */
+    var pDeviceInfos: Star<DeviceInfo>; /* Playback devices first, then capture. */
+    var isBackendAsynchronous: Bool; /* Set when the context is initialized. Set to 1 for asynchronous backends such as Core Audio and JACK. Do not modify. */
 
     // ma_result (* onUninit        )(ma_context* pContext);
     // ma_bool32 (* onDeviceIDEqual )(ma_context* pContext, const ma_device_id* pID0, const ma_device_id* pID1);
-    // ma_result (* onEnumDevices   )(ma_context* pContext, ma_enum_devices_callback_proc callback, void* pUserData);    /* Return false from the callback to stop enumeration. */
+    // ma_result (* onEnumDevices   )(ma_context* pContext, ma_enum_devices_callback_proc callback, void* pUserData); /* Return false from the callback to stop enumeration. */
     // ma_result (* onGetDeviceInfo )(ma_context* pContext, ma_device_type deviceType, const ma_device_id* pDeviceID, ma_share_mode shareMode, ma_device_info* pDeviceInfo);
     // ma_result (* onDeviceInit    )(ma_context* pContext, const ma_device_config* pConfig, ma_device* pDevice);
     // void      (* onDeviceUninit  )(ma_device* pDevice);
@@ -209,23 +220,111 @@ extern class Context {
     // ma_result (* onDeviceStop    )(ma_device* pDevice);
     // ma_result (* onDeviceMainLoop)(ma_device* pDevice);
 
+    @:native('~ma_context')
+    function free(): Void;
+
     @:native('new ma_context')
     static function alloc(): Star<Context>;
 
-    @:native('delete ma_context')
-    static function free(): Star<Context>;
+    static inline function init(?backends: Array<Backend>, config: Star<ContextConfig>, context: Star<Context>): Star<Context> {
+        var backendCount = backends != null ? backends.length : 0;
+        var backendsPointer = backends == null ? null : NativeArray.address(backends, 0);
+        return untyped __global__.ma_context_init(backendsPointer, backendCount, config, context);
+    }
 
-    static inline function init(?backends: Array<Backend>, config: Star<ContextConfig>): Star<Context> {
+    @:native('ma_context_uninit')
+    static function uninit(context: Star<Context>): Result;
+
+}
+
+@:include('./miniaudio_include.h')
+@:sourceFile('./miniaudio_implementation.c')
+@:native('ma_device') @:unreflective
+@:structAccess
+extern class Device {
+
+    var pContext: Star<Context>;
+    var type: DeviceType;
+    var sampleRate: UInt32;
+    var state: UInt32;
+    // ma_device_callback_proc onData;
+    // ma_stop_proc onStop;
+    var pUserData: Star<cpp.Void>;
+    var lock: Mutex;
+    var wakeupEvent: Event;
+    var startEvent: Event;
+    var stopEvent: Event;
+    var thread: Thread;
+    var workResult: Result; /* This is set by the worker thread after it's finished doing a job. */
+    var usingDefaultSampleRate: Bool;
+    var usingDefaultBufferSize: Bool;
+    var usingDefaultPeriods: Bool;
+    var isOwnerOfContext: Bool; /* When set to true, uninitializing the device will also uninitialize the context. Set to true when NULL is passed into ma_device_init(). */
+    var noPreZeroedOutputBuffer: Bool;
+    var noClip: Bool;
+    var masterVolumeFactor: cpp.Float32;
+    // struct
+    // {
+    //     char name[256]; /* Maybe temporary. Likely to be replaced with a query API. */
+    //     ma_share_mode shareMode; /* Set to whatever was passed in when the device was initialized. */
+    //     ma_bool32 usingDefaultFormat     : 1;
+    //     ma_bool32 usingDefaultChannels   : 1;
+    //     ma_bool32 usingDefaultChannelMap : 1;
+    //     ma_format format;
+    //     ma_uint32 channels;
+    //     ma_channel channelMap[MA_MAX_CHANNELS];
+    //     ma_format internalFormat;
+    //     ma_uint32 internalChannels;
+    //     ma_uint32 internalSampleRate;
+    //     ma_channel internalChannelMap[MA_MAX_CHANNELS];
+    //     ma_uint32 internalBufferSizeInFrames;
+    //     ma_uint32 internalPeriods;
+    //     ma_pcm_converter converter;
+    //     ma_uint32 _dspFrameCount; /* Internal use only. Used as the data source when reading from the device. */
+    //     const ma_uint8* _dspFrames; /* ^^^ AS ABOVE ^^^ */
+    // } playback;
+    // struct
+    // {
+    //     char name[256]; /* Maybe temporary. Likely to be replaced with a query API. */
+    //     ma_share_mode shareMode; /* Set to whatever was passed in when the device was initialized. */
+    //     ma_bool32 usingDefaultFormat     : 1;
+    //     ma_bool32 usingDefaultChannels   : 1;
+    //     ma_bool32 usingDefaultChannelMap : 1;
+    //     ma_format format;
+    //     ma_uint32 channels;
+    //     ma_channel channelMap[MA_MAX_CHANNELS];
+    //     ma_format internalFormat;
+    //     ma_uint32 internalChannels;
+    //     ma_uint32 internalSampleRate;
+    //     ma_channel internalChannelMap[MA_MAX_CHANNELS];
+    //     ma_uint32 internalBufferSizeInFrames;
+    //     ma_uint32 internalPeriods;
+    //     ma_pcm_converter converter;
+    //     ma_uint32 _dspFrameCount; /* Internal use only. Used as the data source when reading from the device. */
+    //     const ma_uint8* _dspFrames; /* ^^^ AS ABOVE ^^^ */
+    // } capture;
+
+    // ma_result ma_device_init(ma_context* pContext, const ma_device_config* pConfig, ma_device* pDevice);
+
+    @:native('~ma_device')
+    function free(): Void;
+
+    @:native('new ma_device')
+    static function alloc(): Star<Context>;
+
+    static inline function init(?backends: Array<Backend>, config: Star<ContextConfig>): Star<Device> {
         var backendCount = backends != null ? backends.length : 0;
         var backendsPointer = backends == null ? null : NativeArray.address(backends, 0);
         var contextPointer = alloc();
-        var result: Result = untyped __global__.ma_context_init(backendsPointer, backendCount, config, contextPointer);
+        var result: Result = untyped __global__.ma_device_init(backendsPointer, backendCount, config, contextPointer);
         if (result != SUCCESS) {
             throw 'Failed to initialize miniaudio context: ${(result.toString())}';
         }
         return contextPointer;
     }
 
+    @:native('ma_device_uninit')
+    static function uninit(context: Star<Context>): Result;
 }
 
 @:include('./miniaudio_include.h')
