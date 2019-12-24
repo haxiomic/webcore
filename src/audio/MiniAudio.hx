@@ -256,6 +256,8 @@ extern class PlaybackInfo {
     //     const ma_uint8* _dspFrames; /* ^^^ AS ABOVE ^^^ */
 }
 
+typedef CaptureInfo = PlaybackInfo;
+
 @:include('./audio.h')
 @:sourceFile('./audio.c')
 @:native('ma_device') @:unreflective
@@ -284,6 +286,7 @@ extern class Device {
     var masterVolumeFactor: cpp.Float32;
 
     var playback: PlaybackInfo;
+    var capture: CaptureInfo;
 
     inline function start(): Result {
         return untyped __global__.ma_device_start(this);
@@ -293,33 +296,6 @@ extern class Device {
         return untyped __global__.ma_device_stop(this);
     }
 
-    // struct
-    // {
-    //     char name[256]; /* Maybe temporary. Likely to be replaced with a query API. */
-    //     ma_share_mode shareMode; /* Set to whatever was passed in when the device was initialized. */
-    //     ma_bool32 usingDefaultFormat     : 1;
-    //     ma_bool32 usingDefaultChannels   : 1;
-    //     ma_bool32 usingDefaultChannelMap : 1;
-    //     ma_format format;
-    //     ma_uint32 channels;
-    //     ma_channel channelMap[MA_MAX_CHANNELS];
-    //     ma_format internalFormat;
-    //     ma_uint32 internalChannels;
-    //     ma_uint32 internalSampleRate;
-    //     ma_channel internalChannelMap[MA_MAX_CHANNELS];
-    //     ma_uint32 internalBufferSizeInFrames;
-    //     ma_uint32 internalPeriods;
-    //     ma_pcm_converter converter;
-    //     ma_uint32 _dspFrameCount; /* Internal use only. Used as the data source when reading from the device. */
-    //     const ma_uint8* _dspFrames; /* ^^^ AS ABOVE ^^^ */
-    // } capture;
-
-    @:native('~ma_device')
-    function free(): Void;
-
-    @:native('new ma_device')
-    static function alloc(): Star<Device>;
-
 }
 
 @:include('./audio.h')
@@ -328,7 +304,7 @@ extern class Device {
 @:structAccess
 extern class DeviceInfo {
     /* Basic info. This is the only information guaranteed to be filled in during device enumeration. */
-    // var id: Any; // backend dependent
+    // var id: Any; // type is backend dependent
 
     /*
     Detailed info. As much of this is filled as possible with ma_context_get_device_info(). Note that you are allowed to initialize
