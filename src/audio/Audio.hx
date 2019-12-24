@@ -64,15 +64,10 @@ extern class AudioOut {
 @:structAccess
 extern class AudioSource {
 
-}
+    @:native('AudioSource_createFileSource')
+    static function createFileSource(path: ConstCharStar, outputFormat: MiniAudio.Format, channelCount: UInt32, sampleRate: UInt32, result: Star<MiniAudio.Result>): Star<AudioSource>;
 
-/**
- *
- */
-class FileSource {
-
-    public function new(path: String) {
-
-    }
+    @:native('AudioSource_destroy')
+    static function destroy(audioSource: Star<AudioOut>): Void;
 
 }

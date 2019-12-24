@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include "./audio.h"
 
+// decoders
+#define DR_MP3_IMPLEMENTATION
+#include "./miniaudio/extras/dr_mp3.h"
+
 #ifdef HXCPP_DEBUG
     #define MA_DEBUG_OUTPUT
 #endif
@@ -8,21 +12,65 @@
 #include "./miniaudio/miniaudio.h"
 
 /**
+ * AudioSource Implementation
+ */
+AudioSource* AudioSource_createFileSource(const char* path, ma_format outputFormat, ma_uint32 channelCount, ma_uint32 sampleRate, ma_result* pResult) {
+    AudioSource* audioSource;
+
+    printf(path);
+
+    audioSource = (AudioSource*)ma_malloc(sizeof(*audioSource));
+    if (audioSource == NULL) {
+        (*pResult) = MA_OUT_OF_MEMORY;
+        return NULL;
+    }
+    ma_zero_object(audioSource);
+
+    audioSource->maDecoder = (ma_decoder*)ma_malloc(sizeof(*audioSource->maDecoder));
+    if (audioSource->maDecoder == NULL) {
+        (*pResult) = MA_OUT_OF_MEMORY;
+        return NULL;
+    }
+    ma_zero_object(audioSource->maDecoder);
+
+    ma_decoder_config decoderConfig = ma_decoder_config_init(outputFormat, channelCount, sampleRate);
+
+    (*pResult) = ma_decoder_init_file(path, &decoderConfig, audioSource->maDecoder);
+
+    if ((*pResult) != MA_SUCCESS) {
+        ma_decoder_uninit(&audioSource->maDecoder);
+        return NULL;
+    }
+
+    return audioSource;
+}
+
+void AudioSource_destroy(AudioSource* audioSource) {
+    ma_decoder_uninit(audioSource->maDecoder);
+    ma_free(audioSource->maDecoder);
+    ma_free(audioSource);
+}
+
+/**
  * AudioOut Implementation
  */
 
 // called from audio thread
 void AudioOut_dataCallback(ma_device* maDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
-    printf("data_callback %u \n", frameCount);
-
     AudioOut* audioOut = (AudioOut*) maDevice->pUserData;
 
     // @! we should copy out the callback pointers to minimize time with mutex held
+    // @! currently: this assumes just a single source, no mixing
     ma_mutex_lock(&audioOut->sourceListLock);
     {
         AudioSourceListNode* currentSourceListNode = audioOut->sourceNext;
         while (currentSourceListNode != NULL) {
-            // currentSourceListNode->source->readFramesCallback()
+
+            ma_assert(currentSourceListNode->item != NULL);
+            ma_assert(currentSourceListNode->item->maDecoder != NULL);
+            
+            ma_decoder_read_pcm_frames(currentSourceListNode->item->maDecoder, pOutput, frameCount);
+
             currentSourceListNode = currentSourceListNode->next;
         }
     }
@@ -31,14 +79,6 @@ void AudioOut_dataCallback(ma_device* maDevice, void* pOutput, const void* pInpu
 
 AudioOut* AudioOut_create(ma_result* pResult) {
     AudioOut* audioOut = NULL;
-    ma_device* maDevice = NULL;
-
-    maDevice = (ma_device*)ma_malloc(sizeof(*maDevice));
-    if (maDevice == NULL) {
-        *pResult = MA_OUT_OF_MEMORY;
-        return NULL;
-    }
-    ma_zero_object(maDevice);
 
     audioOut = (AudioOut*)ma_malloc(sizeof(*audioOut));
     if (audioOut == NULL) {
@@ -47,25 +87,33 @@ AudioOut* AudioOut_create(ma_result* pResult) {
     }
     ma_zero_object(audioOut);
 
-    // initialize a miniaudio audioOut
-    ma_device_config deviceConfig;
-    deviceConfig = ma_device_config_init(ma_device_type_playback);
+    audioOut->maDevice = (ma_device*)ma_malloc(sizeof(*audioOut->maDevice));
+    if (audioOut->maDevice == NULL) {
+        *pResult = MA_OUT_OF_MEMORY;
+        return NULL;
+    }
+    ma_zero_object(audioOut->maDevice);
+
+    // initialize a miniaudio device
+    ma_device_config deviceConfig = ma_device_config_init(ma_device_type_playback);
     // deviceConfig.playback.format = sampleFormat;
     // deviceConfig.playback.channels = channelCount;
     // deviceConfig.sampleRate = sampleRate;
     deviceConfig.dataCallback = AudioOut_dataCallback;
     deviceConfig.pUserData = NULL;
 
-    (*pResult) = ma_device_init(NULL, &deviceConfig, maDevice);
+    (*pResult) = ma_device_init(NULL, &deviceConfig, audioOut->maDevice);
     if ((*pResult) != MA_SUCCESS) {
+        ma_device_uninit(audioOut->maDevice);
         return NULL;
     }
 
-    // setup audioOut fields
-    audioOut->maDevice = maDevice;
-    maDevice->pUserData = audioOut;
-    (*pResult) = ma_mutex_init(maDevice->pContext, &audioOut->sourceListLock);
+    audioOut->maDevice->pUserData = audioOut;
+
+    // initialize audioOut fields
+    (*pResult) = ma_mutex_init(audioOut->maDevice->pContext, &audioOut->sourceListLock);
     if ((*pResult) != MA_SUCCESS) {
+        ma_mutex_uninit(&audioOut->sourceListLock);
         return NULL;
     }
     
@@ -73,13 +121,11 @@ AudioOut* AudioOut_create(ma_result* pResult) {
 }
 
 void AudioOut_destroy(AudioOut* audioOut) {
-    if (audioOut != NULL) {
-        ma_device_uninit(audioOut->maDevice);
-        ma_mutex_uninit(&audioOut->sourceListLock);
+    ma_device_uninit(audioOut->maDevice);
+    ma_mutex_uninit(&audioOut->sourceListLock);
 
-        ma_free(audioOut->maDevice);
-        ma_free(audioOut);
-    }
+    ma_free(audioOut->maDevice);
+    ma_free(audioOut);
 }
 
 ma_result AudioOut_addSource(AudioOut* audioOut, AudioSource* source) {
@@ -92,7 +138,7 @@ ma_result AudioOut_addSource(AudioOut* audioOut, AudioSource* source) {
         return MA_OUT_OF_MEMORY;
     }
     ma_zero_object(newListNode);
-    newListNode->source = source;
+    newListNode->item = source;
 
     ma_mutex_lock(&audioOut->sourceListLock);
     {
@@ -116,7 +162,7 @@ void AudioOut_removeSource(AudioOut* audioOut, AudioSource* source) {
         AudioSourceListNode* currentSourceListNode = audioOut->sourceNext;
         while (currentSourceListNode != NULL) {
 
-            if (currentSourceListNode->source == source) {
+            if (currentSourceListNode->item == source) {
                 // found, link the parent pointer to the current's next, then free the current node since it's finished with
                 *(parentSourceListNodePtr) = currentSourceListNode->next;
                 ma_free(currentSourceListNode);

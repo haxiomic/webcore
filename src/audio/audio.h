@@ -13,17 +13,21 @@
 extern "C" {
 #endif
 
-typedef void (*ReadFrames)(int16_t* buffer, uint32_t frameCount);
-
 /**
  * AudioSource Structure
  */
 typedef struct {
-    ReadFrames readFramesCallback;
+    ma_decoder* maDecoder;
 } AudioSource;
 
+/**
+ * AudioSource Methods
+ */
+AudioSource* AudioSource_createFileSource(const char* path, ma_format outputFormat, ma_uint32 channelCount, ma_uint32 sampleRate, ma_result* pResult);
+void AudioSource_destroy(AudioSource* audioSource);
+
 typedef struct AudioSourceListNode {
-    AudioSource* source;
+    AudioSource* item;
     struct AudioSourceListNode* next;
 } AudioSourceListNode;
 

@@ -1,5 +1,5 @@
-import audio.AudioNode.AudioBufferSourceNode;
-import audio.AudioContext;
+import audio.MiniAudio;
+import audio.Audio;
 import typedarray.Float32Array;
 import gluon.es2.GLBuffer;
 import gluon.es2.GLProgram;
@@ -13,10 +13,6 @@ class MinimalGL implements MinimalGLNativeInterface {
 	final gl: GLContext;
 	final program: GLProgram;
 	final triangleBuffer: GLBuffer;
-
-	final audioContext: AudioContext;
-
-	final testBufferSource: AudioBufferSourceNode;
 
 	public function new(gl) {
 		this.gl = gl;
@@ -46,9 +42,64 @@ class MinimalGL implements MinimalGLNativeInterface {
 
 		gl.disable(CULL_FACE);
 
-		// test audio
+		var result: audio.MiniAudio.Result = null;
+		var audioOut = AudioOut.create(result);
+		Console.examine('audioOut', result);
+		
+		if (audioOut != null) {
+			Console.examine(audioOut.maDevice.sampleRate);
+			Console.examine(audioOut.maDevice.pContext.backend);
+			Console.examine(audioOut.maDevice.playback.format);
+			Console.examine(audioOut.maDevice.playback.internalFormat);
+			Console.examine(audioOut.maDevice.playback.channels);
+			Console.examine(audioOut.maDevice.playback.internalChannels);
+			Console.examine(audioOut.sourceCount());
+		}
+
+		var fileSource = AudioSource.createFileSource(
+			'/Users/geo/Projects/teach-your-monster-native-media/src/audio/soul_short.mp3',
+			audioOut.maDevice.playback.format,
+			audioOut.maDevice.playback.channels,
+			audioOut.maDevice.sampleRate,
+			result
+		);
+		Console.examine('fileSource', result, fileSource);
+
+		// test add null source
+		Console.examine(audioOut.addSource(null), audioOut.sourceCount());
+		audioOut.removeSource(null);
+		Console.examine(audioOut.sourceCount());
+
+		if (fileSource != null) {
+			Console.log('Testing source');
+			audioOut.addSource(fileSource);
+			audioOut.addSource(fileSource);
+
+			Console.examine(audioOut.sourceCount());
+
+			audioOut.removeSource(fileSource);
+			audioOut.removeSource(fileSource);
+			audioOut.removeSource(fileSource);
+
+			Console.examine(audioOut.sourceCount());
+
+			audioOut.addSource(fileSource);
+			audioOut.start();
+		}
 
 
+		Timer.delay(() -> {
+			Console.log('Destorying audioDevice');
+			AudioOut.destroy(audioOut);
+		}, 4000);
+
+		// AudioDevice.destroy(audioDevice);
+
+		/*
+		final audioContext: AudioContext;
+
+		final testBufferSource: AudioBufferSourceNode;
+		// test WebAudio API
 		var soundBytes = haxe.crypto.Base64.decode(audio.TestCase.base64);
 		
 		audioContext = new audio.AudioContext();
@@ -63,6 +114,7 @@ class MinimalGL implements MinimalGLNativeInterface {
 				trace('testBufferSource.onended');
 			}
 		});	
+		*/
 	}
 
 	public function drawFrame() {
@@ -77,11 +129,6 @@ class MinimalGL implements MinimalGLNativeInterface {
 		gl.vertexAttribPointer(0, 2, FLOAT, false, 0, 0);
 		gl.useProgram(program);
 		gl.drawArrays(TRIANGLES, 0, 3);
-	}
-
-	public function playAudio() {
-		trace('playAudio()');
-		testBufferSource.start();
 	}
 	
 	/**
