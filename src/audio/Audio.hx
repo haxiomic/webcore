@@ -4,8 +4,6 @@ import audio.MiniAudio.Result;
 import cpp.*;
 
 class Audio {
-
-
 }
 
 @:include('./audio.h')
@@ -38,22 +36,20 @@ extern class AudioOut {
         return untyped __global__.AudioOut_sourceCount(this);
     }
 
-    /*
-    inline function get_volume(): Float32 {
-        return untyped __global__.AudioOut_getVolume(this);
+    /**
+     * @throws String if failed to create the output
+     **/
+    static inline function create(): Star<AudioOut> {
+        var result: Result = ERROR;
+        var audioOut = untyped  __global__.AudioOut_create(Native.addressOf(result));
+        if (result != SUCCESS || audioOut == null) {
+            throw 'Failed to create AudioOut ($result)';
+        }
+        return audioOut;
     }
-
-    inline function set_volume(v: Float32): Float32 {
-        untyped __global__.AudioOut_setVolume(this, v);
-        return v;
-    }
-    */
-
-    @:native('AudioOut_create')
-    static function create(result: Star<MiniAudio.Result>): Star<AudioOut>;
 
     @:native('AudioOut_destroy')
-    static function destroy(device: Star<AudioOut>): Void;
+    static function destroy(audioOut: Star<AudioOut>): Void;
 
 }
 
@@ -64,10 +60,19 @@ extern class AudioOut {
 @:structAccess
 extern class AudioSource {
 
-    @:native('AudioSource_createFileSource')
-    static function createFileSource(path: ConstCharStar, outputFormat: MiniAudio.Format, channelCount: UInt32, sampleRate: UInt32, result: Star<MiniAudio.Result>): Star<AudioSource>;
+    /**
+     * @throws String if failed to create the decoder
+     **/
+    static inline function createFileSource(path: ConstCharStar, outputFormat: MiniAudio.Format, channelCount: UInt32, sampleRate: UInt32): Star<AudioSource> {
+        var result: Result = ERROR;
+        var audioSource = untyped  __global__.AudioSource_createFileSource(path, outputFormat, channelCount, sampleRate, Native.addressOf(result));
+        if (result != SUCCESS || audioSource == null) {
+            throw 'Failed to create AudioSource ($result)';
+        }
+        return audioSource;
+    }
 
     @:native('AudioSource_destroy')
-    static function destroy(audioSource: Star<AudioOut>): Void;
+    static function destroy(audioSource: Star<AudioSource>): Void;
 
 }

@@ -17,8 +17,6 @@
 AudioSource* AudioSource_createFileSource(const char* path, ma_format outputFormat, ma_uint32 channelCount, ma_uint32 sampleRate, ma_result* pResult) {
     AudioSource* audioSource;
 
-    printf(path);
-
     audioSource = (AudioSource*)ma_malloc(sizeof(*audioSource));
     if (audioSource == NULL) {
         (*pResult) = MA_OUT_OF_MEMORY;
@@ -38,7 +36,7 @@ AudioSource* AudioSource_createFileSource(const char* path, ma_format outputForm
     (*pResult) = ma_decoder_init_file(path, &decoderConfig, audioSource->maDecoder);
 
     if ((*pResult) != MA_SUCCESS) {
-        ma_decoder_uninit(&audioSource->maDecoder);
+        ma_decoder_uninit(audioSource->maDecoder);
         return NULL;
     }
 

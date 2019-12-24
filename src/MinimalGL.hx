@@ -42,10 +42,8 @@ class MinimalGL implements MinimalGLNativeInterface {
 
 		gl.disable(CULL_FACE);
 
-		var result: audio.MiniAudio.Result = null;
-		var audioOut = AudioOut.create(result);
-		Console.examine('audioOut', result);
-		
+		var audioOut = AudioOut.create();		
+
 		if (audioOut != null) {
 			Console.examine(audioOut.maDevice.sampleRate);
 			Console.examine(audioOut.maDevice.pContext.backend);
@@ -60,36 +58,36 @@ class MinimalGL implements MinimalGLNativeInterface {
 			'/Users/geo/Projects/teach-your-monster-native-media/src/audio/soul_short.mp3',
 			audioOut.maDevice.playback.format,
 			audioOut.maDevice.playback.channels,
-			audioOut.maDevice.sampleRate,
-			result
+			audioOut.maDevice.sampleRate
 		);
-		Console.examine('fileSource', result, fileSource);
+		Console.examine('fileSource', fileSource);
 
 		// test add null source
-		Console.examine(audioOut.addSource(null), audioOut.sourceCount());
-		audioOut.removeSource(null);
+		// Console.examine(audioOut.addSource(null), audioOut.sourceCount());
+		// audioOut.removeSource(null);
+		// Console.examine(audioOut.sourceCount());
+
+		Console.log('Testing source');
+		audioOut.addSource(fileSource);
+		audioOut.addSource(fileSource);
+
 		Console.examine(audioOut.sourceCount());
 
-		if (fileSource != null) {
-			Console.log('Testing source');
-			audioOut.addSource(fileSource);
-			audioOut.addSource(fileSource);
+		audioOut.removeSource(fileSource);
+		audioOut.removeSource(fileSource);
+		audioOut.removeSource(fileSource);
 
-			Console.examine(audioOut.sourceCount());
+		Console.examine(audioOut.sourceCount());
 
-			audioOut.removeSource(fileSource);
-			audioOut.removeSource(fileSource);
-			audioOut.removeSource(fileSource);
-
-			Console.examine(audioOut.sourceCount());
-
-			audioOut.addSource(fileSource);
-			audioOut.start();
-		}
+		audioOut.addSource(fileSource);
+		audioOut.start();
 
 
 		Timer.delay(() -> {
-			Console.log('Destorying audioDevice');
+			audioOut.removeSource(fileSource);
+			Console.log('Destorying AudioSource');
+			AudioSource.destroy(fileSource);
+			Console.log('Destorying AudioOut');
 			AudioOut.destroy(audioOut);
 		}, 4000);
 
