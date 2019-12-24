@@ -47,7 +47,7 @@ AudioOut* AudioOut_create(ma_result* result);
 void AudioOut_destroy(AudioOut* output);
 
 ma_result AudioOut_addSource(AudioOut* output, AudioSource* source);
-void AudioOut_removeSource(AudioOut* output, AudioSource* source);
+ma_bool32 AudioOut_removeSource(AudioOut* output, AudioSource* source);
 int AudioOut_sourceCount(AudioOut* output);
 
 #ifdef __cplusplus

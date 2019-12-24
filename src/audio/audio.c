@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include "./audio.h"
 
 // decoders
 #define DR_MP3_IMPLEMENTATION
@@ -9,7 +8,10 @@
     #define MA_DEBUG_OUTPUT
 #endif
 #define MINIAUDIO_IMPLEMENTATION
-#include "./miniaudio/miniaudio.h"
+
+#include "./audio.h"
+
+
 
 /**
  * AudioSource Implementation
@@ -57,7 +59,6 @@ void AudioSource_destroy(AudioSource* audioSource) {
 void AudioOut_dataCallback(ma_device* maDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
     AudioOut* audioOut = (AudioOut*) maDevice->pUserData;
 
-    // @! we should copy out the callback pointers to minimize time with mutex held
     // @! currently: this assumes just a single source, no mixing
     ma_mutex_lock(&audioOut->sourceListLock);
     {
@@ -122,6 +123,13 @@ void AudioOut_destroy(AudioOut* audioOut) {
     ma_device_uninit(audioOut->maDevice);
     ma_mutex_uninit(&audioOut->sourceListLock);
 
+    // free source list nodes
+    AudioSourceListNode* currentSourceListNode = audioOut->sourceNext;
+    while (currentSourceListNode != NULL) {
+        ma_free(currentSourceListNode);
+        currentSourceListNode = currentSourceListNode->next;
+    }
+
     ma_free(audioOut->maDevice);
     ma_free(audioOut);
 }
@@ -152,7 +160,9 @@ ma_result AudioOut_addSource(AudioOut* audioOut, AudioSource* source) {
     return result;
 }
 
-void AudioOut_removeSource(AudioOut* audioOut, AudioSource* source) {
+ma_bool32 AudioOut_removeSource(AudioOut* audioOut, AudioSource* source) {
+    ma_bool32 removed = MA_FALSE;
+
     ma_mutex_lock(&audioOut->sourceListLock);
     {
         // iterate list searching for source and remove when found
@@ -164,6 +174,7 @@ void AudioOut_removeSource(AudioOut* audioOut, AudioSource* source) {
                 // found, link the parent pointer to the current's next, then free the current node since it's finished with
                 *(parentSourceListNodePtr) = currentSourceListNode->next;
                 ma_free(currentSourceListNode);
+                removed = MA_TRUE;
                 break;
             }
 
@@ -172,6 +183,8 @@ void AudioOut_removeSource(AudioOut* audioOut, AudioSource* source) {
         }
     }
     ma_mutex_unlock(&audioOut->sourceListLock);
+
+    return removed;
 }
 
 int AudioOut_sourceCount(AudioOut* audioOut) {

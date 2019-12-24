@@ -17,19 +17,23 @@ extern class AudioOut {
     // var volume (get, set): Float32;
 
     inline function start(): Result {
+        // @! GC +1
         return maDevice.start();
     }
 
     inline function stop(): Result {
+        // @! GC -1
         return maDevice.stop();
     }
 
     inline function addSource(source: Star<AudioSource>): Result {
+        // @! source GC +1
         return untyped __global__.AudioOut_addSource(this, source);
     }
 
-    inline function removeSource(source: Star<AudioSource>): Void {
-        untyped __global__.AudioOut_removeSource(this, source);
+    inline function removeSource(source: Star<AudioSource>): Bool {
+        // @! source GC -1
+        return untyped __global__.AudioOut_removeSource(this, source);
     }
 
     inline function sourceCount(): Int {
