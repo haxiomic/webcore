@@ -1,12 +1,19 @@
 /**
  * Minimalistic Audio Interface Abstraction
  * C89
+ * 
+ * Defines
+ *  - AudioMixer
+ *  - AudioSource
  * @author George Corney (haxiomic)
  */
 
 #ifndef AUDIO_H
 #define AUDIO_H
 
+#ifdef HXCPP_DEBUG
+    #define MA_DEBUG_OUTPUT
+#endif
 #include "./miniaudio/miniaudio.h"
 
 #ifdef __cplusplus

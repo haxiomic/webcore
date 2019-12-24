@@ -1,12 +1,9 @@
 #include <stdio.h>
 
-// decoders
+// audio file decoders
 #define DR_MP3_IMPLEMENTATION
 #include "./miniaudio/extras/dr_mp3.h"
 
-#ifdef HXCPP_DEBUG
-    #define MA_DEBUG_OUTPUT
-#endif
 #define MINIAUDIO_IMPLEMENTATION
 
 #include "./audio.h"
