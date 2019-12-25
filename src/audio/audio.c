@@ -8,12 +8,10 @@
 
 #include "./audio.h"
 
-
-
 /**
  * AudioSource Implementation
  */
-AudioSource* AudioSource_createFileSource(const char* path, ma_format outputFormat, ma_uint32 channelCount, ma_uint32 sampleRate, ma_result* pResult) {
+AudioSource* AudioSource_createFileSource(const char* path, ma_uint32 channelCount, ma_uint32 sampleRate, ma_result* pResult) {
     AudioSource* audioSource;
 
     audioSource = (AudioSource*)ma_malloc(sizeof(*audioSource));
@@ -30,7 +28,7 @@ AudioSource* AudioSource_createFileSource(const char* path, ma_format outputForm
     }
     ma_zero_object(audioSource->maDecoder);
 
-    ma_decoder_config decoderConfig = ma_decoder_config_init(outputFormat, channelCount, sampleRate);
+    ma_decoder_config decoderConfig = ma_decoder_config_init(ma_format_f32, channelCount, sampleRate);
 
     (*pResult) = ma_decoder_init_file(path, &decoderConfig, audioSource->maDecoder);
 
@@ -52,9 +50,12 @@ void AudioSource_destroy(AudioSource* audioSource) {
  * AudioOut Implementation
  */
 
+
 // called from audio thread
-void AudioOut_dataCallback(ma_device* maDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
+void AudioOut_dataCallbackMixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
     AudioOut* audioOut = (AudioOut*) maDevice->pUserData;
+
+    float decoderOutputBuffer[4096];
 
     // @! currently: this assumes just a single source, no mixing
     ma_mutex_lock(&audioOut->sourceListLock);
@@ -64,8 +65,70 @@ void AudioOut_dataCallback(ma_device* maDevice, void* pOutput, const void* pInpu
 
             ma_assert(currentSourceListNode->item != NULL);
             ma_assert(currentSourceListNode->item->maDecoder != NULL);
-            
-            ma_decoder_read_pcm_frames(currentSourceListNode->item->maDecoder, pOutput, frameCount);
+
+            ma_decoder* maDecoder = currentSourceListNode->item->maDecoder;
+
+            // decoder should be setup to read into float buffers, if not then something has gone wrong
+            if (maDecoder->outputFormat != ma_format_f32) {
+                ma_post_error(maDevice, MA_LOG_LEVEL_ERROR, "decoder outputFormat was not ma_format_f32", MA_INVALID_OPERATION);
+                continue;
+            }
+
+            // we expect the decoder to have the same number of channels as the output
+            if (maDecoder->outputChannels != maDevice->playback.channels) {
+                ma_post_error(maDevice, MA_LOG_LEVEL_ERROR, "decoder / device channel number mismatch", MA_INVALID_OPERATION);
+                continue;
+            }
+
+            // read and mix frames in chunks of decoderOutputBuffer length
+            ma_uint32 bufferMaxFrames = ma_countof(decoderOutputBuffer) / maDecoder->outputChannels;
+            ma_uint32 totalFramesRead = 0;
+            while (totalFramesRead < frameCount) {
+                ma_uint32 framesRemaining = frameCount - totalFramesRead;
+                ma_uint32 framesToRead = ma_min(framesRemaining, bufferMaxFrames);
+
+                ma_uint32 framesRead = (ma_uint32) ma_decoder_read_pcm_frames(maDecoder, decoderOutputBuffer, framesToRead);
+
+                // no more frames left to read in this decoder
+                if (framesRead == 0) {
+                    break;
+                }
+
+                // mix decoderOutputBuffer with pOutput
+                ma_uint32 sampleCount = framesRead * maDecoder->outputChannels;
+                ma_uint32 outputOffset = totalFramesRead * maDecoder->outputChannels;
+                for(ma_uint32 sampleIdx = 0; sampleIdx < sampleCount; ++sampleIdx) {
+                    float sample = decoderOutputBuffer[sampleIdx];
+                    
+                    // if the playback output buffer is float32 then we can just add, otherwise we need to convert
+                    switch (maDevice->playback.format) {
+                        case ma_format_f32: {
+                            // by default minaudio will handle float clipping
+                            ((float*)pOutput)[outputOffset + sampleIdx] += sample;
+                        } break;
+                        case ma_format_s16: {
+                            float currentSample = (float)((ma_int16*)pOutput)[outputOffset + sampleIdx];
+                            float summedAndClippedSample = ma_clamp(sample + currentSample, -1.0, 1.0);
+                            ((ma_int16*)pOutput)[outputOffset + sampleIdx] += (ma_int16)(summedAndClippedSample * 32767);
+                        } break;
+                        case ma_format_s32: {
+                            float currentSample = (float)((ma_int32*)pOutput)[outputOffset + sampleIdx];
+                            float summedAndClippedSample = ma_clamp(sample + currentSample, -1.0, 1.0);
+                            ((ma_int32*)pOutput)[outputOffset + sampleIdx] += (ma_int32)(summedAndClippedSample * 2147483647);
+                        } break;
+                        // unsupported
+                        case ma_format_u8: { } break;
+                        case ma_format_s24: { } break;
+                    }
+                }
+
+                totalFramesRead += framesRead;
+
+                if (framesRead < framesToRead) {
+                    // we read less frames than we requested so we must have reached the end of this decoder
+                    break;
+                }
+            }
 
             currentSourceListNode = currentSourceListNode->next;
         }
@@ -73,7 +136,7 @@ void AudioOut_dataCallback(ma_device* maDevice, void* pOutput, const void* pInpu
     ma_mutex_unlock(&audioOut->sourceListLock);
 }
 
-AudioOut* AudioOut_create(ma_result* pResult) {
+AudioOut* AudioOut_create(ma_uint32 sampleRate, ma_result* pResult) {
     AudioOut* audioOut = NULL;
 
     audioOut = (AudioOut*)ma_malloc(sizeof(*audioOut));
@@ -92,10 +155,10 @@ AudioOut* AudioOut_create(ma_result* pResult) {
 
     // initialize a miniaudio device
     ma_device_config deviceConfig = ma_device_config_init(ma_device_type_playback);
-    // deviceConfig.playback.format = sampleFormat;
+    deviceConfig.sampleRate = sampleRate;
+    // deviceConfig.playback.format = format;
     // deviceConfig.playback.channels = channelCount;
-    // deviceConfig.sampleRate = sampleRate;
-    deviceConfig.dataCallback = AudioOut_dataCallback;
+    deviceConfig.dataCallback = AudioOut_dataCallbackMixSources;
     deviceConfig.pUserData = NULL;
 
     (*pResult) = ma_device_init(NULL, &deviceConfig, audioOut->maDevice);

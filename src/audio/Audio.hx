@@ -1,5 +1,6 @@
 package audio;
 
+import audio.MiniAudio.Format;
 import audio.MiniAudio.Result;
 import cpp.*;
 
@@ -43,9 +44,9 @@ extern class AudioOut {
     /**
      * @throws String if failed to create the output
      **/
-    static inline function create(): Star<AudioOut> {
+    static inline function create(?sampleRate: UInt32 = 0): Star<AudioOut> {
         var result: Result = ERROR;
-        var audioOut = untyped  __global__.AudioOut_create(Native.addressOf(result));
+        var audioOut = untyped  __global__.AudioOut_create(sampleRate, Native.addressOf(result));
         if (result != SUCCESS || audioOut == null) {
             throw 'Failed to create AudioOut ($result)';
         }
@@ -67,9 +68,9 @@ extern class AudioSource {
     /**
      * @throws String if failed to create the decoder
      **/
-    static inline function createFileSource(path: ConstCharStar, outputFormat: MiniAudio.Format, channelCount: UInt32, sampleRate: UInt32): Star<AudioSource> {
+    static inline function createFileSource(path: ConstCharStar, channelCount: UInt32, sampleRate: UInt32): Star<AudioSource> {
         var result: Result = ERROR;
-        var audioSource = untyped  __global__.AudioSource_createFileSource(path, outputFormat, channelCount, sampleRate, Native.addressOf(result));
+        var audioSource = untyped  __global__.AudioSource_createFileSource(path, channelCount, sampleRate, Native.addressOf(result));
         if (result != SUCCESS || audioSource == null) {
             throw 'Failed to create AudioSource ($result)';
         }
