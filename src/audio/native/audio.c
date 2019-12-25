@@ -83,16 +83,12 @@ void AudioOut_dataCallbackMixSources(ma_device* maDevice, void* pOutput, const v
             // read and mix frames in chunks of decoderOutputBuffer length
             ma_uint32 bufferMaxFrames = ma_countof(decoderOutputBuffer) / maDecoder->outputChannels;
             ma_uint32 totalFramesRead = 0;
+            ma_bool32 reachedEOF = MA_FALSE;
             while (totalFramesRead < frameCount) {
                 ma_uint32 framesRemaining = frameCount - totalFramesRead;
                 ma_uint32 framesToRead = ma_min(framesRemaining, bufferMaxFrames);
 
                 ma_uint32 framesRead = (ma_uint32) ma_decoder_read_pcm_frames(maDecoder, decoderOutputBuffer, framesToRead);
-
-                // no more frames left to read in this decoder
-                if (framesRead == 0) {
-                    break;
-                }
 
                 // mix decoderOutputBuffer with pOutput
                 ma_uint32 sampleCount = framesRead * maDecoder->outputChannels;
@@ -107,12 +103,12 @@ void AudioOut_dataCallbackMixSources(ma_device* maDevice, void* pOutput, const v
                             ((float*)pOutput)[outputOffset + sampleIdx] += sample;
                         } break;
                         case ma_format_s16: {
-                            float currentSample = (float)((ma_int16*)pOutput)[outputOffset + sampleIdx];
+                            float currentSample = (float)(((ma_int16*)pOutput)[outputOffset + sampleIdx]);
                             float summedAndClippedSample = ma_clamp(sample + currentSample, -1.0, 1.0);
                             ((ma_int16*)pOutput)[outputOffset + sampleIdx] += (ma_int16)(summedAndClippedSample * 32767);
                         } break;
                         case ma_format_s32: {
-                            float currentSample = (float)((ma_int32*)pOutput)[outputOffset + sampleIdx];
+                            float currentSample = (float)(((ma_int32*)pOutput)[outputOffset + sampleIdx]);
                             float summedAndClippedSample = ma_clamp(sample + currentSample, -1.0, 1.0);
                             ((ma_int32*)pOutput)[outputOffset + sampleIdx] += (ma_int32)(summedAndClippedSample * 2147483647);
                         } break;
@@ -126,8 +122,15 @@ void AudioOut_dataCallbackMixSources(ma_device* maDevice, void* pOutput, const v
 
                 if (framesRead < framesToRead) {
                     // we read less frames than we requested so we must have reached the end of this decoder
+                    reachedEOF = MA_TRUE;
                     break;
                 }
+            }
+
+            if (reachedEOF) {
+                // trigger something
+                // @! this doesn't account for the case were we read exactly  all of the frames
+                // might need some thinking to enable seamless looping
             }
 
             currentSourceListNode = currentSourceListNode->next;

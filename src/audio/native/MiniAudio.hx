@@ -1,4 +1,4 @@
-package audio;
+package audio.native;
 
 import cpp.*;
 
@@ -55,13 +55,13 @@ extern enum abstract Format(MaFormat) {
     I like to keep these explicitly defined because they're used as a key into a lookup table. When items are
     added to this, make sure there are no gaps and that they're added to the lookup table in ma_get_bytes_per_sample().
     */
-    @:native('ma_format_unknown') var FORMAT_UNKNOWN; /* Mainly used for indicating an error, but also used as the default for the output format for decoders. */
-    @:native('ma_format_u8') var FORMAT_U8;     
-    @:native('ma_format_s16') var FORMAT_S16; /* Seems to be the most widely supported format. */
-    @:native('ma_format_s24') var FORMAT_S24; /* Tightly packed. 3 bytes per sample. */
-    @:native('ma_format_s32') var FORMAT_S32;    
-    @:native('ma_format_f32') var FORMAT_F32;    
-    @:native('ma_format_count') var FORMAT_COUNT;
+    @:native('ma_format_unknown') var UNKNOWN; /* Mainly used for indicating an error, but also used as the default for the output format for decoders. */
+    @:native('ma_format_u8') var U8;     
+    @:native('ma_format_s16') var S16; /* Seems to be the most widely supported format. */
+    @:native('ma_format_s24') var S24; /* Tightly packed. 3 bytes per sample. */
+    @:native('ma_format_s32') var S32;    
+    @:native('ma_format_f32') var F32;    
+    @:native('ma_format_count') var COUNT;
 }
 @:include('./audio.h')
 @:sourceFile('./audio.c')
@@ -205,7 +205,7 @@ extern class Context {
     var deviceInfoCapacity: UInt32; /* Total capacity of pDeviceInfos. */
     var playbackDeviceInfoCount: UInt32;
     var captureDeviceInfoCount: UInt32;
-    var pDeviceInfos: Star<DeviceInfo>; /* Playback devices first, then capture. */
+    // var pDeviceInfos: Star<DeviceInfo>; /* Playback devices first, then capture. */
     var isBackendAsynchronous: Bool; /* Set when the context is initialized. Set to 1 for asynchronous backends such as Core Audio and JACK. Do not modify. */
 
     // ma_result (* onUninit        )(ma_context* pContext);

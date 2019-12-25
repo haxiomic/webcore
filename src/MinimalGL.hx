@@ -1,5 +1,8 @@
-import audio.MiniAudio;
-import audio.Audio;
+import cpp.Pointer;
+import cpp.NativeArray;
+import audio.native.MiniAudio;
+import audio.native.AudioOut;
+import audio.native.AudioSource;
 import typedarray.Float32Array;
 import gluon.es2.GLBuffer;
 import gluon.es2.GLProgram;
@@ -42,7 +45,7 @@ class MinimalGL implements MinimalGLNativeInterface {
 
 		gl.disable(CULL_FACE);
 
-		var audioOut = AudioOut.create();		
+		var audioOut = AudioOut.create();
 
 		if (audioOut != null) {
 			Console.examine(audioOut.maDevice.sampleRate);
@@ -54,13 +57,19 @@ class MinimalGL implements MinimalGLNativeInterface {
 			Console.examine(audioOut.sourceCount());
 		}
 
-		var fileSource = AudioSource.createFileSource(
-			'/Users/geo/Projects/teach-your-monster-native-media/src/audio/soul_short.mp3',
-			audioOut.maDevice.playback.format,
+		var multiChannelTest = AudioSource.createFileSource(
+			'/Users/geo/Projects/teach-your-monster-native-media/src/audio/multi-channel-test.mp3',
 			audioOut.maDevice.playback.channels,
 			audioOut.maDevice.sampleRate
 		);
-		Console.examine('fileSource', fileSource);
+		Console.examine(multiChannelTest);
+
+		var twoChannelSong = AudioSource.createFileSource(
+			'/Users/geo/Projects/teach-your-monster-native-media/src/audio/two-channel.mp3',
+			audioOut.maDevice.playback.channels,
+			audioOut.maDevice.sampleRate
+		);
+		Console.examine(twoChannelSong);
 
 		// test add null source
 		// Console.examine(audioOut.addSource(null), audioOut.sourceCount());
@@ -68,21 +77,34 @@ class MinimalGL implements MinimalGLNativeInterface {
 		// Console.examine(audioOut.sourceCount());
 
 		Console.log('Testing source');
-		audioOut.addSource(fileSource);
-		audioOut.addSource(fileSource);
+		audioOut.addSource(multiChannelTest);
+		audioOut.addSource(twoChannelSong);
+		audioOut.addSource(multiChannelTest);
 
 		Console.examine(audioOut.sourceCount());
 
-		audioOut.removeSource(fileSource);
-		audioOut.removeSource(fileSource);
-		audioOut.removeSource(fileSource);
+		audioOut.removeSource(multiChannelTest);
+		audioOut.removeSource(twoChannelSong);
+		audioOut.removeSource(multiChannelTest);
+		audioOut.removeSource(multiChannelTest);
 
 		Console.examine(audioOut.sourceCount());
 
-		audioOut.addSource(fileSource);
+		audioOut.addSource(multiChannelTest);
+		audioOut.addSource(twoChannelSong);
 		audioOut.start();
 
+		Timer.delay(() -> {
+			var testcase = AudioSource.createFileSource(
+				'/Users/geo/Projects/teach-your-monster-native-media/src/audio/testcase.mp3',
+				audioOut.maDevice.playback.channels,
+				audioOut.maDevice.sampleRate
+			);
+			audioOut.addSource(testcase);
+			audioOut.removeSource(twoChannelSong);
+		}, 2000);
 
+		/*
 		Timer.delay(() -> {
 			audioOut.removeSource(fileSource);
 			Console.log('Destorying AudioSource');
@@ -90,6 +112,7 @@ class MinimalGL implements MinimalGLNativeInterface {
 			Console.log('Destorying AudioOut');
 			AudioOut.destroy(audioOut);
 		}, 4000);
+		*/
 
 		// AudioDevice.destroy(audioDevice);
 

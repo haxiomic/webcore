@@ -23,6 +23,8 @@ extern "C" {
 
 /**
  * AudioSource Structure
+ * 
+ * Decoder always use float32 output format (for simplicity)
  */
 typedef struct {
     ma_decoder* maDecoder;
