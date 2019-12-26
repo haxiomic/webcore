@@ -13,9 +13,9 @@ class AudioNode {
 	/**
 		Allows us to connect the output of this node to be input into another node, either as audio data or as the value of an `AudioParam`.
 	**/
-	function connect(destination:AudioNode): Void;
+	public function connect(destination:AudioNode): Void {}
 
-	function disconnect(?destination: AudioNode): Void;
+	public function disconnect(?destination: AudioNode): Void {}
 
 }
 
@@ -28,7 +28,7 @@ typedef AudioBufferSourceOptions = {
 	var ?playbackRate : Float;
 }
 
-class AudioBufferSourceNode {
+class AudioBufferSourceNode extends AudioNode {
 
 	/**
 		A function to be called when the `ended` event is fired, indicating that the node has finished playing.

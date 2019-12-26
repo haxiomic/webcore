@@ -7,6 +7,8 @@ typedef AudioContext = js.html.audio.AudioContext;
 
 #else
 
+import audio.AudioNode;
+
 typedef AudioContextOptions = {
 	var ?sampleRate : Float;
     /**
