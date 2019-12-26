@@ -55,9 +55,13 @@ void AudioSource_destroy(AudioSource* audioSource) {
 void AudioOut_dataCallbackMixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
     AudioOut* audioOut = (AudioOut*) maDevice->pUserData;
 
-    float decoderOutputBuffer[4096];
+    static float decoderOutputBuffer[4096];
 
-    // @! currently: this assumes just a single source, no mixing
+    ma_uint32 channelCount = maDevice->playback.channels;
+
+    // @! can get seamless loops with a loop flag and seek
+    ma_uint32 bufferMaxFrames = ma_countof(decoderOutputBuffer) / channelCount;
+
     ma_mutex_lock(&audioOut->sourceListLock);
     {
         AudioSourceListNode* currentSourceListNode = audioOut->sourceNext;
@@ -81,7 +85,6 @@ void AudioOut_dataCallbackMixSources(ma_device* maDevice, void* pOutput, const v
             }
 
             // read and mix frames in chunks of decoderOutputBuffer length
-            ma_uint32 bufferMaxFrames = ma_countof(decoderOutputBuffer) / maDecoder->outputChannels;
             ma_uint32 totalFramesRead = 0;
             ma_bool32 reachedEOF = MA_FALSE;
             while (totalFramesRead < frameCount) {
@@ -90,32 +93,14 @@ void AudioOut_dataCallbackMixSources(ma_device* maDevice, void* pOutput, const v
 
                 ma_uint32 framesRead = (ma_uint32) ma_decoder_read_pcm_frames(maDecoder, decoderOutputBuffer, framesToRead);
 
-                // mix decoderOutputBuffer with pOutput
-                ma_uint32 sampleCount = framesRead * maDecoder->outputChannels;
-                ma_uint32 outputOffset = totalFramesRead * maDecoder->outputChannels;
+                // mix decoderOutputBuffer with pOutput, applying conversions if the playback format is not float
+                ma_uint32 sampleCount = framesRead * channelCount;
+                ma_uint32 outputOffset = totalFramesRead * channelCount;
+
+                float* mixBuffer = (float*)pOutput + outputOffset;
+
                 for(ma_uint32 sampleIdx = 0; sampleIdx < sampleCount; ++sampleIdx) {
-                    float sample = decoderOutputBuffer[sampleIdx];
-                    
-                    // if the playback output buffer is float32 then we can just add, otherwise we need to convert
-                    switch (maDevice->playback.format) {
-                        case ma_format_f32: {
-                            // by default minaudio will handle float clipping
-                            ((float*)pOutput)[outputOffset + sampleIdx] += sample;
-                        } break;
-                        case ma_format_s16: {
-                            float currentSample = (float)(((ma_int16*)pOutput)[outputOffset + sampleIdx]);
-                            float summedAndClippedSample = ma_clamp(sample + currentSample, -1.0, 1.0);
-                            ((ma_int16*)pOutput)[outputOffset + sampleIdx] += (ma_int16)(summedAndClippedSample * 32767);
-                        } break;
-                        case ma_format_s32: {
-                            float currentSample = (float)(((ma_int32*)pOutput)[outputOffset + sampleIdx]);
-                            float summedAndClippedSample = ma_clamp(sample + currentSample, -1.0, 1.0);
-                            ((ma_int32*)pOutput)[outputOffset + sampleIdx] += (ma_int32)(summedAndClippedSample * 2147483647);
-                        } break;
-                        // unsupported
-                        case ma_format_u8: { } break;
-                        case ma_format_s24: { } break;
-                    }
+                    mixBuffer[sampleIdx] += decoderOutputBuffer[sampleIdx];
                 }
 
                 totalFramesRead += framesRead;
@@ -159,7 +144,7 @@ AudioOut* AudioOut_create(ma_uint32 sampleRate, ma_result* pResult) {
     // initialize a miniaudio device
     ma_device_config deviceConfig = ma_device_config_init(ma_device_type_playback);
     deviceConfig.sampleRate = sampleRate;
-    // deviceConfig.playback.format = format;
+    deviceConfig.playback.format = ma_format_f32; // always use float32 sample input, miniaudio will convert if the device does not support this
     // deviceConfig.playback.channels = channelCount;
     deviceConfig.dataCallback = AudioOut_dataCallbackMixSources;
     deviceConfig.pUserData = NULL;
