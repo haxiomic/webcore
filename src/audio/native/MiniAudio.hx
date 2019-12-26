@@ -452,6 +452,10 @@ extern class Decoder {
         return untyped __global__.ma_decoder_init_file(filePath, config, (this: Star<Decoder>));
     }
 
+    inline function initMemory(bytes: ConstStar<cpp.Void>, byteLength: cpp.SizeT, config: ConstStar<DecoderConfig>): Result {
+        return untyped __global__.ma_decoder_init_memory(bytes, byteLength, config, (this: Star<Decoder>));
+    }
+
     inline function uninit(): Result {
         return untyped __global__.ma_decoder_uninit((this: Star<Decoder>));
     }
