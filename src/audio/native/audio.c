@@ -66,11 +66,14 @@ void AudioOut_dataCallbackMixSources(ma_device* maDevice, void* pOutput, const v
     {
         AudioSourceListNode* currentSourceListNode = audioOut->sourceNext;
         while (currentSourceListNode != NULL) {
+            AudioSource* source = currentSourceListNode->item;
+            currentSourceListNode = currentSourceListNode->next;
 
-            ma_assert(currentSourceListNode->item != NULL);
-            ma_assert(currentSourceListNode->item->maDecoder != NULL);
+            ma_assert(source != NULL);
+            ma_assert(source->maDecoder != NULL);
+                
 
-            ma_decoder* maDecoder = currentSourceListNode->item->maDecoder;
+            ma_decoder* maDecoder = source->maDecoder;
 
             // decoder should be setup to read into float buffers, if not then something has gone wrong
             if (maDecoder->outputFormat != ma_format_f32) {
@@ -117,8 +120,6 @@ void AudioOut_dataCallbackMixSources(ma_device* maDevice, void* pOutput, const v
                 // @! this doesn't account for the case were we read exactly  all of the frames
                 // might need some thinking to enable seamless looping
             }
-
-            currentSourceListNode = currentSourceListNode->next;
         }
     }
     ma_mutex_unlock(&audioOut->sourceListLock);
