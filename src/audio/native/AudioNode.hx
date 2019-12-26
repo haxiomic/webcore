@@ -1,6 +1,6 @@
 package audio.native;
 
-import audio.native.AudioContext.ExternAudioSourceList;
+import audio.native.AudioSource.ExternAudioSource;
 import cpp.*;
 
 @:allow(audio.native.AudioContext)
@@ -50,5 +50,27 @@ class AudioNode {
         #end
         ExternAudioSourceList.destroy(instance.nativeSourceList);
     }
+
+}
+
+@:include('./native.h')
+@:sourceFile('./native.c')
+@:native('AudioSourceList') @:unreflective
+@:structAccess
+extern class ExternAudioSourceList {
+
+    inline function add(source: Star<ExternAudioSource>): Void {
+        untyped __global__.AudioSourceList_add(this, source);
+    }
+
+    inline function remove(source: Star<ExternAudioSource>): Bool {
+        return untyped __global__.AudioSourceList_remove(this, source);
+    }
+
+    @:native('AudioSourceList_create')
+    static function create(context: Star<MiniAudio.Context>): Star<ExternAudioSourceList>;
+
+    @:native('AudioSourceList_destroy')
+    static function destroy(instance: Star<ExternAudioSourceList>): Void;
 
 }
