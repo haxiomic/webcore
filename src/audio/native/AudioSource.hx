@@ -9,12 +9,12 @@ import cpp.*;
 @:native('AudioSourceHx')
 class AudioSource {
 
-    final nativeSource: Star<ExternAudioSource>;
+    final nativeSource: Star<NativeAudioSource>;
     final decoderConfig: DecoderConfig;
 
     function new(context: AudioContext) {
         cpp.vm.Gc.setFinalizer(this, Function.fromStaticFunction(finalizer));
-        nativeSource = ExternAudioSource.create(context);
+        nativeSource = NativeAudioSource.create(context);
         
         var maDevice = context.maDevice;
         decoderConfig = MiniAudio.DecoderConfig.init(
@@ -28,7 +28,7 @@ class AudioSource {
         #if debug
         Stdio.printf("%s\n", "[debug] AudioSource.finalizer()");
         #end
-        ExternAudioSource.destroy(instance.nativeSource);
+        NativeAudioSource.destroy(instance.nativeSource);
     }
 
 }
@@ -64,7 +64,7 @@ class BufferAudioSource extends AudioSource {
 @:native('AudioSource') @:unreflective
 @:structAccess
 @:access(audio.native.AudioContext)
-extern class ExternAudioSource {
+extern class NativeAudioSource {
 
     var maDecoder: Star<Decoder>;
     // var mutex: Mutex;
@@ -73,16 +73,16 @@ extern class ExternAudioSource {
     function free(): Void;
 
     @:native('new AudioSource')
-    static function alloc(): Star<ExternAudioSource>;
+    static function alloc(): Star<NativeAudioSource>;
 
-    static inline function create(context: AudioContext): Star<ExternAudioSource> {
+    static inline function create(context: AudioContext): Star<NativeAudioSource> {
         var instance = alloc();
         instance.maDecoder = MiniAudio.Decoder.alloc();
         // @! mutex create
         return instance;
     }
 
-    static inline function destroy(instance: ExternAudioSource): Void {
+    static inline function destroy(instance: NativeAudioSource): Void {
         instance.maDecoder.uninit();
         instance.maDecoder.free();
         instance.free();

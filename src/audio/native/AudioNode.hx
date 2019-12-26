@@ -1,6 +1,6 @@
 package audio.native;
 
-import audio.native.AudioSource.ExternAudioSource;
+import audio.native.AudioSource.NativeAudioSource;
 import cpp.*;
 
 @:allow(audio.native.AudioContext)
@@ -9,14 +9,14 @@ class AudioNode {
     public final context: AudioContext;
     var source: Null<AudioSource>;
 
-    final nativeSourceList: Star<ExternAudioSourceList>;
+    final nativeSourceList: Star<NativeAudioSourceList>;
     final connectedSources = new List<AudioNode>();
     final connectedDestinations = new List<AudioNode>();
 
     function new(context: AudioContext, ?source: AudioSource) {
         this.context = context;
         this.source = source;
-        nativeSourceList = ExternAudioSourceList.create(context.maDevice.pContext);
+        nativeSourceList = NativeAudioSourceList.create(context.maDevice.pContext);
 
         cpp.vm.Gc.setFinalizer(this, Function.fromStaticFunction(finalizer));
     }
@@ -73,7 +73,7 @@ class AudioNode {
         #if debug
         Stdio.printf("%s\n", "[debug] AudioNode.finalizer()");
         #end
-        ExternAudioSourceList.destroy(instance.nativeSourceList);
+        NativeAudioSourceList.destroy(instance.nativeSourceList);
     }
 
 }
@@ -102,20 +102,20 @@ class AudioScheduledSourceNode extends AudioNode {
 @:sourceFile('./native.c')
 @:native('AudioSourceList') @:unreflective
 @:structAccess
-extern class ExternAudioSourceList {
+extern class NativeAudioSourceList {
 
-    inline function add(source: Star<ExternAudioSource>): Void {
+    inline function add(source: Star<NativeAudioSource>): Void {
         untyped __global__.AudioSourceList_add(this, source);
     }
 
-    inline function remove(source: Star<ExternAudioSource>): Bool {
+    inline function remove(source: Star<NativeAudioSource>): Bool {
         return untyped __global__.AudioSourceList_remove(this, source);
     }
 
     @:native('AudioSourceList_create')
-    static function create(context: Star<MiniAudio.Context>): Star<ExternAudioSourceList>;
+    static function create(context: Star<MiniAudio.Context>): Star<NativeAudioSourceList>;
 
     @:native('AudioSourceList_destroy')
-    static function destroy(instance: Star<ExternAudioSourceList>): Void;
+    static function destroy(instance: Star<NativeAudioSourceList>): Void;
 
 }
