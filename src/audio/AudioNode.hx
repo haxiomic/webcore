@@ -9,7 +9,7 @@ typedef AudioDestinationNode = js.html.audio.AudioDestinationNode;
 
 #else
 
-typedef AudioNode = {
+class AudioNode {
 	/**
 		Allows us to connect the output of this node to be input into another node, either as audio data or as the value of an `AudioParam`.
 	**/
