@@ -1,7 +1,7 @@
 package audio.native;
 
+import typedarray.ArrayBuffer;
 import audio.native.MiniAudio.DecoderConfig;
-import audio.native.MiniAudio.Mutex;
 import audio.native.MiniAudio.Decoder;
 import cpp.*;
 
@@ -38,7 +38,23 @@ class FileAudioSource extends AudioSource {
 
     function new(context: AudioContext, path: String) {
         super(context);
-        nativeSource.maDecoder.initFile(path, Native.addressOf(decoderConfig));
+        var result = nativeSource.maDecoder.initFile(path, Native.addressOf(decoderConfig));
+        if (result != SUCCESS) {
+            throw 'Failed to initialize an audio file decoder: $result';
+        }
+    }
+
+}
+
+@:allow(audio.native.AudioContext)
+class BufferAudioSource extends AudioSource {
+
+    function new(context: AudioContext, buffer: ArrayBuffer) {
+        super(context);
+        var result = nativeSource.maDecoder.initMemory(cast buffer.toCPointer(), buffer.byteLength, Native.addressOf(decoderConfig));
+        if (result != SUCCESS) {
+            throw 'Failed to initialize an buffer decoder: $result';
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 package audio.native;
 
+import typedarray.ArrayBuffer;
 import audio.native.AudioSource.FileAudioSource;
 import cpp.*;
 
@@ -64,6 +65,23 @@ class AudioContext {
 
     public function createFileSource(path: String): AudioNode {
         return new AudioNode(this, new FileAudioSource(this, path));
+    }
+
+	public function createBufferSource(): AudioNode.AudioBufferSourceNode {
+        return new AudioNode.AudioBufferSourceNode(this);
+    }
+
+    public function decodeAudioData(audioData: ArrayBuffer, ?successCallback: AudioBuffer -> Void, ?errorCallback: String -> Void): Void {
+        try {
+            var audioBuffer = new AudioSource.BufferAudioSource(this, audioData);
+            if (successCallback != null) {
+                successCallback(audioBuffer);
+            }
+        } catch (e: String) {
+            if (errorCallback != null) {
+                errorCallback(e);
+            }
+        }
     }
 
     static var gcReference = new List<AudioContext>();

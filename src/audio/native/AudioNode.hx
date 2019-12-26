@@ -7,10 +7,11 @@ import cpp.*;
 class AudioNode {
 
     public final context: AudioContext;
-    final source: Null<AudioSource>;
+    var source: Null<AudioSource>;
 
     final nativeSourceList: Star<ExternAudioSourceList>;
-    final activeSources = new List<AudioNode>();
+    final connectedSources = new List<AudioNode>();
+    final connectedDestinations = new List<AudioNode>();
 
     function new(context: AudioContext, ?source: AudioSource) {
         this.context = context;
@@ -21,27 +22,51 @@ class AudioNode {
     }
 
     public function connect(destination: AudioNode) {
+        if (!Lambda.has(connectedDestinations, destination)) {
+            connectedDestinations.add(destination);
+        }
         destination.addSourceNode(this);
     }
 
     public function disconnect(destination: AudioNode) {
+        connectedDestinations.remove(destination);
         destination.removeSourceNode(this);
     }
 
-    function addSourceNode(node: AudioNode) {
-        if (node.source == null) return; // node has source
+    function updateSource(newSource: Null<AudioSource>) {
+        // first disconnect all existing destinations
+        var connectedDestinationsCopy = new List<AudioNode>();
+        for (node in connectedDestinations) {
+            connectedDestinationsCopy.add(node);
+        }
 
-        if (!Lambda.has(activeSources, node)) {
-            activeSources.add(node);
-            this.nativeSourceList.add(node.source.nativeSource);
+        for (node in connectedDestinationsCopy) {
+            disconnect(node);
+        }
+
+        // change value of source
+        this.source = newSource;
+
+        // reconnect
+        for (node in connectedDestinationsCopy) {
+            connect(node);
+        }
+    }
+
+    function addSourceNode(node: AudioNode) {
+        if (!Lambda.has(connectedSources, node)) {
+            connectedSources.add(node);
+            if (node.source != null) {
+                this.nativeSourceList.add(node.source.nativeSource);
+            }
         }
     }
 
     function removeSourceNode(node: AudioNode) {
-        if (node.source == null) return; // node has source
-
-        activeSources.remove(node);
-        this.nativeSourceList.remove(node.source.nativeSource);
+        connectedSources.remove(node);
+        if (node.source != null) {
+            this.nativeSourceList.remove(node.source.nativeSource);
+        }
     }
 
     static function finalizer(instance: AudioNode) {
@@ -51,6 +76,26 @@ class AudioNode {
         ExternAudioSourceList.destroy(instance.nativeSourceList);
     }
 
+}
+
+class AudioBufferSourceNode extends AudioScheduledSourceNode {
+
+    public var buffer (get, set): AudioBuffer;
+
+    inline function get_buffer(): AudioBuffer {
+        return cast this.source;
+    }
+
+    inline function set_buffer(b: AudioBuffer): AudioBuffer {
+        updateSource(b);
+        return b;
+    }
+
+}
+
+class AudioScheduledSourceNode extends AudioNode {
+    // public function start()
+    // public function stop()
 }
 
 @:include('./native.h')
