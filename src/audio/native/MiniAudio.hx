@@ -2,8 +2,8 @@ package audio.native;
 
 import cpp.*;
 
-@:include('./audio.h')
-@:sourceFile('./audio.c')
+@:include('./native.h')
+@:sourceFile('./native.c')
 extern class MiniAudio { }
 
 /*
@@ -30,8 +30,8 @@ extern enum abstract Backend(MaBackend) {
         return name.toString();
     }
 }
-@:include('./audio.h')
-@:sourceFile('./audio.c')
+@:include('./native.h')
+@:sourceFile('./native.c')
 @:unreflective @:native('ma_backend')
 private extern class MaBackend {}
 
@@ -44,9 +44,11 @@ extern enum abstract ThreadPriority(MaThreadPriority) {
     @:native('ma_thread_priority_highest') var HIGHEST;
     @:native('ma_thread_priority_realtime') var REALTIME;
     @:native('ma_thread_priority_default') var DEFAULT;
+    @:to inline function toInt(): Int return cast this;
+    @:from static inline function fromInt(i: Int): ThreadPriority return cast i;
 }
-@:include('./audio.h')
-@:sourceFile('./audio.c')
+@:include('./native.h')
+@:sourceFile('./native.c')
 @:native('ma_thread_priority') @:unreflective 
 private extern class MaThreadPriority {}
 
@@ -63,8 +65,8 @@ extern enum abstract Format(MaFormat) {
     @:native('ma_format_f32') var F32;    
     @:native('ma_format_count') var COUNT;
 }
-@:include('./audio.h')
-@:sourceFile('./audio.c')
+@:include('./native.h')
+@:sourceFile('./native.c')
 @:native('ma_format') @:unreflective
 private extern class MaFormat {}
 
@@ -74,13 +76,31 @@ extern enum abstract DeviceType(MaDeviceType) {
     @:native('ma_device_type_duplex') var DUPLEX;
     @:native('ma_device_type_loopback') var LOOPBACK;
 }
-@:include('./audio.h')
-@:sourceFile('./audio.c')
+@:include('./native.h')
+@:sourceFile('./native.c')
 @:native('ma_device_type') @:unreflective
 private extern class MaDeviceType {}
 
-@:include('./audio.h')
-@:sourceFile('./audio.c')
+extern enum abstract PerformanceProfile(MaPerformanceProfile) {
+    @:native('ma_performance_profile_low_latency') var LOW_LATENCY;
+    @:native('ma_performance_profile_conservative') var CONSERVATIVE;
+}
+@:include('./native.h')
+@:sourceFile('./native.c')
+@:native('ma_performance_profile') @:unreflective
+private extern class MaPerformanceProfile {}
+
+extern enum abstract ShareMode(MaShareMode) {
+    @:native('ma_share_mode_shared') var SHARED;
+    @:native('ma_share_mode_exclusive') var EXCLUSIVE;
+}
+@:include('./native.h')
+@:sourceFile('./native.c')
+@:native('ma_share_mode') @:unreflective
+private extern class MaShareMode {}
+
+@:include('./native.h')
+@:sourceFile('./native.c')
 extern enum abstract Result(MaResult) {
     @:native('MA_SUCCESS') var SUCCESS;
     @:native('MA_ERROR') var ERROR;
@@ -117,16 +137,14 @@ extern enum abstract Result(MaResult) {
     @:native('MA_FAILED_TO_CREATE_SEMAPHORE') var FAILED_TO_CREATE_SEMAPHORE;
     @:native('MA_FAILED_TO_CREATE_THREAD') var FAILED_TO_CREATE_THREAD;
 
-    @:to inline function toInt(): Int {
-        return cast this;
-    }
+    @:to inline function toInt(): Int return cast this;
 
     inline function toString(): String {
         return ResultLookup.getString(cast this);
     }
 }
-@:include('./audio.h')
-@:sourceFile('./audio.c')
+@:include('./native.h')
+@:sourceFile('./native.c')
 @:native('int') @:unreflective
 private extern class MaResult {}
 
@@ -175,29 +193,32 @@ class ResultLookup {
 }
 
 /*
-    MINIAUDIO Configuration Structures
+    MINIAUDIO Classes
 */
-@:include('./audio.h')
-@:sourceFile('./audio.c')
+
+typedef ContextLogCallback = Callable<(Star<Context>, Star<Device>, logLevel: UInt32, message: ConstCharStar) -> Void>;
+
+@:include('./native.h')
+@:sourceFile('./native.c')
 @:native('ma_context_config') @:unreflective
 @:structAccess
 extern class ContextConfig {
     var threadPriority: ThreadPriority;
     var pUserData: Star<cpp.Void>;
-    // ma_log_proc logCallback;
+    var logCallback: ContextLogCallback;
     static inline function init(): ContextConfig {
         return untyped __global__.ma_context_config_init();
-    } 
+    }
 }
 
-@:include('./audio.h')
-@:sourceFile('./audio.c')
+@:include('./native.h')
+@:sourceFile('./native.c')
 @:native('ma_context') @:unreflective
 @:structAccess
 extern class Context {
 
     var backend: Backend;
-    // ma_log_proc logCallback;
+    var logCallback: ContextLogCallback;
     var threadPriority: ThreadPriority;
     var pUserData: Star<cpp.Void>;
     var deviceEnumLock: Mutex; /* Used to make ma_context_get_devices() thread safe. */
@@ -224,7 +245,7 @@ extern class Context {
     @:native('new ma_context')
     static function alloc(): Star<Context>;
 
-    static inline function init(?backends: Array<Backend>, config: Star<ContextConfig>, context: Star<Context>): Star<Context> {
+    static inline function init(?backends: Array<Backend>, config: Star<ContextConfig>, context: Star<Context>): Result {
         var backendCount = backends != null ? backends.length : 0;
         var backendsPointer = backends == null ? null : NativeArray.address(backends, 0);
         return untyped __global__.ma_context_init(backendsPointer, backendCount, config, context);
@@ -236,6 +257,7 @@ extern class Context {
 }
 
 @:structAccess
+@:unreflective
 extern class PlaybackInfo {
     //     char name[256]; /* Maybe temporary. Likely to be replaced with a query API. */
     //     ma_share_mode shareMode; /* Set to whatever was passed in when the device was initialized. */
@@ -258,8 +280,47 @@ extern class PlaybackInfo {
 
 typedef CaptureInfo = PlaybackInfo;
 
-@:include('./audio.h')
-@:sourceFile('./audio.c')
+@:structAccess
+@:unreflective
+extern class PlaybackConfig {
+    // ma_device_id* pDeviceID;
+    var format: Format;
+    var channels: UInt32;
+    // ma_channel channelMap[MA_MAX_CHANNELS];
+    var shareMode: ShareMode;
+}
+
+typedef CaptureConfig = PlaybackConfig;
+
+typedef DeviceDataCallback = Callable<(device: Star<Device>, output: Star<cpp.Void>, input: ConstStar<cpp.Void>, frameCount: UInt32) -> Void>;
+typedef DeviceStopCallback = Callable<(device: Star<Device>) -> Void>;
+
+@:include('./native.h')
+@:sourceFile('./native.c')
+@:native('ma_device_config') @:unreflective
+@:structAccess
+extern class DeviceConfig {
+
+    var deviceType: DeviceType;
+    var sampleRate: UInt32;
+    var bufferSizeInFrames: UInt32;
+    var bufferSizeInMilliseconds: UInt32;
+    var periods: UInt32;
+    var performanceProfile: PerformanceProfile;
+    var noPreZeroedOutputBuffer: Bool;  /* When set to true, the contents of the output buffer passed into the data callback will be left undefined rather than initialized to zero. */
+    var noClip: Bool;                   /* When set to true, the contents of the output buffer passed into the data callback will be clipped after returning. Only applies when the playback sample format is f32. */
+    var dataCallback: DeviceDataCallback;
+    var stopCallback: DeviceStopCallback;
+    var pUserData: Star<cpp.Void>;
+    var playback: PlaybackConfig;
+    var capture: CaptureConfig;
+    
+    @:native('ma_device_config_init')
+    static function init(type: DeviceType = PLAYBACK): DeviceConfig;
+}
+
+@:include('./native.h')
+@:sourceFile('./native.c')
 @:native('ma_device') @:unreflective
 @:structAccess
 extern class Device {
@@ -268,8 +329,8 @@ extern class Device {
     var type: DeviceType;
     var sampleRate: UInt32;
     var state: UInt32;
-    // ma_device_callback_proc onData;
-    // ma_stop_proc onStop;
+    var onData: DeviceDataCallback;
+    var onStop: DeviceStopCallback;
     var pUserData: Star<cpp.Void>;
     var lock: Mutex;
     var wakeupEvent: Event;
@@ -288,18 +349,32 @@ extern class Device {
     var playback: PlaybackInfo;
     var capture: CaptureInfo;
 
+    inline function init(context: Star<Context>, config: Star<DeviceConfig>): Result {
+        return untyped __global__.ma_device_init(context, config, (this: Star<Device>));
+    }
+
+    inline function uninit(): Void {
+        untyped __global__.ma_device_uninit((this: Star<Device>));
+    }
+
     inline function start(): Result {
-        return untyped __global__.ma_device_start(this);
+        return untyped __global__.ma_device_start((this: Star<Device>));
     }
 
     inline function stop(): Result {
-        return untyped __global__.ma_device_stop(this);
+        return untyped __global__.ma_device_stop((this: Star<Device>));
     }
+
+    @:native('~ma_device')
+    function free(): Void;
+
+    @:native('new ma_device')
+    static function alloc(): Star<Device>; 
 
 }
 
-@:include('./audio.h')
-@:sourceFile('./audio.c')
+@:include('./native.h')
+@:sourceFile('./native.c')
 @:native('ma_device_info') @:unreflective
 @:structAccess
 extern class DeviceInfo {
@@ -322,29 +397,29 @@ extern class DeviceInfo {
     var maxSampleRate: UInt32;
 }
 
-@:include('./audio.h')
-@:sourceFile('./audio.c')
+@:include('./native.h')
+@:sourceFile('./native.c')
 @:native('ma_mutex') @:unreflective
 extern class Mutex {
     var context: Star<Context>;
 }
 
-@:include('./audio.h')
-@:sourceFile('./audio.c')
+@:include('./native.h')
+@:sourceFile('./native.c')
 @:native('ma_thread') @:unreflective
 extern class Thread {
     var context: Star<Context>;
 }
 
-@:include('./audio.h')
-@:sourceFile('./audio.c')
+@:include('./native.h')
+@:sourceFile('./native.c')
 @:native('ma_event') @:unreflective
 extern class Event {
     var context: Star<Context>;
 }
 
-@:include('./audio.h')
-@:sourceFile('./audio.c')
+@:include('./native.h')
+@:sourceFile('./native.c')
 @:native('ma_semaphore') @:unreflective
 extern class Semaphore {
     var context: Star<Context>;
