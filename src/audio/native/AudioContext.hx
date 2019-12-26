@@ -1,15 +1,19 @@
 package audio.native;
 
+import audio.native.AudioSource.FileAudioSource;
 import audio.native.AudioSource.ExternAudioSource;
 import cpp.*;
 using Lambda;
 
 @:include('./native.h')
 @:sourceFile('./native.c')
+@:allow(audio.native.AudioNode)
+@:allow(audio.native.AudioSource)
 class AudioContext {
 
+    public final destination: AudioNode;
+
     final maDevice: Star<MiniAudio.Device>;
-    final nativeSourceList: Star<ExternAudioSourceList>;
     var started: Bool = false;
     var activeSources = new List<AudioSource>();
 
@@ -35,10 +39,11 @@ class AudioContext {
             throw 'Failed to initialize miniaudio device: $initResult';
         }
 
-        nativeSourceList = ExternAudioSourceList.create(maDevice.pContext);
-        maDevice.pUserData = cast nativeSourceList;
-
         cpp.vm.Gc.setFinalizer(this, Function.fromStaticFunction(finalizer));
+
+        destination = new AudioNode(this);
+
+        maDevice.pUserData = cast destination.nativeSourceList;
 
         resume();
     }
@@ -59,26 +64,19 @@ class AudioContext {
         }
     }
 
-    public inline function addSource(source: AudioSource) {
-        if (!activeSources.has(source)) {
-            activeSources.add(source);
-            this.nativeSourceList.add(source.nativeSource);
-        }
-    }
-
-    public inline function removeSource(source: AudioSource) {
-        activeSources.remove(source);
-        this.nativeSourceList.remove(source.nativeSource);
+    public function createFileSource(path: String): AudioNode {
+        return new AudioNode(this, new FileAudioSource(this, path));
     }
 
     static var gcReference = new List<AudioContext>();
 
     static function finalizer(instance: AudioContext) {
-        Stdio.printf("%s", "AudioContext.finalizer\n");
+        #if debug
+        Stdio.printf("%s\n", "[debug] AudioContext.finalizer()");
+        #end
 
         instance.maDevice.uninit();
         instance.maDevice.free();
-        ExternAudioSourceList.destroy(instance.nativeSourceList);
     }
 
 }
@@ -90,11 +88,11 @@ class AudioContext {
 extern class ExternAudioSourceList {
 
     inline function add(source: Star<ExternAudioSource>): Void {
-        untyped __global__.AudioSource_add(this, source);
+        untyped __global__.AudioSourceList_add(this, source);
     }
 
     inline function remove(source: Star<ExternAudioSource>): Bool {
-        return untyped __global__.AudioSource_remove(this, source);
+        return untyped __global__.AudioSourceList_remove(this, source);
     }
 
     @:native('AudioSourceList_create')

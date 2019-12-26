@@ -6,82 +6,9 @@
 #define MINIAUDIO_IMPLEMENTATION
 #include "./native.h"
 
-void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
-    AudioSourceList* sourceList = (AudioSourceList*) maDevice->pUserData;
-
-    if (sourceList == NULL) {
-        return;
-    }
-
-    static float decoderOutputBuffer[4096];
-
-    ma_uint32 channelCount = maDevice->playback.channels;
-
-    // @! can get seamless loops with a loop flag and seek
-    ma_uint32 bufferMaxFrames = ma_countof(decoderOutputBuffer) / channelCount;
-
-    ma_mutex_lock(&sourceList->lock);
-    {
-        AudioSourceListNode* currentSourceListNode = sourceList->sourceNext;
-        while (currentSourceListNode != NULL) {
-            AudioSource* source = currentSourceListNode->item;
-            currentSourceListNode = currentSourceListNode->next;
-
-            ma_assert(source != NULL);
-            ma_assert(source->maDecoder != NULL);
-                
-            ma_decoder* maDecoder = source->maDecoder;
-
-            // decoder should be setup to read into float buffers, if not then something has gone wrong
-            if (maDecoder->outputFormat != ma_format_f32) {
-                ma_post_error(maDevice, MA_LOG_LEVEL_ERROR, "decoder outputFormat was not ma_format_f32", MA_INVALID_OPERATION);
-                continue;
-            }
-
-            // we expect the decoder to have the same number of channels as the output
-            if (maDecoder->outputChannels != maDevice->playback.channels) {
-                ma_post_error(maDevice, MA_LOG_LEVEL_ERROR, "decoder / device channel number mismatch", MA_INVALID_OPERATION);
-                continue;
-            }
-
-            // read and mix frames in chunks of decoderOutputBuffer length
-            ma_uint32 totalFramesRead = 0;
-            ma_bool32 reachedEOF = MA_FALSE;
-            while (totalFramesRead < frameCount) {
-                ma_uint32 framesRemaining = frameCount - totalFramesRead;
-                ma_uint32 framesToRead = ma_min(framesRemaining, bufferMaxFrames);
-
-                ma_uint32 framesRead = (ma_uint32) ma_decoder_read_pcm_frames(maDecoder, decoderOutputBuffer, framesToRead);
-
-                // mix decoderOutputBuffer with pOutput, applying conversions if the playback format is not float
-                ma_uint32 sampleCount = framesRead * channelCount;
-                ma_uint32 outputOffset = totalFramesRead * channelCount;
-
-                float* mixBuffer = (float*)pOutput + outputOffset;
-
-                for(ma_uint32 sampleIdx = 0; sampleIdx < sampleCount; ++sampleIdx) {
-                    mixBuffer[sampleIdx] += decoderOutputBuffer[sampleIdx];
-                }
-
-                totalFramesRead += framesRead;
-
-                if (framesRead < framesToRead) {
-                    // we read less frames than we requested so we must have reached the end of this decoder
-                    reachedEOF = MA_TRUE;
-                    // if loop then we should seek to start here
-                    break;
-                }
-            }
-
-            if (reachedEOF) {
-                // trigger something
-                // @! this doesn't account for the case were we read exactly  all of the frames
-                // might need some thinking to enable seamless looping
-            }
-        }
-    }
-    ma_mutex_unlock(&sourceList->lock);
-}
+/**
+ * AudioSourceList
+ */
 
 AudioSourceList* AudioSourceList_create(ma_context* context) {
     AudioSourceList* instance = NULL;
@@ -173,4 +100,85 @@ int AudioSourceList_sourceCount(AudioSourceList* audioSourceList) {
     ma_mutex_unlock(&audioSourceList->lock);
 
     return count;
+}
+
+/**
+ * Global Audio Methods
+ */
+
+void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
+    AudioSourceList* sourceList = (AudioSourceList*) maDevice->pUserData;
+
+    if (sourceList == NULL) {
+        return;
+    }
+
+    static float decoderOutputBuffer[4096];
+
+    ma_uint32 channelCount = maDevice->playback.channels;
+
+    // @! can get seamless loops with a loop flag and seek
+    ma_uint32 bufferMaxFrames = ma_countof(decoderOutputBuffer) / channelCount;
+
+    ma_mutex_lock(&sourceList->lock);
+    {
+        AudioSourceListNode* currentSourceListNode = sourceList->sourceNext;
+        while (currentSourceListNode != NULL) {
+            AudioSource* source = currentSourceListNode->item;
+            currentSourceListNode = currentSourceListNode->next;
+
+            ma_assert(source != NULL);
+            ma_assert(source->maDecoder != NULL);
+                
+            ma_decoder* maDecoder = source->maDecoder;
+
+            // decoder should be setup to read into float buffers, if not then something has gone wrong
+            if (maDecoder->outputFormat != ma_format_f32) {
+                ma_post_error(maDevice, MA_LOG_LEVEL_ERROR, "decoder outputFormat was not ma_format_f32", MA_INVALID_OPERATION);
+                continue;
+            }
+
+            // we expect the decoder to have the same number of channels as the output
+            if (maDecoder->outputChannels != maDevice->playback.channels) {
+                ma_post_error(maDevice, MA_LOG_LEVEL_ERROR, "decoder / device channel number mismatch", MA_INVALID_OPERATION);
+                continue;
+            }
+
+            // read and mix frames in chunks of decoderOutputBuffer length
+            ma_uint32 totalFramesRead = 0;
+            ma_bool32 reachedEOF = MA_FALSE;
+            while (totalFramesRead < frameCount) {
+                ma_uint32 framesRemaining = frameCount - totalFramesRead;
+                ma_uint32 framesToRead = ma_min(framesRemaining, bufferMaxFrames);
+
+                ma_uint32 framesRead = (ma_uint32) ma_decoder_read_pcm_frames(maDecoder, decoderOutputBuffer, framesToRead);
+
+                // mix decoderOutputBuffer with pOutput, applying conversions if the playback format is not float
+                ma_uint32 sampleCount = framesRead * channelCount;
+                ma_uint32 outputOffset = totalFramesRead * channelCount;
+
+                float* mixBuffer = (float*)pOutput + outputOffset;
+
+                for(ma_uint32 sampleIdx = 0; sampleIdx < sampleCount; ++sampleIdx) {
+                    mixBuffer[sampleIdx] += decoderOutputBuffer[sampleIdx];
+                }
+
+                totalFramesRead += framesRead;
+
+                if (framesRead < framesToRead) {
+                    // we read less frames than we requested so we must have reached the end of this decoder
+                    reachedEOF = MA_TRUE;
+                    // if loop then we should seek to start here
+                    break;
+                }
+            }
+
+            if (reachedEOF) {
+                // trigger something
+                // @! this doesn't account for the case were we read exactly  all of the frames
+                // might need some thinking to enable seamless looping
+            }
+        }
+    }
+    ma_mutex_unlock(&sourceList->lock);
 }

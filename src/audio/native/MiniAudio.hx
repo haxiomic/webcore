@@ -206,9 +206,9 @@ extern class ContextConfig {
     var threadPriority: ThreadPriority;
     var pUserData: Star<cpp.Void>;
     var logCallback: ContextLogCallback;
-    static inline function init(): ContextConfig {
-        return untyped __global__.ma_context_config_init();
-    }
+
+    @:native('ma_context_config_init')
+    static function init(): ContextConfig;
 }
 
 @:include('./native.h')
@@ -239,20 +239,21 @@ extern class Context {
     // ma_result (* onDeviceStop    )(ma_device* pDevice);
     // ma_result (* onDeviceMainLoop)(ma_device* pDevice);
 
+    inline function init(?backends: Array<Backend>, config: Star<ContextConfig>): Result {
+        var backendCount = backends != null ? backends.length : 0;
+        var backendsPointer = backends == null ? null : NativeArray.address(backends, 0);
+        return untyped __global__.ma_context_init(backendsPointer, backendCount, config, (context: Star<Context>));
+    }
+
+    inline function uninit(): Result {
+        return untyped __global__.ma_context_uninit((this: Star<Context>));
+    }
+
     @:native('~ma_context')
     function free(): Void;
 
     @:native('new ma_context')
     static function alloc(): Star<Context>;
-
-    static inline function init(?backends: Array<Backend>, config: Star<ContextConfig>, context: Star<Context>): Result {
-        var backendCount = backends != null ? backends.length : 0;
-        var backendsPointer = backends == null ? null : NativeArray.address(backends, 0);
-        return untyped __global__.ma_context_init(backendsPointer, backendCount, config, context);
-    }
-
-    @:native('ma_context_uninit')
-    static function uninit(context: Star<Context>): Result;
 
 }
 
@@ -321,6 +322,30 @@ extern class DeviceConfig {
 
 @:include('./native.h')
 @:sourceFile('./native.c')
+@:native('ma_device_info') @:unreflective
+@:structAccess
+extern class DeviceInfo {
+    /* Basic info. This is the only information guaranteed to be filled in during device enumeration. */
+    // var id: Any; // type is backend dependent
+
+    /*
+    Detailed info. As much of this is filled as possible with ma_context_get_device_info(). Note that you are allowed to initialize
+    a device with settings outside of this range, but it just means the data will be converted using miniaudio's data conversion
+    pipeline before sending the data to/from the device. Most programs will need to not worry about these values, but it's provided
+    here mainly for informational purposes or in the rare case that someone might find it useful.
+
+    These will be set to 0 when returned by ma_context_enumerate_devices() or ma_context_get_devices().
+    */
+    var formatCount: UInt32;
+    var formats: Star<Format>;
+    var minChannels: UInt32;
+    var maxChannels: UInt32;
+    var minSampleRate: UInt32;
+    var maxSampleRate: UInt32;
+}
+
+@:include('./native.h')
+@:sourceFile('./native.c')
 @:native('ma_device') @:unreflective
 @:structAccess
 extern class Device {
@@ -375,26 +400,67 @@ extern class Device {
 
 @:include('./native.h')
 @:sourceFile('./native.c')
-@:native('ma_device_info') @:unreflective
+@:native('ma_decoder_config') @:unreflective
 @:structAccess
-extern class DeviceInfo {
-    /* Basic info. This is the only information guaranteed to be filled in during device enumeration. */
-    // var id: Any; // type is backend dependent
+extern class DecoderConfig {
+    var format: Format;      /* Set to 0 or ma_format_unknown to use the stream's internal format. */
+    var channels: UInt32;    /* Set to 0 to use the stream's internal channels. */
+    var sampleRate: UInt32;  /* Set to 0 to use the stream's internal sample rate. */
+    // ma_channel channelMap[MA_MAX_CHANNELS];
+    // ma_channel_mix_mode channelMixMode;
+    // ma_dither_mode ditherMode;
+    // ma_src_algorithm srcAlgorithm;
+    // union
+    // {
+    //     ma_src_config_sinc sinc;
+    // } src;
+    
+    @:native('ma_decoder_config_init')
+    static function init(outputFormat: Format, outputChannels: UInt32, outputSampleRate: UInt32): DecoderConfig;
+}
 
-    /*
-    Detailed info. As much of this is filled as possible with ma_context_get_device_info(). Note that you are allowed to initialize
-    a device with settings outside of this range, but it just means the data will be converted using miniaudio's data conversion
-    pipeline before sending the data to/from the device. Most programs will need to not worry about these values, but it's provided
-    here mainly for informational purposes or in the rare case that someone might find it useful.
+@:include('./native.h')
+@:sourceFile('./native.c')
+@:native('ma_decoder') @:unreflective
+@:structAccess
+extern class Decoder {
+    // ma_decoder_read_proc onRead;
+    // ma_decoder_seek_proc onSeek;
+    var pUserData: Star<cpp.Void>;
+    var readPointer: UInt64; /* Used for returning back to a previous position after analysing the stream or whatnot. */
+    var internalFormat: Format;
+    var internalChannels: UInt32;
+    var internalSampleRate: UInt32;
+    // ma_channel internalChannelMap[MA_MAX_CHANNELS];
+    var outputFormat: Format;
+    var outputChannels: UInt32;
+    var outputSampleRate: UInt32;
+    // ma_channel outputChannelMap[MA_MAX_CHANNELS];
+    // ma_pcm_converter dsp;   /* <-- Format conversion is achieved by running frames through this. */
+    // ma_decoder_seek_to_pcm_frame_proc onSeekToPCMFrame;
+    // ma_decoder_uninit_proc onUninit;
+    // ma_decoder_get_length_in_pcm_frames_proc onGetLengthInPCMFrames;
+    // void* pInternalDecoder; /* <-- The drwav/drflac/stb_vorbis/etc. objects. */
+    // struct
+    // {
+    //     const ma_uint8* pData;
+    //     size_t dataSize;
+    //     size_t currentReadPos;
+    // } memory;               /* Only used for decoders that were opened against a block of memory. */
 
-    These will be set to 0 when returned by ma_context_enumerate_devices() or ma_context_get_devices().
-    */
-    var formatCount: UInt32;
-    var formats: Star<Format>;
-    var minChannels: UInt32;
-    var maxChannels: UInt32;
-    var minSampleRate: UInt32;
-    var maxSampleRate: UInt32;
+    inline function initFile(filePath: ConstCharStar, config: ConstStar<DecoderConfig>): Result {
+        return untyped __global__.ma_decoder_init_file(filePath, config, (this: Star<Decoder>));
+    }
+
+    inline function uninit(): Result {
+        return untyped __global__.ma_decoder_uninit((this: Star<Decoder>));
+    }
+
+    @:native('~ma_decoder')
+    function free(): Void;
+
+    @:native('new ma_decoder')
+    static function alloc(): Star<Decoder>; 
 }
 
 @:include('./native.h')

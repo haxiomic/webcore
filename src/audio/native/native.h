@@ -11,7 +11,12 @@
 extern "C" {
 #endif
 
+/**
+ * AudioSource
+ */
+
 typedef struct {
+    ma_mutex    lock;
     ma_decoder* maDecoder;
 
     // use atomics access for the following
@@ -21,25 +26,41 @@ typedef struct {
 
 } AudioSource;
 
+
+/**
+ * AudioSourceListNode
+ * 
+ */
+
 typedef struct AudioSourceListNode {
-    AudioSource* item;
+    AudioSource*                item;
     struct AudioSourceListNode* next;
 } AudioSourceListNode;
 
+
+/**
+ * AudioSourceList
+ */
+
 typedef struct {
-    ma_mutex lock; // acquire when accessing sourceNext list
+    ma_mutex             lock; // acquire when accessing sourceNext list
     AudioSourceListNode* sourceNext;
 } AudioSourceList;
 
-void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma_uint32 frameCount);
 
 AudioSourceList* AudioSourceList_create(ma_context* context);
-void AudioSourceList_destroy(AudioSourceList* instance);
+void             AudioSourceList_destroy(AudioSourceList* instance);
 
-
-void AudioSourceList_add(AudioSourceList* list, AudioSource* source);
+void      AudioSourceList_add(AudioSourceList* list, AudioSource* source);
 ma_bool32 AudioSourceList_remove(AudioSourceList* list, AudioSource* source);
-int AudioSourceList_sourceCount(AudioSourceList* list);
+int       AudioSourceList_sourceCount(AudioSourceList* list);
+
+
+/**
+ * Global Audio Methods
+ */
+
+void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma_uint32 frameCount);
 
 #ifdef __cplusplus
 }
