@@ -1,19 +1,17 @@
 package audio.native;
 
-import audio.native.AudioSource.FileAudioSource;
 import cpp.*;
 
 @:include('./native.h')
 @:sourceFile('./native.m')
 @:allow(audio.native.AudioNode)
-@:allow(audio.native.AudioSource)
+@:allow(audio.native.AudioDecoder)
 class AudioContext {
 
     public final destination: AudioNode;
 
     final maDevice: Star<MiniAudio.Device>;
     var started: Bool = false;
-    var activeSources = new List<AudioSource>();
 
     public function new(?options: {
         ?sampleRate: Int,
@@ -63,7 +61,7 @@ class AudioContext {
     }
 
     public function createFileSource(path: String): AudioNode {
-        return new AudioNode(this, new FileAudioSource(this, path));
+        return new AudioNode(this, new AudioDecoder.FileDecoder(this, path));
     }
 
     public function createBufferSource(): AudioNode.AudioBufferSourceNode {
@@ -72,7 +70,7 @@ class AudioContext {
 
     public function decodeAudioData(audioData: haxe.io.Bytes, ?successCallback: AudioBuffer -> Void, ?errorCallback: String -> Void): Void {
         try {
-            var audioBuffer = new AudioSource.BufferAudioSource(this, audioData);
+            var audioBuffer = new AudioBuffer(audioData);
             if (successCallback != null) {
                 successCallback(audioBuffer);
             }

@@ -1,22 +1,30 @@
 package audio.native;
 
-import audio.native.AudioSource.NativeAudioSource;
 import cpp.*;
 
 @:allow(audio.native.AudioContext)
 class AudioNode {
 
     public final context: AudioContext;
-    var source: Null<AudioSource>;
+    public var numberOfInputs(get, null): Int;
+    public var numberOfOutputs(get, null): Int;
+
+    var decoder: Null<AudioDecoder>;
+    final nativeSource: Star<NativeAudioSource>;
 
     final nativeSourceList: Star<NativeAudioSourceList>;
     final connectedSources = new List<AudioNode>();
     final connectedDestinations = new List<AudioNode>();
 
-    function new(context: AudioContext, ?source: AudioSource) {
+
+    function new(context: AudioContext, ?decoder: AudioDecoder) {
         this.context = context;
-        this.source = source;
-        nativeSourceList = NativeAudioSourceList.create(context.maDevice.pContext);
+        this.nativeSource = NativeAudioSource.create(context.maDevice.pContext);
+        this.nativeSourceList = NativeAudioSourceList.create(context.maDevice.pContext);
+
+        if (decoder != null) {
+            setDecoder(decoder);
+        }
 
         cpp.vm.Gc.setFinalizer(this, Function.fromStaticFunction(finalizer));
     }
@@ -33,69 +41,97 @@ class AudioNode {
         destination.removeSourceNode(this);
     }
 
-    function updateSource(newSource: Null<AudioSource>) {
-        // first disconnect all existing destinations
-        var connectedDestinationsCopy = new List<AudioNode>();
-        for (node in connectedDestinations) {
-            connectedDestinationsCopy.add(node);
-        }
-
-        for (node in connectedDestinationsCopy) {
-            disconnect(node);
-        }
-
-        // change value of source
-        this.source = newSource;
-
-        // reconnect
-        for (node in connectedDestinationsCopy) {
-            connect(node);
+    function setDecoder(decoder: AudioDecoder) {
+        this.decoder = decoder;
+        if (nativeSource != null) {
+            this.nativeSource.maDecoder = decoder.maDecoder;
         }
     }
 
     function addSourceNode(node: AudioNode) {
         if (!Lambda.has(connectedSources, node)) {
             connectedSources.add(node);
-            if (node.source != null) {
-                this.nativeSourceList.add(node.source.nativeSource);
+            if (node.nativeSource != null) {
+                this.nativeSourceList.add(node.nativeSource);
             }
         }
     }
 
     function removeSourceNode(node: AudioNode) {
         connectedSources.remove(node);
-        if (node.source != null) {
-            this.nativeSourceList.remove(node.source.nativeSource);
+        if (node.nativeSource != null) {
+            this.nativeSourceList.remove(node.nativeSource);
         }
+    }
+
+    inline function get_numberOfInputs(): Int {
+        return this.connectedSources.length;
+    }
+
+    inline function get_numberOfOutputs(): Int {
+        return this.connectedDestinations.length;
     }
 
     static function finalizer(instance: AudioNode) {
         #if debug
         Stdio.printf("%s\n", "[debug] AudioNode.finalizer()");
         #end
+        NativeAudioSource.destroy(instance.nativeSource);
         NativeAudioSourceList.destroy(instance.nativeSourceList);
     }
 
 }
 
-class AudioBufferSourceNode extends AudioScheduledSourceNode {
-
-    public var buffer (get, set): AudioBuffer;
-
-    inline function get_buffer(): AudioBuffer {
-        return cast this.source;
-    }
-
-    inline function set_buffer(b: AudioBuffer): AudioBuffer {
-        updateSource(b);
-        return b;
-    }
-
-}
 
 class AudioScheduledSourceNode extends AudioNode {
     // public function start()
     // public function stop()
+}
+
+class AudioBufferSourceNode extends AudioScheduledSourceNode {
+
+    public var buffer (get, set): AudioBuffer;
+    var _buffer: AudioBuffer;
+
+    inline function get_buffer(): AudioBuffer {
+        return this._buffer;
+    }
+
+    inline function set_buffer(b: AudioBuffer): AudioBuffer {
+        // create a decoder for this buffer
+        var bytesDecoder = new AudioDecoder.FileBytesDecoder(context, b.audioFileBytes);
+        setDecoder(bytesDecoder);
+        return _buffer = b;
+    }
+
+}
+
+@:include('./native.h')
+@:sourceFile('./native.m')
+@:native('AudioSource') @:unreflective
+@:structAccess
+@:access(audio.native.AudioContext)
+extern class NativeAudioSource {
+
+    var maDecoder: Star<MiniAudio.Decoder>;
+    // var mutex: Mutex;
+
+    @:native('~AudioSource')
+    function free(): Void;
+
+    @:native('new AudioSource')
+    static function alloc(): Star<NativeAudioSource>;
+
+    static inline function create(maContext: Star<MiniAudio.Context>): Star<NativeAudioSource> {
+        var instance = alloc();
+        instance.maDecoder = null;
+        return instance;
+    }
+
+    static inline function destroy(instance: NativeAudioSource): Void {
+        instance.free();
+    }
+
 }
 
 @:include('./native.h')
@@ -113,7 +149,7 @@ extern class NativeAudioSourceList {
     }
 
     @:native('AudioSourceList_create')
-    static function create(context: Star<MiniAudio.Context>): Star<NativeAudioSourceList>;
+    static function create(maContext: Star<MiniAudio.Context>): Star<NativeAudioSourceList>;
 
     @:native('AudioSourceList_destroy')
     static function destroy(instance: Star<NativeAudioSourceList>): Void;

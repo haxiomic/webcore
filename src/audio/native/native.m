@@ -131,9 +131,11 @@ void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma
             currentSourceListNode = currentSourceListNode->next;
 
             ma_assert(source != NULL);
-            ma_assert(source->maDecoder != NULL);
-                
+
             ma_decoder* maDecoder = source->maDecoder;
+
+            // maDecoder is allowed to be NULL
+            if (maDecoder == NULL) continue;
 
             // decoder should be setup to read into float buffers, if not then something has gone wrong
             if (maDecoder->outputFormat != ma_format_f32) {
