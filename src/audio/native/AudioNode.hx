@@ -45,6 +45,7 @@ class AudioNode {
         this.decoder = decoder;
         if (nativeSource != null) {
             this.nativeSource.maDecoder = decoder.maDecoder;
+            this.nativeSource.maDecoderLock = decoder.maDecoderLock;
         }
     }
 
@@ -114,7 +115,7 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
 extern class NativeAudioSource {
 
     var maDecoder: Star<MiniAudio.Decoder>;
-    // var mutex: Mutex;
+    var maDecoderLock: Star<MiniAudio.Mutex>;
 
     @:native('~AudioSource')
     function free(): Void;
@@ -125,6 +126,7 @@ extern class NativeAudioSource {
     static inline function create(maContext: Star<MiniAudio.Context>): Star<NativeAudioSource> {
         var instance = alloc();
         instance.maDecoder = null;
+        instance.maDecoderLock = null;
         return instance;
     }
 

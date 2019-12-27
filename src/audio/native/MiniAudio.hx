@@ -454,16 +454,41 @@ extern class Decoder {
     //     size_t currentReadPos;
     // } memory;               /* Only used for decoders that were opened against a block of memory. */
 
-    inline function initFile(filePath: ConstCharStar, config: ConstStar<DecoderConfig>): Result {
+    inline function init_file(filePath: ConstCharStar, config: ConstStar<DecoderConfig>): Result {
         return untyped __global__.ma_decoder_init_file(filePath, config, (this: Star<Decoder>));
     }
 
-    inline function initMemory(bytes: ConstStar<cpp.Void>, byteLength: cpp.SizeT, config: ConstStar<DecoderConfig>): Result {
+    inline function init_memory(bytes: ConstStar<cpp.Void>, byteLength: cpp.SizeT, config: ConstStar<DecoderConfig>): Result {
         return untyped __global__.ma_decoder_init_memory(bytes, byteLength, config, (this: Star<Decoder>));
+    }
+
+    inline function init_memory_raw(bytes: ConstStar<cpp.Void>, byteLength: cpp.SizeT, configIn: ConstStar<DecoderConfig>, configOut: ConstStar<DecoderConfig>): Result {
+        return untyped __global__.ma_decoder_init_memory_raw(bytes, byteLength, configIn, configOut, (this: Star<Decoder>));
     }
 
     inline function uninit(): Result {
         return untyped __global__.ma_decoder_uninit((this: Star<Decoder>));
+    }
+
+    /**
+        Not thread-safe – audio thread may also be using the decoder, must synchronize before calling this
+    **/
+    inline function get_length_in_pcm_frames(): UInt64 {
+        return untyped __global__.ma_decoder_get_length_in_pcm_frames((this: Star<Decoder>));
+    }
+
+    /**
+        Not thread-safe – audio thread may also be using the decoder, must synchronize before calling this
+    **/
+    inline function read_pcm_frames(framesOut: Star<cpp.Void>, frameCount: UInt64): UInt64 {
+        return untyped __global__.ma_decoder_read_pcm_frames((this: Star<Decoder>), framesOut, frameCount);
+    }
+
+    /**
+        Not thread-safe – audio thread may also be using the decoder, must synchronize before calling this
+    **/
+    inline function seek_to_pcm_frame(frameIndex: UInt64): Result {
+        return untyped __global__.ma_decoder_seek_to_pcm_frame((this: Star<Decoder>), frameIndex);
     }
 
     @:native('~ma_decoder')
@@ -476,13 +501,41 @@ extern class Decoder {
 @:include('./native.h')
 @:sourceFile('./native.m')
 @:native('ma_mutex') @:unreflective
+@:structAccess
 extern class Mutex {
     var context: Star<Context>;
+
+    /*
+    A mutex must be created from a valid context. A mutex is initially unlocked.
+    */
+    inline function init(context: Star<Context>): Result {
+        return untyped __global__.ma_mutex_init(context, (this: Star<Mutex>));
+    }
+
+    inline function uninit(): Void {
+        untyped __global__.ma_mutex_uninit((this: Star<Mutex>));
+    }
+
+    inline function lock(): Void {
+        untyped __global__.ma_mutex_lock((this: Star<Mutex>));
+    }
+
+    inline function unlock(): Void {
+        untyped __global__.ma_mutex_unlock((this: Star<Mutex>));
+    }
+
+    @:native('~ma_mutex')
+    function free(): Void;
+
+    @:native('new ma_mutex')
+    static function alloc(): Star<Mutex>; 
+
 }
 
 @:include('./native.h')
 @:sourceFile('./native.m')
 @:native('ma_thread') @:unreflective
+@:structAccess
 extern class Thread {
     var context: Star<Context>;
 }
@@ -490,6 +543,7 @@ extern class Thread {
 @:include('./native.h')
 @:sourceFile('./native.m')
 @:native('ma_event') @:unreflective
+@:structAccess
 extern class Event {
     var context: Star<Context>;
 }
@@ -497,6 +551,7 @@ extern class Event {
 @:include('./native.h')
 @:sourceFile('./native.m')
 @:native('ma_semaphore') @:unreflective
+@:structAccess
 extern class Semaphore {
     var context: Star<Context>;
 }

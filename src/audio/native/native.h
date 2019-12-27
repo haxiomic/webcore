@@ -25,7 +25,7 @@ extern "C" {
  */
 
 typedef struct {
-    ma_mutex    lock;
+    ma_mutex*   maDecoderLock;
     ma_decoder* maDecoder;
 
     // use atomics access for the following

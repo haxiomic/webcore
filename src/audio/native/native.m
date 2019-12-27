@@ -133,9 +133,12 @@ void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma
             ma_assert(source != NULL);
 
             ma_decoder* maDecoder = source->maDecoder;
+            ma_mutex* maDecoderLock = source->maDecoderLock;
 
             // maDecoder is allowed to be NULL
             if (maDecoder == NULL) continue;
+
+            ma_assert(maDecoderLock != NULL);
 
             // decoder should be setup to read into float buffers, if not then something has gone wrong
             if (maDecoder->outputFormat != ma_format_f32) {
@@ -156,7 +159,9 @@ void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma
                 ma_uint32 framesRemaining = frameCount - totalFramesRead;
                 ma_uint32 framesToRead = ma_min(framesRemaining, bufferMaxFrames);
 
+                ma_mutex_lock(maDecoderLock);
                 ma_uint32 framesRead = (ma_uint32) ma_decoder_read_pcm_frames(maDecoder, decoderOutputBuffer, framesToRead);
+                ma_mutex_unlock(maDecoderLock);
 
                 // mix decoderOutputBuffer with pOutput, applying conversions if the playback format is not float
                 ma_uint32 sampleCount = framesRead * channelCount;
