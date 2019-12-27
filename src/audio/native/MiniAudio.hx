@@ -9,7 +9,7 @@ package audio.native;
 import cpp.*;
 
 @:include('./native.h')
-@:sourceFile('./native.c')
+@:sourceFile('./native.m')
 extern class MiniAudio { }
 
 /*
@@ -37,7 +37,7 @@ extern enum abstract Backend(MaBackend) {
     }
 }
 @:include('./native.h')
-@:sourceFile('./native.c')
+@:sourceFile('./native.m')
 @:unreflective @:native('ma_backend')
 private extern class MaBackend {}
 
@@ -54,7 +54,7 @@ extern enum abstract ThreadPriority(MaThreadPriority) {
     @:from static inline function fromInt(i: Int): ThreadPriority return cast i;
 }
 @:include('./native.h')
-@:sourceFile('./native.c')
+@:sourceFile('./native.m')
 @:native('ma_thread_priority') @:unreflective 
 private extern class MaThreadPriority {}
 
@@ -72,7 +72,7 @@ extern enum abstract Format(MaFormat) {
     @:native('ma_format_count') var COUNT;
 }
 @:include('./native.h')
-@:sourceFile('./native.c')
+@:sourceFile('./native.m')
 @:native('ma_format') @:unreflective
 private extern class MaFormat {}
 
@@ -83,7 +83,7 @@ extern enum abstract DeviceType(MaDeviceType) {
     @:native('ma_device_type_loopback') var LOOPBACK;
 }
 @:include('./native.h')
-@:sourceFile('./native.c')
+@:sourceFile('./native.m')
 @:native('ma_device_type') @:unreflective
 private extern class MaDeviceType {}
 
@@ -92,7 +92,7 @@ extern enum abstract PerformanceProfile(MaPerformanceProfile) {
     @:native('ma_performance_profile_conservative') var CONSERVATIVE;
 }
 @:include('./native.h')
-@:sourceFile('./native.c')
+@:sourceFile('./native.m')
 @:native('ma_performance_profile') @:unreflective
 private extern class MaPerformanceProfile {}
 
@@ -101,12 +101,12 @@ extern enum abstract ShareMode(MaShareMode) {
     @:native('ma_share_mode_exclusive') var EXCLUSIVE;
 }
 @:include('./native.h')
-@:sourceFile('./native.c')
+@:sourceFile('./native.m')
 @:native('ma_share_mode') @:unreflective
 private extern class MaShareMode {}
 
 @:include('./native.h')
-@:sourceFile('./native.c')
+@:sourceFile('./native.m')
 extern enum abstract Result(MaResult) {
     @:native('MA_SUCCESS') var SUCCESS;
     @:native('MA_ERROR') var ERROR;
@@ -150,7 +150,7 @@ extern enum abstract Result(MaResult) {
     }
 }
 @:include('./native.h')
-@:sourceFile('./native.c')
+@:sourceFile('./native.m')
 @:native('int') @:unreflective
 private extern class MaResult {}
 
@@ -205,7 +205,7 @@ class ResultLookup {
 typedef ContextLogCallback = Callable<(Star<Context>, Star<Device>, logLevel: UInt32, message: ConstCharStar) -> Void>;
 
 @:include('./native.h')
-@:sourceFile('./native.c')
+@:sourceFile('./native.m')
 @:native('ma_context_config') @:unreflective
 @:structAccess
 extern class ContextConfig {
@@ -218,7 +218,7 @@ extern class ContextConfig {
 }
 
 @:include('./native.h')
-@:sourceFile('./native.c')
+@:sourceFile('./native.m')
 @:native('ma_context') @:unreflective
 @:structAccess
 extern class Context {
@@ -303,7 +303,7 @@ typedef DeviceDataCallback = Callable<(device: Star<Device>, output: Star<cpp.Vo
 typedef DeviceStopCallback = Callable<(device: Star<Device>) -> Void>;
 
 @:include('./native.h')
-@:sourceFile('./native.c')
+@:sourceFile('./native.m')
 @:native('ma_device_config') @:unreflective
 @:structAccess
 extern class DeviceConfig {
@@ -327,7 +327,7 @@ extern class DeviceConfig {
 }
 
 @:include('./native.h')
-@:sourceFile('./native.c')
+@:sourceFile('./native.m')
 @:native('ma_device_info') @:unreflective
 @:structAccess
 extern class DeviceInfo {
@@ -351,7 +351,7 @@ extern class DeviceInfo {
 }
 
 @:include('./native.h')
-@:sourceFile('./native.c')
+@:sourceFile('./native.m')
 @:native('ma_device') @:unreflective
 @:structAccess
 extern class Device {
@@ -405,7 +405,7 @@ extern class Device {
 }
 
 @:include('./native.h')
-@:sourceFile('./native.c')
+@:sourceFile('./native.m')
 @:native('ma_decoder_config') @:unreflective
 @:structAccess
 extern class DecoderConfig {
@@ -426,7 +426,7 @@ extern class DecoderConfig {
 }
 
 @:include('./native.h')
-@:sourceFile('./native.c')
+@:sourceFile('./native.m')
 @:native('ma_decoder') @:unreflective
 @:structAccess
 extern class Decoder {
@@ -474,28 +474,28 @@ extern class Decoder {
 }
 
 @:include('./native.h')
-@:sourceFile('./native.c')
+@:sourceFile('./native.m')
 @:native('ma_mutex') @:unreflective
 extern class Mutex {
     var context: Star<Context>;
 }
 
 @:include('./native.h')
-@:sourceFile('./native.c')
+@:sourceFile('./native.m')
 @:native('ma_thread') @:unreflective
 extern class Thread {
     var context: Star<Context>;
 }
 
 @:include('./native.h')
-@:sourceFile('./native.c')
+@:sourceFile('./native.m')
 @:native('ma_event') @:unreflective
 extern class Event {
     var context: Star<Context>;
 }
 
 @:include('./native.h')
-@:sourceFile('./native.c')
+@:sourceFile('./native.m')
 @:native('ma_semaphore') @:unreflective
 extern class Semaphore {
     var context: Star<Context>;

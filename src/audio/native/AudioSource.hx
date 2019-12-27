@@ -60,7 +60,7 @@ class BufferAudioSource extends AudioSource {
 }
 
 @:include('./native.h')
-@:sourceFile('./native.c')
+@:sourceFile('./native.m')
 @:native('AudioSource') @:unreflective
 @:structAccess
 @:access(audio.native.AudioContext)

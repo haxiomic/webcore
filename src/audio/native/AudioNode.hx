@@ -99,7 +99,7 @@ class AudioScheduledSourceNode extends AudioNode {
 }
 
 @:include('./native.h')
-@:sourceFile('./native.c')
+@:sourceFile('./native.m')
 @:native('AudioSourceList') @:unreflective
 @:structAccess
 extern class NativeAudioSourceList {

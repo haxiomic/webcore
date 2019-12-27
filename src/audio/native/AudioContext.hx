@@ -4,7 +4,7 @@ import audio.native.AudioSource.FileAudioSource;
 import cpp.*;
 
 @:include('./native.h')
-@:sourceFile('./native.c')
+@:sourceFile('./native.m')
 @:allow(audio.native.AudioNode)
 @:allow(audio.native.AudioSource)
 class AudioContext {
