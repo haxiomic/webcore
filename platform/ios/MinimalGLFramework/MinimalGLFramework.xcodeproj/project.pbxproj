@@ -11,6 +11,8 @@
 		BE35669B23255E8F00F0CD08 /* MinimalGLFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = BE35669923255E8F00F0CD08 /* MinimalGLFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BE3566A42325647E00F0CD08 /* MinimalGLC.h in Headers */ = {isa = PBXBuildFile; fileRef = BE3566A32325647E00F0CD08 /* MinimalGLC.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BE3566AB23256FC300F0CD08 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BE3566AA23256FC300F0CD08 /* libc++.tbd */; };
+		BE48749F23B61512005644A1 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE48749E23B61512005644A1 /* AVFoundation.framework */; };
+		BE4874A123B61535005644A1 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE4874A023B61535005644A1 /* AudioToolbox.framework */; };
 		BEA0D5512326CDB200984B67 /* MinimalGL.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA0D5502326CDB200984B67 /* MinimalGL.swift */; };
 		BEA0D5532326CFB400984B67 /* libMinimalGL.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BEA0D5522326CFB400984B67 /* libMinimalGL.a */; };
 /* End PBXBuildFile section */
@@ -22,6 +24,8 @@
 		BE35669A23255E8F00F0CD08 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BE3566A32325647E00F0CD08 /* MinimalGLC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MinimalGLC.h; path = ../../../../src/native/MinimalGLC.h; sourceTree = "<group>"; };
 		BE3566AA23256FC300F0CD08 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
+		BE48749E23B61512005644A1 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		BE4874A023B61535005644A1 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		BEA0D5502326CDB200984B67 /* MinimalGL.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MinimalGL.swift; sourceTree = "<group>"; };
 		BEA0D5522326CFB400984B67 /* libMinimalGL.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMinimalGL.a; path = "../_hxcpp-bin/libMinimalGL.a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -31,6 +35,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE4874A123B61535005644A1 /* AudioToolbox.framework in Frameworks */,
+				BE48749F23B61512005644A1 /* AVFoundation.framework in Frameworks */,
 				BE3566AB23256FC300F0CD08 /* libc++.tbd in Frameworks */,
 				BEA0D5532326CFB400984B67 /* libMinimalGL.a in Frameworks */,
 			);
@@ -71,6 +77,8 @@
 		BE3566A723256D5A00F0CD08 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BE4874A023B61535005644A1 /* AudioToolbox.framework */,
+				BE48749E23B61512005644A1 /* AVFoundation.framework */,
 				BEA0D5522326CFB400984B67 /* libMinimalGL.a */,
 				BE3566AA23256FC300F0CD08 /* libc++.tbd */,
 			);
