@@ -1,6 +1,5 @@
 package audio.native;
 
-import typedarray.ArrayBuffer;
 import audio.native.AudioSource.FileAudioSource;
 import cpp.*;
 
@@ -71,7 +70,7 @@ class AudioContext {
         return new AudioNode.AudioBufferSourceNode(this);
     }
 
-    public function decodeAudioData(audioData: ArrayBuffer, ?successCallback: AudioBuffer -> Void, ?errorCallback: String -> Void): Void {
+    public function decodeAudioData(audioData: haxe.io.Bytes, ?successCallback: AudioBuffer -> Void, ?errorCallback: String -> Void): Void {
         try {
             var audioBuffer = new AudioSource.BufferAudioSource(this, audioData);
             if (successCallback != null) {
