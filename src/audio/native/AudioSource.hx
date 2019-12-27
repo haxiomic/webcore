@@ -6,7 +6,7 @@ import audio.native.MiniAudio.Decoder;
 import cpp.*;
 
 @:allow(audio.native.AudioNode)
-@:native('AudioSourceHx')
+@:native('AudioSourceHx') // rename to avoid the collision with AudioSource in C
 class AudioSource {
 
     final nativeSource: Star<NativeAudioSource>;

@@ -67,7 +67,7 @@ class AudioContext {
         return new AudioNode(this, new FileAudioSource(this, path));
     }
 
-	public function createBufferSource(): AudioNode.AudioBufferSourceNode {
+    public function createBufferSource(): AudioNode.AudioBufferSourceNode {
         return new AudioNode.AudioBufferSourceNode(this);
     }
 

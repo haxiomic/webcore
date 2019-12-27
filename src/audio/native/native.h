@@ -1,3 +1,12 @@
+/**
+ * This file include miniaudio.h with #define flags and provides helper utilities, including
+ * - Thread-safe linked list to track audio source references between the audio thread and haxe thread
+ * - Audio source abstraction with looping and play-state
+ * - An audio mixer function to use as the dataCallback in miniaudio.h
+ * 
+ * @author George Corney (haxiomic)
+ */
+
 #ifndef AUDIO_NATIVE_NATIVE_H
 #define AUDIO_NATIVE_NATIVE_H
 
@@ -40,6 +49,7 @@ typedef struct AudioSourceListNode {
 
 /**
  * AudioSourceList
+ * Linked-list of AudioSources with a miniaudio mutex lock
  */
 
 typedef struct {
@@ -57,7 +67,7 @@ int       AudioSourceList_sourceCount(AudioSourceList* list);
 
 
 /**
- * Global Audio Methods
+ * Global Audio Functions
  */
 
 void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma_uint32 frameCount);

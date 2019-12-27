@@ -1,6 +1,9 @@
 // audio file decoders
 #define DR_MP3_IMPLEMENTATION
 #include "./miniaudio/extras/dr_mp3.h"
+// other possible formats:
+// #include "./miniaudio/extras/dr_flac.h"
+// #include "./miniaudio/extras/dr_wav.h"
 
 // miniaudio implementation
 #define MINIAUDIO_IMPLEMENTATION
@@ -159,6 +162,7 @@ void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma
 
                 float* mixBuffer = (float*)pOutput + outputOffset;
 
+                // with compiler optimizations enabled, this should vectorize
                 for(ma_uint32 sampleIdx = 0; sampleIdx < sampleCount; ++sampleIdx) {
                     mixBuffer[sampleIdx] += decoderOutputBuffer[sampleIdx];
                 }
