@@ -1880,6 +1880,31 @@ typedef enum
     ma_share_mode_exclusive
 } ma_share_mode;
 
+/* iOS/tvOS/watchOS session categories. */
+typedef enum
+{
+    ma_ios_session_category_default = 0,        /* AVAudioSessionCategoryPlayAndRecord with AVAudioSessionCategoryOptionDefaultToSpeaker. */
+    ma_ios_session_category_none,               /* Leave the session category unchanged. */
+    ma_ios_session_category_ambient,            /* AVAudioSessionCategoryAmbient */
+    ma_ios_session_category_solo_ambient,       /* AVAudioSessionCategorySoloAmbient */
+    ma_ios_session_category_playback,           /* AVAudioSessionCategoryPlayback */
+    ma_ios_session_category_record,             /* AVAudioSessionCategoryRecord */
+    ma_ios_session_category_play_and_record,    /* AVAudioSessionCategoryPlayAndRecord */
+    ma_ios_session_category_multi_route         /* AVAudioSessionCategoryMultiRoute */
+} ma_ios_session_category;
+
+/* iOS/tvOS/watchOS session category options */
+typedef enum
+{
+    ma_ios_session_category_option_mix_with_others                            = 0x01,   /* AVAudioSessionCategoryOptionMixWithOthers */
+    ma_ios_session_category_option_duck_others                                = 0x02,   /* AVAudioSessionCategoryOptionDuckOthers */
+    ma_ios_session_category_option_allow_bluetooth                            = 0x04,   /* AVAudioSessionCategoryOptionAllowBluetooth */
+    ma_ios_session_category_option_default_to_speaker                         = 0x08,   /* AVAudioSessionCategoryOptionDefaultToSpeaker */
+    ma_ios_session_category_option_interrupt_spoken_audio_and_mix_with_others = 0x11,   /* AVAudioSessionCategoryOptionInterruptSpokenAudioAndMixWithOthers */
+    ma_ios_session_category_option_allow_bluetooth_a2dp                       = 0x20,   /* AVAudioSessionCategoryOptionAllowBluetoothA2DP */
+    ma_ios_session_category_option_allow_air_play                             = 0x40,   /* AVAudioSessionCategoryOptionAllowAirPlay */
+} ma_ios_session_category_option;
+
 typedef union
 {
 #ifdef MA_SUPPORT_WASAPI
@@ -2018,7 +2043,8 @@ typedef struct
     } pulse;
     struct
     {
-        ma_bool32 noBluetoothRouting;
+        ma_ios_session_category sessionCategory;
+        ma_uint32 sessionCategoryOptions;
     } coreaudio;
     struct
     {
@@ -2578,6 +2604,7 @@ MA_ALIGNED_STRUCT(MA_SIMD_ALIGNMENT) ma_device
             ma_bool32 isSwitchingPlaybackDevice;   /* <-- Set to true when the default device has changed and miniaudio is in the process of switching. */
             ma_bool32 isSwitchingCaptureDevice;    /* <-- Set to true when the default device has changed and miniaudio is in the process of switching. */
             ma_pcm_rb duplexRB;
+            void* pRouteChangeHandler;             /* Only used on mobile platforms. Obj-C object for handling route changes. */
         } coreaudio;
 #endif
 #ifdef MA_SUPPORT_SNDIO
@@ -3185,6 +3212,10 @@ float ma_gain_db_to_factor(float gain);
 /************************************************************************************************************************************************************
 
 Decoding
+========
+
+Decoders are independent of the main device API. Decoding APIs can be called freely inside the device's data callback, but they are not thread safe unless
+you do your own synchronization.
 
 ************************************************************************************************************************************************************/
 #ifndef MA_NO_DECODING
@@ -3287,11 +3318,24 @@ If the length is unknown or an error occurs, 0 will be returned.
 This will always return 0 for Vorbis decoders. This is due to a limitation with stb_vorbis in push mode which is what miniaudio
 uses internally.
 
-This will run in linear time for MP3 decoders. Do not call this in time critical scenarios.
+For MP3's, this will decode the entire file. Do not call this in time critical scenarios.
+
+This function is not thread safe without your own synchronization.
 */
 ma_uint64 ma_decoder_get_length_in_pcm_frames(ma_decoder* pDecoder);
 
+/*
+Reads PCM frames from the given decoder.
+
+This is not thread safe without your own synchronization.
+*/
 ma_uint64 ma_decoder_read_pcm_frames(ma_decoder* pDecoder, void* pFramesOut, ma_uint64 frameCount);
+
+/*
+Seeks to a PCM frame based on it's absolute index.
+
+This is not thread safe without your own synchronization.
+*/
 ma_result ma_decoder_seek_to_pcm_frame(ma_decoder* pDecoder, ma_uint64 frameIndex);
 
 /*
@@ -3342,8 +3386,11 @@ IMPLEMENTATION
 #include <limits.h> /* For INT_MAX */
 #include <math.h>   /* sin(), etc. */
 
-#if defined(MA_DEBUG_OUTPUT)
-#include <stdio.h>  /* for printf() for debug output */
+#if !defined(MA_NO_STDIO) || defined(MA_DEBUG_OUTPUT)
+#include <stdio.h>
+#if !defined(_MSC_VER) && !defined(__DMC__)
+#include <strings.h>    /* For strcasecmp(). */
+#include <wchar.h>      /* For wcslen(), wcsrtombs() */
 #endif
 
 #ifdef MA_WIN32
@@ -5241,9 +5288,14 @@ ma_result ma_semaphore_init__posix(ma_context* pContext, int initialValue, ma_se
 {
     (void)pContext;
 
+#if defined(MA_APPLE)
+    /* Not yet implemented for Apple platforms since sem_init() is deprecated. Need to use a named semaphore via sem_open() instead. */
+    return MA_INVALID_OPERATION;
+#else
     if (sem_init(&pSemaphore->posix.semaphore, 0, (unsigned int)initialValue) == 0) {
         return MA_FAILED_TO_CREATE_SEMAPHORE;
     }
+#endif
 
     return MA_SUCCESS;
 }
@@ -16753,6 +16805,10 @@ ma_result ma_device_read__pulse(ma_device* pDevice, void* pPCMFrames, ma_uint32 
                 return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[PulseAudio] Failed to drop fragment.", ma_result_from_pulse(error));
             }
 
+        #if defined(MA_DEBUG_OUTPUT)
+            printf("[PulseAudio] ma_device_read__pulse: Call pa_stream_drop()\n");
+        #endif
+
             pDevice->pulse.pMappedBufferCapture = NULL;
             pDevice->pulse.mappedBufferFramesRemainingCapture = 0;
             pDevice->pulse.mappedBufferFramesCapacityCapture = 0;
@@ -16787,6 +16843,10 @@ ma_result ma_device_read__pulse(ma_device* pDevice, void* pPCMFrames, ma_uint32 
                         return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[PulseAudio] Failed to peek capture buffer.", ma_result_from_pulse(error));
                     }
 
+                #if defined(MA_DEBUG_OUTPUT)
+                    printf("[PulseAudio] ma_device_read__pulse: Call pa_stream_peek(). bytesMapped=%d\n", (int)bytesMapped);
+                #endif
+
                     if (pDevice->pulse.pMappedBufferCapture == NULL && bytesMapped == 0) {
                         /* Nothing available. This shouldn't happen because we checked earlier with pa_stream_readable_size(). I'm going to throw an error in this case. */
                         return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[PulseAudio] Nothing available after peeking capture buffer.", MA_ERROR);
@@ -16808,6 +16868,10 @@ ma_result ma_device_read__pulse(ma_device* pDevice, void* pPCMFrames, ma_uint32 
                     if (error < 0) {
                         return ma_result_from_pulse(error);
                     }
+
+                #if defined(MA_DEBUG_OUTPUT)
+                    printf("[PulseAudio] ma_device_read__pulse: No data available. Waiting.\n");
+                #endif
 
                     /* Sleep for a bit if nothing was dispatched. */
                     if (error == 0) {
@@ -17930,6 +17994,12 @@ Core Audio Backend
 
 #if defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE == 1
     #define MA_APPLE_MOBILE
+    #if defined(TARGET_OS_TV) && TARGET_OS_TV == 1
+        #define MA_APPLE_TV
+    #endif
+    #if defined(TARGET_OS_WATCH) && TARGET_OS_WATCH == 1
+        #define MA_APPLE_WATCH
+    #endif
 #else
     #define MA_APPLE_DESKTOP
 #endif
@@ -19834,6 +19904,105 @@ static ma_result ma_device__untrack__coreaudio(ma_device* pDevice)
 }
 #endif
 
+#if defined(MA_APPLE_MOBILE)
+@interface ma_router_change_handler:NSObject {
+    ma_device* m_pDevice;
+}
+@end
+
+@implementation ma_router_change_handler
+-(id)init:(ma_device*)pDevice
+{
+    self = [super init];
+    m_pDevice = pDevice;
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handle_route_change:) name:AVAudioSessionRouteChangeNotification object:[AVAudioSession sharedInstance]];
+
+    return self;
+}
+
+-(void)dealloc
+{
+    [self remove_handler];
+}
+
+-(void)remove_handler
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"AVAudioSessionRouteChangeNotification" object:nil];
+}
+
+-(void)handle_route_change:(NSNotification*)pNotification
+{
+    AVAudioSession* pSession = [AVAudioSession sharedInstance];
+
+    NSInteger reason = [[[pNotification userInfo] objectForKey:AVAudioSessionRouteChangeReasonKey] integerValue];
+    switch (reason)
+    {
+        case AVAudioSessionRouteChangeReasonOldDeviceUnavailable:
+        {
+        #if defined(MA_DEBUG_OUTPUT)
+            printf("[Core Audio] Route Changed: AVAudioSessionRouteChangeReasonOldDeviceUnavailable\n");
+        #endif
+        } break;
+
+        case AVAudioSessionRouteChangeReasonNewDeviceAvailable:
+        {
+        #if defined(MA_DEBUG_OUTPUT)
+            printf("[Core Audio] Route Changed: AVAudioSessionRouteChangeReasonNewDeviceAvailable\n");
+        #endif
+        } break;
+
+        case AVAudioSessionRouteChangeReasonNoSuitableRouteForCategory:
+        {
+        #if defined(MA_DEBUG_OUTPUT)
+            printf("[Core Audio] Route Changed: AVAudioSessionRouteChangeReasonNoSuitableRouteForCategory\n");
+        #endif
+        } break;
+
+        case AVAudioSessionRouteChangeReasonWakeFromSleep:
+        {
+        #if defined(MA_DEBUG_OUTPUT)
+            printf("[Core Audio] Route Changed: AVAudioSessionRouteChangeReasonWakeFromSleep\n");
+        #endif
+        } break;
+
+        case AVAudioSessionRouteChangeReasonOverride:
+        {
+        #if defined(MA_DEBUG_OUTPUT)
+            printf("[Core Audio] Route Changed: AVAudioSessionRouteChangeReasonOverride\n");
+        #endif
+        } break;
+
+        case AVAudioSessionRouteChangeReasonCategoryChange:
+        {
+        #if defined(MA_DEBUG_OUTPUT)
+            printf("[Core Audio] Route Changed: AVAudioSessionRouteChangeReasonCategoryChange\n");
+        #endif
+        } break;
+
+        case AVAudioSessionRouteChangeReasonUnknown:
+        default:
+        {
+        #if defined(MA_DEBUG_OUTPUT)
+            printf("[Core Audio] Route Changed: AVAudioSessionRouteChangeReasonUnknown\n");
+        #endif
+        } break;
+    }
+
+    m_pDevice->sampleRate = (ma_uint32)pSession.sampleRate;
+
+    if (m_pDevice->type == ma_device_type_capture || m_pDevice->type == ma_device_type_duplex) {
+        m_pDevice->capture.channels = pSession.inputNumberOfChannels;
+        ma_device__post_init_setup(m_pDevice, ma_device_type_capture);
+    }
+    if (m_pDevice->type == ma_device_type_playback || m_pDevice->type == ma_device_type_duplex) {
+        m_pDevice->playback.channels = pSession.outputNumberOfChannels;
+        ma_device__post_init_setup(m_pDevice, ma_device_type_playback);
+    }
+}
+@end
+#endif
+
 void ma_device_uninit__coreaudio(ma_device* pDevice)
 {
     ma_assert(pDevice != NULL);
@@ -19845,6 +20014,12 @@ void ma_device_uninit__coreaudio(ma_device* pDevice)
     just gracefully ignore it.
     */
     ma_device__untrack__coreaudio(pDevice);
+#endif
+#if defined(MA_APPLE_MOBILE)
+    if (pDevice->coreaudio.pRouteChangeHandler != NULL) {
+        ma_router_change_handler* pRouteChangeHandler = (__bridge ma_router_change_handler*)pDevice->coreaudio.pRouteChangeHandler;
+        [pRouteChangeHandler remove_handler];
+    }
 #endif
     
     if (pDevice->coreaudio.audioUnitCapture != NULL) {
@@ -20050,10 +20225,10 @@ ma_result ma_device_init_internal__coreaudio(ma_context* pContext, ma_device_typ
             AVAudioSession outputNumberOfChannels. I'm going to try using the AVAudioSession values instead.
             */
             if (deviceType == ma_device_type_playback) {
-                bestFormat.mChannelsPerFrame = pAudioSession.outputNumberOfChannels;
+                bestFormat.mChannelsPerFrame = (UInt32)pAudioSession.outputNumberOfChannels;
             }
             if (deviceType == ma_device_type_capture) {
-                bestFormat.mChannelsPerFrame = pAudioSession.inputNumberOfChannels;
+                bestFormat.mChannelsPerFrame = (UInt32)pAudioSession.inputNumberOfChannels;
             }
         }
         
@@ -20494,6 +20669,14 @@ ma_result ma_device_init__coreaudio(ma_context* pContext, const ma_device_config
         }
     }
 
+    /*
+    We need to detect when a route has changed so we can update the data conversion pipeline accordingly. This is done
+    differently on non-Desktop Apple platforms.
+    */
+#if defined(MA_APPLE_MOBILE)
+    pDevice->coreaudio.pRouteChangeHandler = (__bridge void*)[[ma_router_change_handler alloc] init:pDevice];
+#endif
+
     return MA_SUCCESS;
 }
 
@@ -20561,35 +20744,63 @@ ma_result ma_context_uninit__coreaudio(ma_context* pContext)
     return MA_SUCCESS;
 }
 
+#if defined(MA_APPLE_MOBILE)
+static AVAudioSessionCategory ma_to_AVAudioSessionCategory(ma_ios_session_category category)
+{
+    /* The "default" and "none" categories are treated different and should not be used as an input into this function. */
+    ma_assert(category != ma_ios_session_category_default);
+    ma_assert(category != ma_ios_session_category_none);
+
+    switch (category) {
+        case ma_ios_session_category_ambient:         return AVAudioSessionCategoryAmbient;
+        case ma_ios_session_category_solo_ambient:    return AVAudioSessionCategorySoloAmbient;
+        case ma_ios_session_category_playback:        return AVAudioSessionCategoryPlayback;
+        case ma_ios_session_category_record:          return AVAudioSessionCategoryRecord;
+        case ma_ios_session_category_play_and_record: return AVAudioSessionCategoryPlayAndRecord;
+        case ma_ios_session_category_multi_route:     return AVAudioSessionCategoryMultiRoute;
+        case ma_ios_session_category_none:            return AVAudioSessionCategoryAmbient;
+        case ma_ios_session_category_default:         return AVAudioSessionCategoryAmbient;
+        default:                                      return AVAudioSessionCategoryAmbient;
+    }
+}
+#endif
+
 ma_result ma_context_init__coreaudio(const ma_context_config* pConfig, ma_context* pContext)
 {
+    ma_assert(pConfig != NULL);
     ma_assert(pContext != NULL);
-
-    (void)pConfig;
 
 #if defined(MA_APPLE_MOBILE)
     @autoreleasepool {
         AVAudioSession* pAudioSession = [AVAudioSession sharedInstance];
-        AVAudioSessionCategoryOptions options = 0;
+        AVAudioSessionCategoryOptions options = pConfig->coreaudio.sessionCategoryOptions;
 
         ma_assert(pAudioSession != NULL);
 
-        /*
-        Try enabling routing to Bluetooth devices. The AVAudioSessionCategoryOptionAllowBluetoothA2DP is only available
-        starting from iOS 10 so I'm doing a version check before enabling this.
-        */
-        if (!pConfig->coreaudio.noBluetoothRouting) {
-            if ([[[UIDevice currentDevice] systemVersion] compare:@"10.0" options:NSNumericSearch] != NSOrderedAscending) {
-                options = 0x20; /* 0x20 = AVAudioSessionCategoryOptionAllowBluetoothA2DP */
-            }
-        }
+        if (pConfig->coreaudio.sessionCategory == ma_ios_session_category_default) {
+            /*
+            I'm going to use trial and error to determine our default session category. First we'll try PlayAndRecord. If that fails
+            we'll try Playback and if that fails we'll try record. If all of these fail we'll just not set the category.
+            */
+        #if !defined(MA_APPLE_TV) && !defined(MA_APPLE_WATCH)
+            options |= AVAudioSessionCategoryOptionDefaultToSpeaker;
+        #endif
 
-        [pAudioSession setCategory: AVAudioSessionCategoryPlayAndRecord withOptions:options error:nil];
-        
-        /* By default we want miniaudio to use the speakers instead of the receiver. In the future this may be customizable. */
-        ma_bool32 useSpeakers = MA_TRUE;
-        if (useSpeakers) {
-            [pAudioSession overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:nil];
+            if ([pAudioSession setCategory: AVAudioSessionCategoryPlayAndRecord withOptions:options error:nil]) {
+                /* Using PlayAndRecord */
+            } else if ([pAudioSession setCategory: AVAudioSessionCategoryPlayback withOptions:options error:nil]) {
+                /* Using Playback */
+            } else if ([pAudioSession setCategory: AVAudioSessionCategoryRecord withOptions:options error:nil]) {
+                /* Using Record */
+            } else {
+                /* Leave as default? */
+            }
+        } else {
+            if (pConfig->coreaudio.sessionCategory != ma_ios_session_category_none) {
+                if (![pAudioSession setCategory: ma_to_AVAudioSessionCategory(pConfig->coreaudio.sessionCategory) withOptions:options error:nil]) {
+                    return MA_INVALID_OPERATION;    /* Failed to set session category. */
+                }
+            }
         }
     }
 #endif
@@ -20600,8 +20811,8 @@ ma_result ma_context_init__coreaudio(const ma_context_config* pConfig, ma_contex
         return MA_API_NOT_FOUND;
     }
     
-    pContext->coreaudio.CFStringGetCString             = ma_dlsym(pContext, pContext->coreaudio.hCoreFoundation, "CFStringGetCString");
-    pContext->coreaudio.CFRelease                      = ma_dlsym(pContext, pContext->coreaudio.hCoreFoundation, "CFRelease");
+    pContext->coreaudio.CFStringGetCString = ma_dlsym(pContext, pContext->coreaudio.hCoreFoundation, "CFStringGetCString");
+    pContext->coreaudio.CFRelease          = ma_dlsym(pContext, pContext->coreaudio.hCoreFoundation, "CFRelease");
     
     
     pContext->coreaudio.hCoreAudio = ma_dlopen(pContext, "CoreAudio.framework/CoreAudio");
@@ -34862,13 +35073,6 @@ ma_result ma_decoder_init_memory_raw(const void* pData, size_t dataSize, const m
     return ma_decoder_init_raw__internal(pConfigIn, &config, pDecoder);
 }
 
-#ifndef MA_NO_STDIO
-#include <stdio.h>
-#if !defined(_MSC_VER) && !defined(__DMC__)
-#include <strings.h>    /* For strcasecmp(). */
-#include <wchar.h>      /* For wcsrtombs() */
-#endif
-
 const char* ma_path_file_name(const char* path)
 {
     const char* fileName;
@@ -35079,6 +35283,23 @@ ma_result ma_decoder__preinit_file(const char* pFilePath, const ma_decoder_confi
     return MA_SUCCESS;
 }
 
+/*
+_wfopen() isn't always available in all compilation environments.
+
+    * Windows only.
+    * MSVC seems to support it universally as far back as VC6 from what I can tell (haven't checked further back).
+    * MinGW-64 (both 32- and 64-bit) seems to support it.
+    * MinGW wraps it in !defined(__STRICT_ANSI__).
+
+This can be reviewed as compatibility issues arise. The preference is to use _wfopen_s() and _wfopen() as opposed to the wcsrtombs()
+fallback, so if you notice your compiler not detecting this properly I'm happy to look at adding support.
+*/
+#if defined(_WIN32)
+    #if defined(_MSC_VER) || defined(__MINGW64__) || !defined(__STRICT_ANSI__)
+        #define MA_HAS_WFOPEN
+    #endif
+#endif
+
 ma_result ma_decoder__preinit_file_w(const wchar_t* pFilePath, const ma_decoder_config* pConfig, ma_decoder* pDecoder)
 {
     FILE* pFile;
@@ -35093,7 +35314,7 @@ ma_result ma_decoder__preinit_file_w(const wchar_t* pFilePath, const ma_decoder_
         return MA_INVALID_ARGS;
     }
 
-#if defined(_WIN32)
+#if defined(MA_HAS_WFOPEN)
     /* Use _wfopen() on Windows. */
     #if defined(_MSC_VER) && _MSC_VER >= 1400
         if (_wfopen_s(&pFile, pFilePath, L"rb") != 0) {
@@ -35613,6 +35834,7 @@ Device
 REVISION HISTORY
 ================
 v0.9.9 - 20xx-xx-xx
+  - Fix compilation errors with MinGW.
   - Core Audio: Fix bugs in the case where the internal device uses deinterleaved buffers.
 
 v0.9.8 - 2019-10-07
