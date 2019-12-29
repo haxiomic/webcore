@@ -60,8 +60,8 @@ class AudioContext {
         }
     }
 
-    public function createFileSource(path: String): AudioNode {
-        return new AudioNode(this, new AudioDecoder.FileDecoder(this, path));
+    public function createFileSource(path: String): AudioNode.AudioScheduledSourceNode {
+        return new AudioNode.AudioScheduledSourceNode(this, new AudioDecoder.FileDecoder(this, path));
     }
 
     public function createBufferSource(): AudioNode.AudioBufferSourceNode {
