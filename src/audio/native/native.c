@@ -164,9 +164,11 @@ void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma
 
             ma_bool32 playing = MA_FALSE;
             NativeAudioDecoder* decoder = NULL;
+            ma_bool32 loop = MA_FALSE;
             ma_mutex_lock(source->lock); {
                 playing = source->playing;
                 decoder = source->decoder;
+                loop = source->loop;
             }
             ma_mutex_unlock(source->lock);
 
@@ -223,11 +225,6 @@ void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma
                         break;
                     }
 
-                    ma_bool32 loop = MA_FALSE;
-                    ma_mutex_lock(source->lock); {
-                        loop = source->loop;
-                    }
-                    ma_mutex_unlock(source->lock);
                     // if looping, seek to start and continue to read more frames
                     if (loop == MA_TRUE) {
                         NativeAudioDecoder_seekToPcmFrame(decoder, 0);
@@ -240,9 +237,10 @@ void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma
             }
 
             if (reachedEOF) {
-                // trigger something
-                // @! this doesn't account for the case were we read exactly  all of the frames
-                // might need some thinking to enable seamless looping
+                ma_mutex_lock(source->lock); {
+                    source->onReachEofFlag = MA_TRUE;
+                }
+                ma_mutex_unlock(source->lock);
             }
         }
     }

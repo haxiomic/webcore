@@ -133,6 +133,7 @@ extern class NativeAudioSource {
     var lock: Star<MiniAudio.Mutex>;
     private var playing: Bool;
     private var loop: Bool;
+    private var onReachEofFlag: Bool;
 
     inline function getPlaying(): Bool {
         return lock.locked(() -> playing);
@@ -150,6 +151,14 @@ extern class NativeAudioSource {
         return lock.locked(() -> loop = v);
     }
 
+    inline function getOnReachEofFlag(): Bool {
+        return lock.locked(() -> onReachEofFlag);
+    }
+
+    inline function setOnReachEofFlag(v: Bool): Bool {
+        return lock.locked(() -> onReachEofFlag = v);
+    }
+
     @:native('~AudioSource')
     function free(): Void;
 
@@ -163,6 +172,7 @@ extern class NativeAudioSource {
         instance.decoder = null;
         instance.playing = false;
         instance.loop = false;
+        instance.onReachEofFlag = false;
         return instance;
     }
 
