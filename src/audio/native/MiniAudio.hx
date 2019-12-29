@@ -524,6 +524,13 @@ extern class Mutex {
         untyped __global__.ma_mutex_unlock((this: Star<Mutex>));
     }
 
+    inline function locked<T>(callback: () -> T): T {
+        this.lock();
+        var returnVal = callback();
+        this.unlock();
+        return returnVal;
+    }
+
     @:native('~ma_mutex')
     function free(): Void;
 
