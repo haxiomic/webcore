@@ -25,8 +25,8 @@ extern "C" {
  */
 
 typedef struct {
-    ma_decoder* maDecoder;
     ma_mutex*   lock;
+    ma_decoder* maDecoder;
     ma_uint64   frameIndex;
 } NativeAudioDecoder;
 
@@ -36,13 +36,16 @@ ma_result NativeAudioDecoder_seekToPcmFrame(NativeAudioDecoder* decoder, ma_uint
 
 /**
  * AudioSource
+ * 
+ * lock should be used when reading or writing to any of the fields
  */
 
 typedef struct {
+    ma_mutex*           lock;
     NativeAudioDecoder* decoder;
     // use atomics access for the following
-    // ma_bool32 loop;
-    // ma_bool32 isPlaying;
+    ma_bool32           playing;
+    ma_bool32           loop;
     // ma_bool32 onReadEofFlag;
 } AudioSource;
 

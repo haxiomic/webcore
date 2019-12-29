@@ -161,8 +161,18 @@ void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma
             currentSourceListNode = currentSourceListNode->next;
 
             ma_assert(source != NULL);
-            
-            NativeAudioDecoder* decoder = source->decoder;
+
+            ma_bool32 playing = MA_FALSE;
+            NativeAudioDecoder* decoder = NULL;
+            ma_mutex_lock(source->lock); {
+                playing = source->playing;
+                decoder = source->decoder;
+            }
+            ma_mutex_unlock(source->lock);
+
+            if (playing != MA_TRUE) {
+                continue;
+            }
 
             // maDecoder is allowed to be NULL
             if (decoder == NULL) continue;
@@ -182,11 +192,14 @@ void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma
             // read and mix frames in chunks of decoderOutputBuffer length
             ma_uint32 totalFramesRead = 0;
             ma_bool32 reachedEOF = MA_FALSE;
+            int loopIndex = -1;
             while (totalFramesRead < frameCount) {
+                loopIndex++;
                 ma_uint32 framesRemaining = frameCount - totalFramesRead;
                 ma_uint32 framesToRead = ma_min(framesRemaining, bufferMaxFrames);
 
                 ma_uint32 framesRead = (ma_uint32) NativeAudioDecoder_readPcmFrames(decoder, decoderOutputBuffer, framesToRead);
+
 
                 // mix decoderOutputBuffer with pOutput, applying conversions if the playback format is not float
                 ma_uint32 sampleCount = framesRead * channelCount;
@@ -204,8 +217,25 @@ void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma
                 if (framesRead < framesToRead) {
                     // we read less frames than we requested so we must have reached the end of this decoder
                     reachedEOF = MA_TRUE;
-                    // if loop then we should seek to start here
-                    break;
+
+                    // if the decoder returns 0 frames after the first iteration (we've given it a chance to loop), then the decoder is probably empty; break to avoid infinite loop
+                    if (framesRead == 0 && loopIndex >= 1) {
+                        break;
+                    }
+
+                    ma_bool32 loop = MA_FALSE;
+                    ma_mutex_lock(source->lock); {
+                        loop = source->loop;
+                    }
+                    ma_mutex_unlock(source->lock);
+                    // if looping, seek to start and continue to read more frames
+                    if (loop == MA_TRUE) {
+                        NativeAudioDecoder_seekToPcmFrame(decoder, 0);
+                        continue;
+                    } else {
+                        break;
+                    }
+
                 }
             }
 
