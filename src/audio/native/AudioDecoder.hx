@@ -8,6 +8,7 @@ class AudioDecoder {
 
     public final nativeAudioDecoder: Star<NativeAudioDecoder>;
     public final context: AudioContext;
+    public var frameIndex (get, never): UInt64;
     final config: DecoderConfig;
 
     function new(context: AudioContext) {
@@ -28,6 +29,10 @@ class AudioDecoder {
 
     public inline function seekToPcmFrame(frameIndex: UInt64): MiniAudio.Result {
         return nativeAudioDecoder.seekToPcmFrame(frameIndex);
+    }
+
+    inline function get_frameIndex() {
+        return this.nativeAudioDecoder.getFrameIndex();
     }
 
     static function finalizer(instance: AudioDecoder) {
@@ -68,9 +73,8 @@ class FileBytesDecoder extends AudioDecoder {
     **/
     public function new(context: AudioContext, fileBytes: haxe.io.Bytes, copyBytes: Bool = true) {
         super(context);
+        // copy bytes by default (wouldn't want GC freeing the backing bytes)
         bytes = copyBytes ? fileBytes.sub(0, fileBytes.length) : fileBytes;
-        // copy bytes
-
         var bytesAddress: ConstStar<cpp.Void> = cast cpp.NativeArray.address(bytes.getData(), 0).raw;
         var result = this.nativeAudioDecoder.maDecoder.init_memory(bytesAddress, bytes.length, Native.addressOf(config));
         if (result != SUCCESS) {
@@ -88,7 +92,7 @@ extern class NativeAudioDecoder {
 
     var maDecoder: Star<MiniAudio.Decoder>;
     var lock: Star<MiniAudio.Mutex>;
-    var frameIndex: UInt64;
+    private var frameIndex: UInt64;
 
     inline function readPcmFrames(pFramesOut: Star<cpp.Void>, frameCount: UInt64): UInt64 {
         return untyped __global__.NativeAudioDecoder_readPcmFrames((this: Star<NativeAudioDecoder>), pFramesOut, frameCount);
@@ -100,6 +104,10 @@ extern class NativeAudioDecoder {
 
     inline function seekToPcmFrame(frameIndex: UInt64): MiniAudio.Result {
         return untyped __global__.NativeAudioDecoder_seekToPcmFrame((this: Star<NativeAudioDecoder>), frameIndex);
+    }
+
+    inline function getFrameIndex(): UInt64 {
+        return lock.locked(() -> this.frameIndex);
     }
 
     @:native('~NativeAudioDecoder')
