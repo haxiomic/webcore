@@ -82,13 +82,21 @@ class AudioNode {
 
 }
 
-
+@:allow(audio.native.AudioContext)
 class AudioScheduledSourceNode extends AudioNode {
-    // public function start()
-    // public function stop()
+    public inline function start() {
+        this.nativeSource.setPlaying(true);
+    }
+
+    public inline function stop() {
+        this.nativeSource.setPlaying(false);
+    }
 }
 
+@:allow(audio.native.AudioContext)
 class AudioBufferSourceNode extends AudioScheduledSourceNode {
+
+    public var loop (get, set): Bool;
 
     public var buffer (get, set): AudioBuffer;
     var _buffer: AudioBuffer;
@@ -104,6 +112,14 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
         return _buffer = b;
     }
 
+    inline function get_loop(): Bool {
+        return this.nativeSource.getLoop();
+    }
+
+    inline function set_loop(v: Bool): Bool {
+        return this.nativeSource.setLoop(v);
+    }
+
 }
 
 @:include('./native.h')
@@ -114,6 +130,25 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
 extern class NativeAudioSource {
 
     var decoder: Star<NativeAudioDecoder>;
+    var lock: Star<MiniAudio.Mutex>;
+    private var playing: Bool;
+    private var loop: Bool;
+
+    inline function getPlaying(): Bool {
+        return lock.locked(() -> playing);
+    }
+
+    inline function setPlaying(v: Bool): Bool {
+        return lock.locked(() -> playing = v);
+    }
+
+    inline function getLoop(): Bool {
+        return lock.locked(() -> loop);
+    }
+
+    inline function setLoop(v: Bool): Bool {
+        return lock.locked(() -> loop = v);
+    }
 
     @:native('~AudioSource')
     function free(): Void;
@@ -123,12 +158,18 @@ extern class NativeAudioSource {
 
     static inline function create(maContext: Star<MiniAudio.Context>): Star<NativeAudioSource> {
         var instance = alloc();
+        instance.lock = MiniAudio.Mutex.alloc();
+        instance.lock.init(maContext);
         instance.decoder = null;
+        instance.playing = false;
+        instance.loop = false;
         return instance;
     }
 
     static inline function destroy(instance: NativeAudioSource): Void {
         instance.free();
+        instance.lock.uninit();
+        instance.lock.free();
     }
 
 }
