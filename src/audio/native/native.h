@@ -21,18 +21,29 @@ extern "C" {
 #endif
 
 /**
+ * NativeAudioDecoder
+ */
+
+typedef struct {
+    ma_decoder* maDecoder;
+    ma_mutex*   lock;
+    ma_uint64   frameIndex;
+} NativeAudioDecoder;
+
+ma_uint64 NativeAudioDecoder_readPcmFrames(NativeAudioDecoder* decoder, void* pFramesOut, ma_uint64 frameCount);
+ma_uint64 NativeAudioDecoder_getLengthInPcmFrames(NativeAudioDecoder* decoder);
+ma_result NativeAudioDecoder_seekToPcmFrame(NativeAudioDecoder* decoder, ma_uint64 frameIndex);
+
+/**
  * AudioSource
  */
 
 typedef struct {
-    ma_mutex*   maDecoderLock;
-    ma_decoder* maDecoder;
-
+    NativeAudioDecoder* decoder;
     // use atomics access for the following
     // ma_bool32 loop;
     // ma_bool32 isPlaying;
-    // ma_bool32 onEndFlag;
-
+    // ma_bool32 onReadEofFlag;
 } AudioSource;
 
 

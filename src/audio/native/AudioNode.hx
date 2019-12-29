@@ -1,5 +1,6 @@
 package audio.native;
 
+import audio.native.AudioDecoder.NativeAudioDecoder;
 import cpp.*;
 
 @:allow(audio.native.AudioContext)
@@ -15,7 +16,6 @@ class AudioNode {
     final nativeSourceList: Star<NativeAudioSourceList>;
     final connectedSources = new List<AudioNode>();
     final connectedDestinations = new List<AudioNode>();
-
 
     function new(context: AudioContext, ?decoder: AudioDecoder) {
         this.context = context;
@@ -44,8 +44,7 @@ class AudioNode {
     function setDecoder(decoder: AudioDecoder) {
         this.decoder = decoder;
         if (nativeSource != null) {
-            this.nativeSource.maDecoder = decoder.maDecoder;
-            this.nativeSource.maDecoderLock = decoder.maDecoderLock;
+            this.nativeSource.decoder = decoder.nativeAudioDecoder;
         }
     }
 
@@ -108,14 +107,13 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
 }
 
 @:include('./native.h')
-@:sourceFile('./native.m')
+@:sourceFile(#if winrt './native.c' #else './native.m' #end)
 @:native('AudioSource') @:unreflective
 @:structAccess
 @:access(audio.native.AudioContext)
 extern class NativeAudioSource {
 
-    var maDecoder: Star<MiniAudio.Decoder>;
-    var maDecoderLock: Star<MiniAudio.Mutex>;
+    var decoder: Star<NativeAudioDecoder>;
 
     @:native('~AudioSource')
     function free(): Void;
@@ -125,8 +123,7 @@ extern class NativeAudioSource {
 
     static inline function create(maContext: Star<MiniAudio.Context>): Star<NativeAudioSource> {
         var instance = alloc();
-        instance.maDecoder = null;
-        instance.maDecoderLock = null;
+        instance.decoder = null;
         return instance;
     }
 
@@ -137,7 +134,7 @@ extern class NativeAudioSource {
 }
 
 @:include('./native.h')
-@:sourceFile('./native.m')
+@:sourceFile(#if winrt './native.c' #else './native.m' #end)
 @:native('AudioSourceList') @:unreflective
 @:structAccess
 extern class NativeAudioSourceList {

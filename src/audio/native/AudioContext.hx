@@ -3,7 +3,7 @@ package audio.native;
 import cpp.*;
 
 @:include('./native.h')
-@:sourceFile('./native.m')
+@:sourceFile(#if winrt './native.c' #else './native.m' #end)
 @:allow(audio.native.AudioNode)
 @:allow(audio.native.AudioDecoder)
 class AudioContext {
