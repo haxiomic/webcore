@@ -84,6 +84,7 @@ class AudioNode {
 
 @:allow(audio.native.AudioContext)
 class AudioScheduledSourceNode extends AudioNode {
+
     public inline function start() {
         this.nativeSource.setPlaying(true);
     }
@@ -91,6 +92,7 @@ class AudioScheduledSourceNode extends AudioNode {
     public inline function stop() {
         this.nativeSource.setPlaying(false);
     }
+
 }
 
 @:allow(audio.native.AudioContext)
