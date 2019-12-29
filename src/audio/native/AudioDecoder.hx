@@ -9,6 +9,8 @@ class AudioDecoder {
     public final nativeAudioDecoder: Star<NativeAudioDecoder>;
     public final context: AudioContext;
     public var frameIndex (get, never): UInt64;
+    public var currentTime_s (get, never): Float;
+
     final config: DecoderConfig;
 
     function new(context: AudioContext) {
@@ -32,7 +34,11 @@ class AudioDecoder {
     }
 
     inline function get_frameIndex() {
-        return this.nativeAudioDecoder.getFrameIndex();
+        return nativeAudioDecoder.getFrameIndex();
+    }
+
+    inline function get_currentTime_s() {
+        return frameIndex / config.sampleRate;
     }
 
     static function finalizer(instance: AudioDecoder) {
