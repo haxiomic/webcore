@@ -60,18 +60,22 @@ class AudioContext {
         }
     }
 
-    public function createFileSource(path: String): AudioNode.AudioScheduledSourceNode {
-        return new AudioNode.AudioScheduledSourceNode(this, new AudioDecoder.FileDecoder(this, path));
+    public function createFileSource(path: String) {
+        return new AudioNode.AudioBufferSourceNode(this, new AudioDecoder.FileDecoder(this, path));
     }
 
-    public function createBufferSource(): AudioNode.AudioBufferSourceNode {
+    public function createFileBytesSource(audioFileBytes: haxe.io.Bytes) {
+        return new AudioNode.AudioBufferSourceNode(this, new AudioDecoder.FileBytesDecoder(this, audioFileBytes, true));
+    }
+
+    public function createBufferSource() {
         return new AudioNode.AudioBufferSourceNode(this);
     }
 
-    public function decodeAudioData(audioData: haxe.io.Bytes, ?successCallback: AudioBuffer -> Void, ?errorCallback: String -> Void): Void {
+    public function decodeAudioData(audioFileBytes: haxe.io.Bytes, ?successCallback: AudioBuffer -> Void, ?errorCallback: String -> Void): Void {
         try {
             // decode file into raw pcm frame bytes
-            var tmpDecoder = new AudioDecoder.FileBytesDecoder(this, audioData, false);
+            var tmpDecoder = new AudioDecoder.FileBytesDecoder(this, audioFileBytes, false);
             var bytes = tmpDecoder.readInterleavedPcmFrames(0);
             var audioBuffer = new AudioBuffer(bytes);
             if (successCallback != null) {
