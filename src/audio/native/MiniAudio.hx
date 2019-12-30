@@ -78,6 +78,11 @@ extern enum abstract Format(MaFormat) {
     @:native('ma_format_s32') var S32;    
     @:native('ma_format_f32') var F32;    
     @:native('ma_format_count') var COUNT;
+
+    inline function toString(): String {
+        var name: ConstCharStar = untyped __global__.ma_get_format_name(this);
+        return name.toString();
+    }
 }
 @:include('./native.h')
 @:sourceFile(#if winrt './native.c' #else './native.m' #end)
