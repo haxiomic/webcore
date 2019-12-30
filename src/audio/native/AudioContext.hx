@@ -76,7 +76,7 @@ class AudioContext {
         try {
             // decode file into raw pcm frame bytes
             var tmpDecoder = new AudioDecoder.FileBytesDecoder(this, audioFileBytes, false);
-            var bytes = tmpDecoder.readInterleavedPcmFrames(0);
+            var bytes = tmpDecoder.getInterleavedPcmFrames(0);
             var audioBuffer = new AudioBuffer(bytes);
             if (successCallback != null) {
                 successCallback(audioBuffer);

@@ -43,7 +43,7 @@ class AudioDecoder {
 
         By default the sample data type will be float32
     **/
-    public inline function readInterleavedPcmFrames(startFrameIndex: UInt64 = 0, ?frameCount: UInt64): haxe.io.Bytes {
+    public inline function getInterleavedPcmFrames(startFrameIndex: UInt64 = 0, ?frameCount: UInt64): haxe.io.Bytes {
         var initialFrameIndex = frameIndex;
         var sourceLength = getLengthInPcmFrames();
         var remainingFrames = sourceLength - startFrameIndex;
