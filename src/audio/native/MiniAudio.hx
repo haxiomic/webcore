@@ -211,6 +211,71 @@ class ResultLookup {
     }
 }
 
+@:include('./native.h')
+@:sourceFile(#if winrt './native.c' #else './native.m' #end)
+extern enum abstract Channel(MaChannel) {
+
+    @:native('MA_CHANNEL_NONE') var NONE;
+    @:native('MA_CHANNEL_MONO') var MONO;
+    @:native('MA_CHANNEL_FRONT_LEFT') var FRONT_LEFT;
+    @:native('MA_CHANNEL_FRONT_RIGHT') var FRONT_RIGHT;
+    @:native('MA_CHANNEL_FRONT_CENTER') var FRONT_CENTER;
+    @:native('MA_CHANNEL_LFE') var LFE;
+    @:native('MA_CHANNEL_BACK_LEFT') var BACK_LEFT;
+    @:native('MA_CHANNEL_BACK_RIGHT') var BACK_RIGHT;
+    @:native('MA_CHANNEL_FRONT_LEFT_CENTER') var FRONT_LEFT_CENTER;
+    @:native('MA_CHANNEL_FRONT_RIGHT_CENTER') var FRONT_RIGHT_CENTER;
+    @:native('MA_CHANNEL_BACK_CENTER') var BACK_CENTER;
+    @:native('MA_CHANNEL_SIDE_LEFT') var SIDE_LEFT;
+    @:native('MA_CHANNEL_SIDE_RIGHT') var SIDE_RIGHT;
+    @:native('MA_CHANNEL_TOP_CENTER') var TOP_CENTER;
+    @:native('MA_CHANNEL_TOP_FRONT_LEFT') var TOP_FRONT_LEFT;
+    @:native('MA_CHANNEL_TOP_FRONT_CENTER') var TOP_FRONT_CENTER;
+    @:native('MA_CHANNEL_TOP_FRONT_RIGHT') var TOP_FRONT_RIGHT;
+    @:native('MA_CHANNEL_TOP_BACK_LEFT') var TOP_BACK_LEFT;
+    @:native('MA_CHANNEL_TOP_BACK_CENTER') var TOP_BACK_CENTER;
+    @:native('MA_CHANNEL_TOP_BACK_RIGHT') var TOP_BACK_RIGHT;
+    @:native('MA_CHANNEL_AUX_0') var AUX_0;
+    @:native('MA_CHANNEL_AUX_1') var AUX_1;
+    @:native('MA_CHANNEL_AUX_2') var AUX_2;
+    @:native('MA_CHANNEL_AUX_3') var AUX_3;
+    @:native('MA_CHANNEL_AUX_4') var AUX_4;
+    @:native('MA_CHANNEL_AUX_5') var AUX_5;
+    @:native('MA_CHANNEL_AUX_6') var AUX_6;
+    @:native('MA_CHANNEL_AUX_7') var AUX_7;
+    @:native('MA_CHANNEL_AUX_8') var AUX_8;
+    @:native('MA_CHANNEL_AUX_9') var AUX_9;
+    @:native('MA_CHANNEL_AUX_10') var AUX_10;
+    @:native('MA_CHANNEL_AUX_11') var AUX_11;
+    @:native('MA_CHANNEL_AUX_12') var AUX_12;
+    @:native('MA_CHANNEL_AUX_13') var AUX_13;
+    @:native('MA_CHANNEL_AUX_14') var AUX_14;
+    @:native('MA_CHANNEL_AUX_15') var AUX_15;
+    @:native('MA_CHANNEL_AUX_16') var AUX_16;
+    @:native('MA_CHANNEL_AUX_17') var AUX_17;
+    @:native('MA_CHANNEL_AUX_18') var AUX_18;
+    @:native('MA_CHANNEL_AUX_19') var AUX_19;
+    @:native('MA_CHANNEL_AUX_20') var AUX_20;
+    @:native('MA_CHANNEL_AUX_21') var AUX_21;
+    @:native('MA_CHANNEL_AUX_22') var AUX_22;
+    @:native('MA_CHANNEL_AUX_23') var AUX_23;
+    @:native('MA_CHANNEL_AUX_24') var AUX_24;
+    @:native('MA_CHANNEL_AUX_25') var AUX_25;
+    @:native('MA_CHANNEL_AUX_26') var AUX_26;
+    @:native('MA_CHANNEL_AUX_27') var AUX_27;
+    @:native('MA_CHANNEL_AUX_28') var AUX_28;
+    @:native('MA_CHANNEL_AUX_29') var AUX_29;
+    @:native('MA_CHANNEL_AUX_30') var AUX_30;
+    @:native('MA_CHANNEL_AUX_31') var AUX_31;
+    @:native('MA_CHANNEL_LEFT') var LEFT;
+    @:native('MA_CHANNEL_RIGHT') var RIGHT;
+
+}
+@:include('./native.h')
+@:sourceFile(#if winrt './native.c' #else './native.m' #end)
+@:native('ma_uint8') @:unreflective
+private extern class MaChannel {}
+
 /*
     MINIAUDIO Classes
 */
@@ -286,11 +351,11 @@ extern class PlaybackInfo {
     var usingDefaultChannelMap: Bool;
     var format: Format;
     var channels: UInt32;
-    //     ma_channel channelMap[MA_MAX_CHANNELS];
+    var channelMap: cpp.RawPointer<Channel>;
     var internalFormat: Format;
     var internalChannels: UInt32;
     var internalSampleRate: UInt32;
-    //     ma_channel internalChannelMap[MA_MAX_CHANNELS];
+    var internalChannelMap: cpp.RawPointer<Channel>;
     var internalBufferSizeInFrames: UInt32;
     var internalPeriods: UInt32;
     //     ma_pcm_converter converter;
@@ -306,7 +371,7 @@ extern class PlaybackConfig {
     // ma_device_id* pDeviceID;
     var format: Format;
     var channels: UInt32;
-    // ma_channel channelMap[MA_MAX_CHANNELS];
+    var channelMap: cpp.RawPointer<Channel>;
     var shareMode: ShareMode;
 }
 
@@ -425,7 +490,7 @@ extern class DecoderConfig {
     var format: Format;      /* Set to 0 or ma_format_unknown to use the stream's internal format. */
     var channels: UInt32;    /* Set to 0 to use the stream's internal channels. */
     var sampleRate: UInt32;  /* Set to 0 to use the stream's internal sample rate. */
-    // ma_channel channelMap[MA_MAX_CHANNELS];
+    var channelMap: cpp.RawPointer<Channel>;
     // ma_channel_mix_mode channelMixMode;
     // ma_dither_mode ditherMode;
     // ma_src_algorithm srcAlgorithm;
@@ -450,11 +515,11 @@ extern class Decoder {
     var internalFormat: Format;
     var internalChannels: UInt32;
     var internalSampleRate: UInt32;
-    // ma_channel internalChannelMap[MA_MAX_CHANNELS];
+    var internalChannelMap: cpp.RawPointer<Channel>;
     var outputFormat: Format;
     var outputChannels: UInt32;
     var outputSampleRate: UInt32;
-    // ma_channel outputChannelMap[MA_MAX_CHANNELS];
+    var outputChannelMap: cpp.RawPointer<Channel>;
     // ma_pcm_converter dsp;   /* <-- Format conversion is achieved by running frames through this. */
     // ma_decoder_seek_to_pcm_frame_proc onSeekToPCMFrame;
     // ma_decoder_uninit_proc onUninit;
