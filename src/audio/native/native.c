@@ -149,8 +149,6 @@ void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma
     static float decoderOutputBuffer[4096];
 
     ma_uint32 channelCount = maDevice->playback.channels;
-
-    // @! can get seamless loops with a loop flag and seek
     ma_uint32 bufferMaxFrames = ma_countof(decoderOutputBuffer) / channelCount;
 
     ma_mutex_lock(&sourceList->lock);
@@ -202,7 +200,6 @@ void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma
 
                 ma_uint32 framesRead = (ma_uint32) NativeAudioDecoder_readPcmFrames(decoder, decoderOutputBuffer, framesToRead);
 
-
                 // mix decoderOutputBuffer with pOutput, applying conversions if the playback format is not float
                 ma_uint32 sampleCount = framesRead * channelCount;
                 ma_uint32 outputOffset = totalFramesRead * channelCount;
@@ -232,7 +229,6 @@ void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma
                     } else {
                         break;
                     }
-
                 }
             }
 
