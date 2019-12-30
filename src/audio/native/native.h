@@ -11,9 +11,17 @@
 #define AUDIO_NATIVE_NATIVE_H
 
 #ifdef HXCPP_DEBUG
-    #define MA_DEBUG_OUTPUT
+    // #define MA_DEBUG_OUTPUT
     #define MA_LOG_LEVEL 1
 #endif
+
+// disable some of the backends we don't need
+#define MA_NO_JACK
+#define MA_NO_SNDIO
+#define MA_NO_AUDIO4
+#define MA_NO_OSS
+#define MA_NO_WEBAUDIO
+
 #include "./miniaudio/miniaudio.h"
 
 #ifdef __cplusplus
