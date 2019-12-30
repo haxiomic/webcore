@@ -10,7 +10,15 @@ import cpp.*;
 
 @:include('./native.h')
 @:sourceFile(#if winrt './native.c' #else './native.m' #end)
-extern class MiniAudio { }
+extern class MiniAudio {
+
+    @:native('ma_get_bytes_per_sample')
+    static function get_bytes_per_sample(format: Format): UInt32;
+
+    @:native('ma_get_bytes_per_frame')
+    static function get_bytes_per_frame(format: Format, channels: UInt32): UInt32;
+
+}
 
 /*
     MINIAUDIO Enums
