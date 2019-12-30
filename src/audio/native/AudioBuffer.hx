@@ -1,17 +1,18 @@
 package audio.native;
 
 /**
-    Rather than storing raw PCM frames, we store the original audio file bytes and then decode as required
-    It would be better to store raw PCM frames, however this requires locking the decoder while reading
+    Represents raw PCM frames
+    Internally this is stored as interleaved samples for each channel, however WebAudio uses separate buffers per channel
 **/
 @:allow(audio.native.AudioContext)
 @:allow(audio.native.AudioBufferSourceNode)
 class AudioBuffer {
+    
+    // could use ma_deinterleave_pcm_frames to get separate buffers
+    final interleavedPcmBytes: haxe.io.Bytes;
 
-    final audioFileBytes: haxe.io.Bytes;
-
-    function new(audioFileBytes: haxe.io.Bytes) {
-        this.audioFileBytes = audioFileBytes;
+    function new(interleavedPcmBytes: haxe.io.Bytes) {
+        this.interleavedPcmBytes = interleavedPcmBytes;
     }
 
 }

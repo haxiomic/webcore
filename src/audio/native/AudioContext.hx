@@ -70,7 +70,10 @@ class AudioContext {
 
     public function decodeAudioData(audioData: haxe.io.Bytes, ?successCallback: AudioBuffer -> Void, ?errorCallback: String -> Void): Void {
         try {
-            var audioBuffer = new AudioBuffer(audioData);
+            // decode file into raw pcm frame bytes
+            var tmpDecoder = new AudioDecoder.FileBytesDecoder(this, audioData, false);
+            var bytes = tmpDecoder.readInterleavedPcmFrames(0);
+            var audioBuffer = new AudioBuffer(bytes);
             if (successCallback != null) {
                 successCallback(audioBuffer);
             }

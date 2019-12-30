@@ -1,17 +1,20 @@
 package audio.native;
 
 import cpp.*;
-import audio.native.MiniAudio.DecoderConfig;
 
 @:native('audio.native.AudioDecoderHx')
 class AudioDecoder {
 
     public final nativeAudioDecoder: Star<NativeAudioDecoder>;
     public final context: AudioContext;
+    public final format: MiniAudio.Format;
+    public final sampleRate: UInt32;
+    public final channels: UInt32;
+
     public var frameIndex (get, never): UInt64;
     public var currentTime_s (get, never): Float;
 
-    final config: DecoderConfig;
+    final config: MiniAudio.DecoderConfig;
 
     function new(context: AudioContext) {
         this.context = context;
@@ -21,6 +24,11 @@ class AudioDecoder {
             maDevice.playback.channels,
             maDevice.sampleRate
         );
+
+        this.format = this.config.format;
+        this.sampleRate = this.config.sampleRate;
+        this.channels = this.config.channels;
+
         this.nativeAudioDecoder = NativeAudioDecoder.create(context.maDevice.pContext, config);
         cpp.vm.Gc.setFinalizer(this, Function.fromStaticFunction(finalizer));
     }
@@ -28,6 +36,34 @@ class AudioDecoder {
     public inline function getLengthInPcmFrames(): UInt64 {
         return nativeAudioDecoder.getLengthInPcmFrames();
     }
+
+    /**
+        Reads PCM frames into a single buffer. The data format for each sample matches the format field. Multiple channels are interleaved
+        For example, 3 samples with two channels: [C1 C2 C1 C2 C1 C2]
+
+        By default the sample data type will be float32
+    **/
+    public inline function readInterleavedPcmFrames(startFrameIndex: UInt64 = 0, ?frameCount: UInt64): haxe.io.Bytes {
+        var initialFrameIndex = frameIndex;
+        var sourceLength = getLengthInPcmFrames();
+        var remainingFrames = sourceLength - startFrameIndex;
+        var framesToRead: UInt64 = if (frameCount == null) {
+            remainingFrames;
+        } else {
+            frameCount < remainingFrames ? frameCount : remainingFrames;
+        }
+
+        var bytesPerFrame = MiniAudio.get_bytes_per_frame(format, channels);
+        var totalBytes: UInt64 = cast bytesPerFrame * framesToRead;
+        var bytes = haxe.io.Bytes.alloc(totalBytes);
+        var bytesAddress: Star<cpp.Void> = cast cpp.NativeArray.address(bytes.getData(), 0).raw;
+        
+        seekToPcmFrame(startFrameIndex);
+        nativeAudioDecoder.readPcmFrames(bytesAddress, framesToRead);
+        seekToPcmFrame(initialFrameIndex);
+
+        return bytes;
+    } 
 
     public inline function seekToPcmFrame(frameIndex: UInt64): MiniAudio.Result {
         return nativeAudioDecoder.seekToPcmFrame(frameIndex);
@@ -79,10 +115,31 @@ class FileBytesDecoder extends AudioDecoder {
     **/
     public function new(context: AudioContext, fileBytes: haxe.io.Bytes, copyBytes: Bool = true) {
         super(context);
-        // copy bytes by default (wouldn't want GC freeing the backing bytes)
+        // copy bytes by default
         bytes = copyBytes ? fileBytes.sub(0, fileBytes.length) : fileBytes;
         var bytesAddress: ConstStar<cpp.Void> = cast cpp.NativeArray.address(bytes.getData(), 0).raw;
         var result = this.nativeAudioDecoder.maDecoder.init_memory(bytesAddress, bytes.length, Native.addressOf(config));
+        if (result != SUCCESS) {
+            throw 'Failed to initialize a FileBytesDecoder: $result';
+        }
+    }
+
+}
+
+class PcmBufferDecoder extends AudioDecoder {
+
+    // keep a reference so bytes doesn't get cleared by the GC
+    final bytes: haxe.io.Bytes;
+    
+    /**
+        @throws string
+    **/
+    public function new(context: AudioContext, pcmBuffer: haxe.io.Bytes, copyBytes: Bool = true) {
+        super(context);
+        // copy bytes by default
+        bytes = copyBytes ? pcmBuffer.sub(0, pcmBuffer.length) : pcmBuffer;
+        var bytesAddress: ConstStar<cpp.Void> = cast cpp.NativeArray.address(bytes.getData(), 0).raw;
+        var result = this.nativeAudioDecoder.maDecoder.init_memory_raw(bytesAddress, bytes.length, Native.addressOf(config), Native.addressOf(config));
         if (result != SUCCESS) {
             throw 'Failed to initialize a FileBytesDecoder: $result';
         }

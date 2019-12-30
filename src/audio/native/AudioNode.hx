@@ -109,7 +109,7 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
 
     inline function set_buffer(b: AudioBuffer): AudioBuffer {
         // create a decoder for this buffer
-        var bytesDecoder = new AudioDecoder.FileBytesDecoder(context, b.audioFileBytes);
+        var bytesDecoder = new AudioDecoder.PcmBufferDecoder(context, b.interleavedPcmBytes);
         setDecoder(bytesDecoder);
         return _buffer = b;
     }
