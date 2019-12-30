@@ -29,13 +29,13 @@ class AudioContext {
         deviceConfig.performanceProfile = options.lowLatency == false ? CONSERVATIVE : LOW_LATENCY;
         deviceConfig.dataCallback = untyped __global__.Audio_mixSources;
 
+        cpp.vm.Gc.setFinalizer(this, Function.fromStaticFunction(finalizer));
+
         // initialize device
         var initResult = maDevice.init(null, Native.addressOf(deviceConfig));
         if (initResult != SUCCESS) {
             throw 'Failed to initialize miniaudio device: $initResult';
         }
-
-        cpp.vm.Gc.setFinalizer(this, Function.fromStaticFunction(finalizer));
 
         destination = new AudioNode(this);
 
