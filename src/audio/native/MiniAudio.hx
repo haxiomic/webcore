@@ -118,6 +118,15 @@ extern enum abstract ShareMode(MaShareMode) {
 @:native('ma_share_mode') @:unreflective
 private extern class MaShareMode {}
 
+extern enum abstract SeekOrigin(MaSeekOrigin) {
+    @:native('ma_seek_origin_start') var START;
+    @:native('ma_seek_origin_current') var CURRENT;
+}
+@:include('./native.h')
+@:sourceFile(#if winrt './native.c' #else './native.m' #end)
+@:native('ma_seek_origin') @:unreflective
+private extern class MaSeekOrigin {}
+
 @:include('./native.h')
 @:sourceFile(#if winrt './native.c' #else './native.m' #end)
 extern enum abstract Result(MaResult) {
@@ -482,6 +491,10 @@ extern class Device {
 
 }
 
+typedef DecoderReadCallback = Callable<(decoder: Star<Decoder>, outputBuffer: Star<cpp.Void>, bytesToRead: cpp.SizeT) -> cpp.SizeT>;
+typedef DecoderSeekCallback = Callable<(decoder: Star<Decoder>, byteOffset: Int, origin: SeekOrigin) -> Bool>;
+typedef DecoderGetLengthInPcmFramesCallback = Callable<(decoder: Star<Decoder>) -> UInt64>;
+
 @:include('./native.h')
 @:sourceFile(#if winrt './native.c' #else './native.m' #end)
 @:native('ma_decoder_config') @:unreflective
@@ -508,8 +521,8 @@ extern class DecoderConfig {
 @:native('ma_decoder') @:unreflective
 @:structAccess
 extern class Decoder {
-    // ma_decoder_read_proc onRead;
-    // ma_decoder_seek_proc onSeek;
+    var onRead: DecoderReadCallback;
+    var onSeek: DecoderSeekCallback;
     var pUserData: Star<cpp.Void>;
     var readPointer: UInt64; /* Used for returning back to a previous position after analysing the stream or whatnot. */
     var internalFormat: Format;
@@ -523,7 +536,7 @@ extern class Decoder {
     // ma_pcm_converter dsp;   /* <-- Format conversion is achieved by running frames through this. */
     // ma_decoder_seek_to_pcm_frame_proc onSeekToPCMFrame;
     // ma_decoder_uninit_proc onUninit;
-    // ma_decoder_get_length_in_pcm_frames_proc onGetLengthInPCMFrames;
+    var onGetLengthInPCMFrames: DecoderGetLengthInPcmFramesCallback;
     // void* pInternalDecoder; /* <-- The drwav/drflac/stb_vorbis/etc. objects. */
     // struct
     // {
@@ -531,6 +544,10 @@ extern class Decoder {
     //     size_t dataSize;
     //     size_t currentReadPos;
     // } memory;               /* Only used for decoders that were opened against a block of memory. */
+
+    inline function init(onRead: DecoderReadCallback, onSeek: DecoderSeekCallback, userData: Star<cpp.Void>, config: ConstStar<DecoderConfig>): Result {
+        return untyped __global__.ma_decoder_init(onRead, onSeek, userData, config, (this: Star<Decoder>));
+    }
 
     inline function init_file(filePath: ConstCharStar, config: ConstStar<DecoderConfig>): Result {
         return untyped __global__.ma_decoder_init_file(filePath, config, (this: Star<Decoder>));
