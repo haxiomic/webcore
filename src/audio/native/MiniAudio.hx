@@ -611,11 +611,11 @@ extern class Mutex {
         untyped __global__.ma_mutex_uninit((this: Star<Mutex>));
     }
 
-    inline function lock(): Void {
+    private inline function lock(): Void {
         untyped __global__.ma_mutex_lock((this: Star<Mutex>));
     }
 
-    inline function unlock(): Void {
+    private inline function unlock(): Void {
         untyped __global__.ma_mutex_unlock((this: Star<Mutex>));
     }
 
