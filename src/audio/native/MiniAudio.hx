@@ -1,7 +1,7 @@
 /**
     Externs for David Reid's (dr-soft) miniaudio.h
     
-    @version miniaudio.h v0.9.9, commit #3bee97
+    @version miniaudio.h v0.9.9, commit #0b3785
     @author George Corney (haxiomic)
 **/
 package audio.native;
