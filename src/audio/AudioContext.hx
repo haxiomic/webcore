@@ -1,16 +1,26 @@
-package audio.native;
+package audio;
+
+#if js
+
+typedef AudioContext = js.html.audio.AudioContext;
+
+#else
 
 import cpp.*;
 
+import audio.native.AudioDecoder;
+import audio.native.MiniAudio.Device;
+import audio.native.MiniAudio.DeviceConfig;
+
 @:include('./native.h')
 @:sourceFile(#if winrt './native.c' #else './native.m' #end)
-@:allow(audio.native.AudioNode)
+@:allow(audio.AudioNode)
 @:allow(audio.native.AudioDecoder)
 class AudioContext {
 
     public final destination: AudioNode;
 
-    final maDevice: Star<MiniAudio.Device>;
+    final maDevice: Star<Device>;
     var started: Bool = false;
 
     public function new(?options: {
@@ -21,9 +31,9 @@ class AudioContext {
             options = {};
         }
 
-        maDevice = MiniAudio.Device.alloc();
+        maDevice = Device.alloc();
 
-        var deviceConfig = MiniAudio.DeviceConfig.init(PLAYBACK);
+        var deviceConfig = DeviceConfig.init(PLAYBACK);
         deviceConfig.sampleRate = options.sampleRate != null ? options.sampleRate : 0;
         deviceConfig.playback.format = F32;
         deviceConfig.performanceProfile = options.lowLatency == false ? CONSERVATIVE : LOW_LATENCY;
@@ -61,11 +71,11 @@ class AudioContext {
     }
 
     public function createFileSource(path: String) {
-        return new AudioNode.AudioBufferSourceNode(this, new AudioDecoder.FileDecoder(this, path));
+        return new AudioNode.AudioBufferSourceNode(this, new FileDecoder(this, path));
     }
 
     public function createFileBytesSource(audioFileBytes: haxe.io.Bytes) {
-        return new AudioNode.AudioBufferSourceNode(this, new AudioDecoder.FileBytesDecoder(this, audioFileBytes, true));
+        return new AudioNode.AudioBufferSourceNode(this, new FileBytesDecoder(this, audioFileBytes, true));
     }
 
     public function createBufferSource() {
@@ -75,7 +85,7 @@ class AudioContext {
     public function decodeAudioData(audioFileBytes: haxe.io.Bytes, ?successCallback: AudioBuffer -> Void, ?errorCallback: String -> Void): Void {
         try {
             // decode file into raw pcm frame bytes
-            var tmpDecoder = new AudioDecoder.FileBytesDecoder(this, audioFileBytes, false);
+            var tmpDecoder = new FileBytesDecoder(this, audioFileBytes, false);
             var bytes = tmpDecoder.getInterleavedPcmFrames(0);
             var audioBuffer = new AudioBuffer(bytes);
             if (successCallback != null) {
@@ -100,3 +110,5 @@ class AudioContext {
     }
 
 }
+
+#end

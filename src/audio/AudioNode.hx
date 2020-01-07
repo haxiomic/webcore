@@ -1,9 +1,16 @@
-package audio.native;
+package audio;
 
-import audio.native.AudioDecoder.NativeAudioDecoder;
+#if js
+
+typedef AudioNode = js.html.audio.AudioNode;
+
+#else
+
 import cpp.*;
+import audio.native.AudioDecoder;
+import audio.native.NativeAudioSource;
 
-@:allow(audio.native.AudioContext)
+@:allow(audio.AudioContext)
 class AudioNode {
 
     public final context: AudioContext;
@@ -95,7 +102,7 @@ class AudioScheduledSourceNode extends AudioNode {
 
 }
 
-@:allow(audio.native.AudioContext)
+@:allow(audio.AudioContext)
 class AudioBufferSourceNode extends AudioScheduledSourceNode {
 
     public var loop (get, set): Bool;
@@ -108,8 +115,9 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
     }
 
     inline function set_buffer(b: AudioBuffer): AudioBuffer {
+
         // create a decoder for this buffer
-        var bytesDecoder = new AudioDecoder.PcmBufferDecoder(context, b.interleavedPcmBytes);
+        var bytesDecoder = new PcmBufferDecoder(context, b.interleavedPcmBytes);
         setDecoder(bytesDecoder);
         return _buffer = b;
     }
@@ -124,86 +132,4 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
 
 }
 
-@:include('./native.h')
-@:sourceFile(#if winrt './native.c' #else './native.m' #end)
-@:native('AudioSource') @:unreflective
-@:structAccess
-@:access(audio.native.AudioContext)
-extern class NativeAudioSource {
-
-    var decoder: Star<NativeAudioDecoder>;
-    var lock: Star<MiniAudio.Mutex>;
-    private var playing: Bool;
-    private var loop: Bool;
-    private var onReachEofFlag: Bool;
-
-    inline function getPlaying(): Bool {
-        return lock.locked(() -> playing);
-    }
-
-    inline function setPlaying(v: Bool): Bool {
-        return lock.locked(() -> playing = v);
-    }
-
-    inline function getLoop(): Bool {
-        return lock.locked(() -> loop);
-    }
-
-    inline function setLoop(v: Bool): Bool {
-        return lock.locked(() -> loop = v);
-    }
-
-    inline function getOnReachEofFlag(): Bool {
-        return lock.locked(() -> onReachEofFlag);
-    }
-
-    inline function setOnReachEofFlag(v: Bool): Bool {
-        return lock.locked(() -> onReachEofFlag = v);
-    }
-
-    @:native('~AudioSource')
-    function free(): Void;
-
-    @:native('new AudioSource')
-    static function alloc(): Star<NativeAudioSource>;
-
-    static inline function create(maContext: Star<MiniAudio.Context>): Star<NativeAudioSource> {
-        var instance = alloc();
-        instance.lock = MiniAudio.Mutex.alloc();
-        instance.lock.init(maContext);
-        instance.decoder = null;
-        instance.playing = false;
-        instance.loop = false;
-        instance.onReachEofFlag = false;
-        return instance;
-    }
-
-    static inline function destroy(instance: NativeAudioSource): Void {
-        instance.free();
-        instance.lock.uninit();
-        instance.lock.free();
-    }
-
-}
-
-@:include('./native.h')
-@:sourceFile(#if winrt './native.c' #else './native.m' #end)
-@:native('AudioSourceList') @:unreflective
-@:structAccess
-extern class NativeAudioSourceList {
-
-    inline function add(source: Star<NativeAudioSource>): Void {
-        untyped __global__.AudioSourceList_add(this, source);
-    }
-
-    inline function remove(source: Star<NativeAudioSource>): Bool {
-        return untyped __global__.AudioSourceList_remove(this, source);
-    }
-
-    @:native('AudioSourceList_create')
-    static function create(maContext: Star<MiniAudio.Context>): Star<NativeAudioSourceList>;
-
-    @:native('AudioSourceList_destroy')
-    static function destroy(instance: Star<NativeAudioSourceList>): Void;
-
-}
+#end

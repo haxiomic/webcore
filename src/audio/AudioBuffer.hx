@@ -1,11 +1,17 @@
-package audio.native;
+package audio;
+
+#if js
+
+typedef AudioBuffer = js.html.audio.AudioBuffer;
+
+#else
 
 /**
     Represents raw PCM frames
     Internally this is stored as interleaved samples for each channel, however WebAudio uses separate buffers per channel
 **/
-@:allow(audio.native.AudioContext)
-@:allow(audio.native.AudioBufferSourceNode)
+@:allow(audio.AudioContext)
+@:allow(audio.AudioBufferSourceNode)
 class AudioBuffer {
     
     // could use ma_deinterleave_pcm_frames to get separate buffers
@@ -16,3 +22,5 @@ class AudioBuffer {
     }
 
 }
+
+#end
