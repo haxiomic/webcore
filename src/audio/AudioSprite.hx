@@ -5,6 +5,9 @@ import audio.AudioNode;
 import audio.native.AudioDecoder;
 #end
 
+/**
+    Audio sprite to enable playback of audio files, specified either by their file path or as bytes
+**/
 @:access(audio.AudioNode)
 class AudioSprite {
 
@@ -18,7 +21,6 @@ class AudioSprite {
     #end
     
     var _playing: Bool = false;
-
 
     public function new(?context: AudioContext, ?path: String, ?audioFileBytes: haxe.io.Bytes) {
         if (context == null) {

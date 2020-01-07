@@ -1,14 +1,11 @@
-import cpp.Pointer;
-import cpp.NativeArray;
-import audio.native.MiniAudio;
-import audio.native.AudioOut;
-import audio.native.AudioSource;
-import typedarray.Float32Array;
+import asset.Assets;
+import audio.AudioSprite;
 import gluon.es2.GLBuffer;
+import gluon.es2.GLContext;
 import gluon.es2.GLProgram;
 import gluon.es2.GLShader;
-import gluon.es2.GLContext;
 import haxe.Timer;
+import typedarray.Float32Array;
 
 @:expose
 class MinimalGL implements MinimalGLNativeInterface {
@@ -20,6 +17,11 @@ class MinimalGL implements MinimalGLNativeInterface {
 	public function new(gl) {
 		this.gl = gl;
 		trace('MinimalGL created');
+
+		// on sys platforms, set the cwd to the exe directory so file reads are relative to the exe 
+		#if sys
+		Sys.setCwd(haxe.io.Path.directory(Sys.programPath()));
+		#end
 
 		// create programs
 		program = try {
@@ -45,97 +47,34 @@ class MinimalGL implements MinimalGLNativeInterface {
 
 		gl.disable(CULL_FACE);
 
-		var audioOut = AudioOut.create();
-
-		if (audioOut != null) {
-			Console.examine(audioOut.maDevice.sampleRate);
-			Console.examine(audioOut.maDevice.pContext.backend);
-			Console.examine(audioOut.maDevice.playback.format);
-			Console.examine(audioOut.maDevice.playback.internalFormat);
-			Console.examine(audioOut.maDevice.playback.channels);
-			Console.examine(audioOut.maDevice.playback.internalChannels);
-			Console.examine(audioOut.sourceCount());
-		}
-
-		var multiChannelTest = AudioSource.createFileSource(
-			'/Users/geo/Projects/teach-your-monster-native-media/src/audio/multi-channel-test.mp3',
-			audioOut.maDevice.playback.channels,
-			audioOut.maDevice.sampleRate
-		);
-		Console.examine(multiChannelTest);
-
-		var twoChannelSong = AudioSource.createFileSource(
-			'/Users/geo/Projects/teach-your-monster-native-media/src/audio/two-channel.mp3',
-			audioOut.maDevice.playback.channels,
-			audioOut.maDevice.sampleRate
-		);
-		Console.examine(twoChannelSong);
-
-		// test add null source
-		// Console.examine(audioOut.addSource(null), audioOut.sourceCount());
-		// audioOut.removeSource(null);
-		// Console.examine(audioOut.sourceCount());
-
-		Console.log('Testing source');
-		audioOut.addSource(multiChannelTest);
-		audioOut.addSource(twoChannelSong);
-		audioOut.addSource(multiChannelTest);
-
-		Console.examine(audioOut.sourceCount());
-
-		audioOut.removeSource(multiChannelTest);
-		audioOut.removeSource(twoChannelSong);
-		audioOut.removeSource(multiChannelTest);
-		audioOut.removeSource(multiChannelTest);
-
-		Console.examine(audioOut.sourceCount());
-
-		audioOut.addSource(multiChannelTest);
-		audioOut.addSource(twoChannelSong);
-		audioOut.start();
-
-		Timer.delay(() -> {
-			var testcase = AudioSource.createFileSource(
-				'/Users/geo/Projects/teach-your-monster-native-media/src/audio/testcase.mp3',
-				audioOut.maDevice.playback.channels,
-				audioOut.maDevice.sampleRate
-			);
-			audioOut.addSource(testcase);
-			audioOut.removeSource(twoChannelSong);
-		}, 2000);
-
-		/*
-		Timer.delay(() -> {
-			audioOut.removeSource(fileSource);
-			Console.log('Destorying AudioSource');
-			AudioSource.destroy(fileSource);
-			Console.log('Destorying AudioOut');
-			AudioOut.destroy(audioOut);
-		}, 4000);
-		*/
-
-		// AudioDevice.destroy(audioDevice);
-
-		/*
-		final audioContext: AudioContext;
-
-		final testBufferSource: AudioBufferSourceNode;
-		// test WebAudio API
-		var soundBytes = haxe.crypto.Base64.decode(audio.TestCase.base64);
+		// Audio demo:
 		
-		audioContext = new audio.AudioContext();
-		testBufferSource = audioContext.createBufferSource();
-
-		audioContext.decodeAudioData(soundBytes.getData(), (audioBuffer) -> {
-			trace('decoded audio buffer', audioBuffer);
-
-			testBufferSource.buffer = audioBuffer;
-			testBufferSource.connect(audioContext.destination);
-			testBufferSource.onended = () -> {
-				trace('testBufferSource.onended');
-			}
-		});	
-		*/
+		// play sound by creating a context and decoding the file manually:
+		// var context = new AudioContext();
+		// var bufferSource = context.createBufferSource();
+		// bufferSource.connect(context.destination);
+		// context.decodeAudioData(Assets.my_triangle_mp3.getData(), audioBuffer -> bufferSource.buffer = audioBuffer, err -> trace(err));
+		// bufferSource.start();
+		
+		// alternatively a AudioSprite which does the above internally
+		var audioSprite = new AudioSprite(Assets.my_triangle_mp3);
+		audioSprite.play();
+		
+		#if js
+		js.Browser.window.addEventListener('click', () -> audioSprite.play());
+		var clickToPlayEl = js.Browser.document.createElement('div');
+		js.Browser.document.body.appendChild(clickToPlayEl);
+		clickToPlayEl.innerText = 'Click to play';
+		clickToPlayEl.style.color = 'white';
+		clickToPlayEl.style.position = 'absolute';
+		clickToPlayEl.style.zIndex = '100';
+		clickToPlayEl.style.margin = 'auto';
+		clickToPlayEl.style.font = '64px helvetica, sans-serif';
+		clickToPlayEl.style.top = '0';
+		clickToPlayEl.style.right = '0';
+		clickToPlayEl.style.left = '0';
+		clickToPlayEl.style.textAlign = 'center';
+		#end
 	}
 
 	public function drawFrame() {
