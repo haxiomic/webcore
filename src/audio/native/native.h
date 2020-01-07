@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 /**
- * NativeAudioDecoder
+ * AudioDecoder
  * 
  * Wraps a miniaudio decoder to enable thread-safety and tracks the current frameIndex
  */
@@ -38,14 +38,14 @@ typedef struct {
     ma_mutex*   lock;
     ma_decoder* maDecoder;
     ma_uint64   frameIndex;
-} NativeAudioDecoder;
+} AudioDecoder;
 
 /**
  * Thread-safe decoder functions
  */ 
-ma_uint64 NativeAudioDecoder_readPcmFrames(NativeAudioDecoder* decoder, void* pFramesOut, ma_uint64 frameCount);
-ma_uint64 NativeAudioDecoder_getLengthInPcmFrames(NativeAudioDecoder* decoder);
-ma_result NativeAudioDecoder_seekToPcmFrame(NativeAudioDecoder* decoder, ma_uint64 frameIndex);
+ma_uint64 AudioDecoder_readPcmFrames(AudioDecoder* decoder, void* pFramesOut, ma_uint64 frameCount);
+ma_uint64 AudioDecoder_getLengthInPcmFrames(AudioDecoder* decoder);
+ma_result AudioDecoder_seekToPcmFrame(AudioDecoder* decoder, ma_uint64 frameIndex);
 
 /**
  * AudioSource
@@ -55,7 +55,7 @@ ma_result NativeAudioDecoder_seekToPcmFrame(NativeAudioDecoder* decoder, ma_uint
 
 typedef struct {
     ma_mutex*           lock;
-    NativeAudioDecoder* decoder;
+    AudioDecoder* decoder;
     // use atomics access for the following
     ma_bool32           playing;
     ma_bool32           loop;

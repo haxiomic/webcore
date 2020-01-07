@@ -149,7 +149,7 @@ class PcmBufferDecoder extends AudioDecoder {
 
 @:include('./native.h')
 @:sourceFile(#if winrt './native.c' #else './native.m' #end)
-@:native('NativeAudioDecoder') @:unreflective
+@:native('AudioDecoder') @:unreflective
 @:structAccess
 extern class NativeAudioDecoder {
 
@@ -173,10 +173,10 @@ extern class NativeAudioDecoder {
         return lock.locked(() -> this.frameIndex);
     }
 
-    @:native('~NativeAudioDecoder')
+    @:native('~AudioDecoder')
     function free(): Void;
 
-    @:native('new NativeAudioDecoder')
+    @:native('new AudioDecoder')
     static function alloc(): Star<NativeAudioDecoder>;
 
     static inline function create(maContext: Star<MiniAudio.Context>, config: Star<MiniAudio.DecoderConfig>): Star<NativeAudioDecoder> {

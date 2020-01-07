@@ -10,10 +10,10 @@
 #include "./native.h"
 
 /**
- * NativeAudioDecoder
+ * AudioDecoder
  */
 
-ma_uint64 NativeAudioDecoder_readPcmFrames(NativeAudioDecoder* decoder, void* pFramesOut, ma_uint64 frameCount) {
+ma_uint64 AudioDecoder_readPcmFrames(AudioDecoder* decoder, void* pFramesOut, ma_uint64 frameCount) {
     ma_uint64 framesRead = 0;
     ma_mutex_lock(decoder->lock);
     framesRead = ma_decoder_read_pcm_frames(decoder->maDecoder, pFramesOut, frameCount);
@@ -22,7 +22,7 @@ ma_uint64 NativeAudioDecoder_readPcmFrames(NativeAudioDecoder* decoder, void* pF
     return framesRead;
 }
 
-ma_uint64 NativeAudioDecoder_getLengthInPcmFrames(NativeAudioDecoder* decoder) {
+ma_uint64 AudioDecoder_getLengthInPcmFrames(AudioDecoder* decoder) {
     ma_uint64 length = 0;
     ma_mutex_lock(decoder->lock);
     length = ma_decoder_get_length_in_pcm_frames(decoder->maDecoder);
@@ -30,7 +30,7 @@ ma_uint64 NativeAudioDecoder_getLengthInPcmFrames(NativeAudioDecoder* decoder) {
     return length;
 }
 
-ma_result NativeAudioDecoder_seekToPcmFrame(NativeAudioDecoder* decoder, ma_uint64 frameIndex) {
+ma_result AudioDecoder_seekToPcmFrame(AudioDecoder* decoder, ma_uint64 frameIndex) {
     ma_result result = MA_ERROR;
     ma_mutex_lock(decoder->lock);
     result = ma_decoder_seek_to_pcm_frame(decoder->maDecoder, frameIndex);
@@ -161,7 +161,7 @@ void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma
             ma_assert(source != NULL);
 
             ma_bool32 playing = MA_FALSE;
-            NativeAudioDecoder* decoder = NULL;
+            AudioDecoder* decoder = NULL;
             ma_bool32 loop = MA_FALSE;
             ma_mutex_lock(source->lock); {
                 playing = source->playing;
@@ -198,7 +198,7 @@ void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma
                 ma_uint32 framesRemaining = frameCount - totalFramesRead;
                 ma_uint32 framesToRead = ma_min(framesRemaining, bufferMaxFrames);
 
-                ma_uint32 framesRead = (ma_uint32) NativeAudioDecoder_readPcmFrames(decoder, decoderOutputBuffer, framesToRead);
+                ma_uint32 framesRead = (ma_uint32) AudioDecoder_readPcmFrames(decoder, decoderOutputBuffer, framesToRead);
 
                 // mix decoderOutputBuffer with pOutput, applying conversions if the playback format is not float
                 ma_uint32 sampleCount = framesRead * channelCount;
@@ -224,7 +224,7 @@ void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma
 
                     // if looping, seek to start and continue to read more frames
                     if (loop == MA_TRUE) {
-                        NativeAudioDecoder_seekToPcmFrame(decoder, 0);
+                        AudioDecoder_seekToPcmFrame(decoder, 0);
                         continue;
                     } else {
                         break;
