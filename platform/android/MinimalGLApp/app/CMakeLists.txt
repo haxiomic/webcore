@@ -74,6 +74,7 @@ target_link_libraries(
     # System libraries
     EGL
     GLESv2
+    OpenSLES
     android
     log
 )
