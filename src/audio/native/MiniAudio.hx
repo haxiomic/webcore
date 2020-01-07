@@ -410,7 +410,7 @@ extern class DeviceConfig {
     var capture: CaptureConfig;
     
     @:native('ma_device_config_init')
-    static function init(type: DeviceType = PLAYBACK): DeviceConfig;
+    static function init(type: DeviceType): DeviceConfig;
 }
 
 @:include('./native.h')
