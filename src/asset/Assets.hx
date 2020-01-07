@@ -62,7 +62,7 @@ class Macro {
                             // wrap raw bytes in a haxe Bytes object
                             var newFields = (macro class X {
 
-                                static public var $variableName: haxe.io.Bytes = $i{initializeVariableName}();
+                                static public final $variableName: haxe.io.Bytes = $i{initializeVariableName}();
                                 static private inline function $initializeVariableName() {
                                     var bytesData = new haxe.io.BytesData();
                                     cpp.NativeArray.setUnmanagedData(bytesData, cpp.ConstPointer.fromStar(untyped __global__.$dataIdent), untyped __global__.$sizeIdent);
@@ -70,7 +70,21 @@ class Macro {
                                 }
 
                             }).fields;
+
                             fields = fields.concat(newFields);
+
+                        case 'js':
+                            var bytes = sys.io.File.getBytes(absPath);
+                            var base64 = haxe.crypto.Base64.encode(bytes);
+
+                            var newFields = (macro class X {
+
+                                static public final $variableName: haxe.io.Bytes = haxe.crypto.Base64.decode($v{base64});
+
+                            }).fields;
+
+                            fields = fields.concat(newFields);
+
                         case null, _:
                     }
 
