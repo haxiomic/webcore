@@ -53,6 +53,7 @@ class Macro {
                     switch Context.getDefines().get('target.name') {
                         case 'cpp':
                             // add INCBIN() file embed directive
+                            // using INCBIN is faster than generating a haxe file with a byte string but that would work too
                             incbinLines.push('INCBIN($variableName, "$absPath");');
                             var dataIdent = 'g${variableName}Data'; // const unsigned char
                             var endIdent = 'g${variableName}End'; // const unsigned char - a marker to the end, take the address to get the ending pointer

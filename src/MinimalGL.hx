@@ -60,20 +60,24 @@ class MinimalGL implements MinimalGLNativeInterface {
 		var audioSprite = new AudioSprite(Assets.my_triangle_mp3);
 		audioSprite.play();
 		
+		// browsers require a user gesture to enable audio output, so call play() on window.onclick
 		#if js
-		js.Browser.window.addEventListener('click', () -> audioSprite.play());
-		var clickToPlayEl = js.Browser.document.createElement('div');
-		js.Browser.document.body.appendChild(clickToPlayEl);
-		clickToPlayEl.innerText = 'Click to play';
-		clickToPlayEl.style.color = 'white';
-		clickToPlayEl.style.position = 'absolute';
-		clickToPlayEl.style.zIndex = '100';
-		clickToPlayEl.style.margin = 'auto';
-		clickToPlayEl.style.font = '64px helvetica, sans-serif';
-		clickToPlayEl.style.top = '0';
-		clickToPlayEl.style.right = '0';
-		clickToPlayEl.style.left = '0';
-		clickToPlayEl.style.textAlign = 'center';
+		{
+			js.Browser.window.addEventListener('click', () -> audioSprite.play());
+			// add a message to click
+			var clickToPlayEl = js.Browser.document.createElement('div');
+			js.Browser.document.body.appendChild(clickToPlayEl);
+			clickToPlayEl.innerText = 'Click for audio';
+			clickToPlayEl.style.color = 'white';
+			clickToPlayEl.style.position = 'absolute';
+			clickToPlayEl.style.zIndex = '100';
+			clickToPlayEl.style.margin = 'auto';
+			clickToPlayEl.style.font = '64px helvetica, sans-serif';
+			clickToPlayEl.style.top = '0';
+			clickToPlayEl.style.right = '0';
+			clickToPlayEl.style.left = '0';
+			clickToPlayEl.style.textAlign = 'center';
+		}
 		#end
 	}
 
