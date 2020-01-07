@@ -31,12 +31,11 @@ class AudioSprite {
         if (path != null) {
             #if js
 
+            // alternatively we could download the full bytes and decode but using a media element enables streaming
             mediaElement = js.Browser.document.createAudioElement();
             mediaElement.src = path;
             sourceNode = context.createMediaElementSource(mediaElement);
             isAudioBufferNode = false;
-
-            // we don't connect the sourceNode to the context destination because a media element doesn't need an audio context output
 
             #else
 
@@ -44,7 +43,6 @@ class AudioSprite {
             var fileDecoder = new FileDecoder(context, path);
             sourceNode.setDecoder(fileDecoder);
             isAudioBufferNode = true;
-            sourceNode.connect(context.destination);
 
             #end
         } else if (audioFileBytes != null) {
@@ -63,13 +61,19 @@ class AudioSprite {
             
             #end
 
-            sourceNode.connect(context.destination);
         } else {
             throw 'A path or bytes are required to create an AudioSprite';
         }
+
+        sourceNode.connect(context.destination);
     }
 
     public function play() {
+        // always try to resume the context because play() on a media element does not do this implicitly
+        if (context.state == SUSPENDED) {
+            context.resume();
+        }
+
         if (_playing) return;
         if (isAudioBufferNode) {
             (cast sourceNode: AudioBufferSourceNode).start();
@@ -77,9 +81,6 @@ class AudioSprite {
             #if js
             mediaElement.play();
             #end
-        }
-        if (context.state == SUSPENDED) {
-            context.resume();
         }
         _playing = true;
     }
