@@ -3,6 +3,8 @@ package audio;
 #if js
 
 typedef AudioNode = js.html.audio.AudioNode;
+typedef AudioScheduledSourceNode = js.html.audio.AudioScheduledSourceNode;
+typedef AudioBufferSourceNode = js.html.audio.AudioBufferSourceNode;
 
 #else
 
@@ -115,7 +117,6 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
     }
 
     inline function set_buffer(b: AudioBuffer): AudioBuffer {
-
         // create a decoder for this buffer
         var bytesDecoder = new PcmBufferDecoder(context, b.interleavedPcmBytes);
         setDecoder(bytesDecoder);

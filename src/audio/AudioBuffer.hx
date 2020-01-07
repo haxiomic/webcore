@@ -8,7 +8,7 @@ typedef AudioBuffer = js.html.audio.AudioBuffer;
 
 /**
     Represents raw PCM frames
-    Internally this is stored as interleaved samples for each channel, however WebAudio uses separate buffers per channel
+    Internally this is stored as interleaved samples for each channel
 **/
 @:allow(audio.AudioContext)
 @:allow(audio.AudioBufferSourceNode)
