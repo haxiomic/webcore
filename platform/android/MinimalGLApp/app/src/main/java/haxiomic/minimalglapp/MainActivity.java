@@ -21,7 +21,7 @@ import android.os.Bundle;
 import android.opengl.GLSurfaceView;
 import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.egl.EGLConfig;
-
+import android.util.Log;
 
 public class MainActivity extends Activity {
 
@@ -29,6 +29,8 @@ public class MainActivity extends Activity {
 
 	@Override protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
+		Log.w("MainActivity", "MainActivity.onCreate");
+
 		mView = new OpenGLES2View(getApplication());
 		setContentView(mView);
 
@@ -47,17 +49,22 @@ public class MainActivity extends Activity {
 
 	private static class Renderer implements GLSurfaceView.Renderer {
 
-		MinimalGL minimalGL;
+		MinimalGL haxeApp = null;
+
+		public Renderer() {}
 
 		public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+			if (haxeApp == null) {
+				Log.w("MainActivity.Renderer", "new MinimalGL()");
+				haxeApp = new MinimalGL(0, 0);
+			}
 		}
 
 		public void onSurfaceChanged(GL10 gl, int width, int height) {
-			minimalGL = new MinimalGL(width, height);
 		}
 
 		public void onDrawFrame(GL10 gl) {
-			minimalGL.drawFrame();
+			haxeApp.drawFrame();
 		}
 
 	}
