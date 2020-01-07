@@ -38,7 +38,7 @@ class AudioDecoder {
     }
 
     /**
-        Reads PCM frames into a single buffer. The data format for each sample matches the format field. Multiple channels are interleaved
+        Reads PCM frames into a single buffer. The data format for each sample matches the `format` field of this instance. Multiple channels are interleaved
         For example, 3 samples with two channels: [C1 C2 C1 C2 C1 C2]
 
         By default the sample data type will be float32
@@ -105,6 +105,9 @@ class FileDecoder extends AudioDecoder {
 
 }
 
+/**
+    Create a decoder to read PCM samples from the bytes of a compressed audio file (e.g. mp3)
+**/
 class FileBytesDecoder extends AudioDecoder {
 
     // keep a reference so bytes doesn't get cleared by the GC
@@ -126,6 +129,9 @@ class FileBytesDecoder extends AudioDecoder {
 
 }
 
+/**
+    Create a decoder to read PCM (pulse-code modulation) samples from a buffer of interleaved PCM samples
+**/
 class PcmBufferDecoder extends AudioDecoder {
 
     // keep a reference so bytes doesn't get cleared by the GC
@@ -134,10 +140,10 @@ class PcmBufferDecoder extends AudioDecoder {
     /**
         @throws string
     **/
-    public function new(context: AudioContext, pcmBuffer: haxe.io.Bytes, copyBytes: Bool = true) {
+    public function new(context: AudioContext, interleavedPcmBuffer: haxe.io.Bytes, copyBytes: Bool = true) {
         super(context);
         // copy bytes by default
-        bytes = copyBytes ? pcmBuffer.sub(0, pcmBuffer.length) : pcmBuffer;
+        bytes = copyBytes ? interleavedPcmBuffer.sub(0, interleavedPcmBuffer.length) : interleavedPcmBuffer;
         var bytesAddress: ConstStar<cpp.Void> = cast cpp.NativeArray.address(bytes.getData(), 0).raw;
         var result = this.nativeAudioDecoder.maDecoder.init_memory_raw(bytesAddress, bytes.length, Native.addressOf(config), Native.addressOf(config));
         if (result != SUCCESS) {
