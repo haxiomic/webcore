@@ -103,7 +103,7 @@ class AudioSprite {
         return _playing;
     }
 
-    inline function get_loop() {
+    function get_loop() {
         if (isAudioBufferNode) {
             return (cast sourceNode: AudioBufferSourceNode).loop;
         } else {
@@ -114,7 +114,7 @@ class AudioSprite {
         return false;
     }
 
-    inline function set_loop(v: Bool) {
+    function set_loop(v: Bool) {
         if (isAudioBufferNode) {
             return (cast sourceNode: AudioBufferSourceNode).loop = v;
         } else {
