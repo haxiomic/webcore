@@ -21,6 +21,22 @@ extern class MiniAudio {
 }
 
 /*
+    MINIADUIO Primitive Data Types
+*/
+
+abstract MaBool32(UInt32) to UInt32 from UInt32 {
+
+    @:to inline function toBool(): Bool {
+        return cast this;
+    }
+
+    @:from static inline function fromBool(b: Bool) {
+        return cast b;
+    }
+
+}
+
+/*
     MINIAUDIO Enums
 */
 @:notNull extern enum abstract Backend(MaBackend) {
@@ -121,6 +137,7 @@ private extern class MaShareMode {}
 @:notNull extern enum abstract SeekOrigin(MaSeekOrigin) {
     @:native('ma_seek_origin_start') var START;
     @:native('ma_seek_origin_current') var CURRENT;
+    @:to inline function toInt(): Int return cast this;
 }
 @:include('./native.h')
 @:sourceFile(#if winrt './native.c' #else './native.m' #end)
@@ -492,7 +509,7 @@ extern class Device {
 }
 
 typedef DecoderReadCallback = Callable<(decoder: Star<Decoder>, outputBuffer: Star<cpp.Void>, bytesToRead: cpp.SizeT) -> cpp.SizeT>;
-typedef DecoderSeekCallback = Callable<(decoder: Star<Decoder>, byteOffset: Int, origin: SeekOrigin) -> Bool>;
+typedef DecoderSeekCallback = Callable<(decoder: Star<Decoder>, byteOffset: Int, origin: SeekOrigin) -> MaBool32>;
 typedef DecoderGetLengthInPcmFramesCallback = Callable<(decoder: Star<Decoder>) -> UInt64>;
 
 @:include('./native.h')
