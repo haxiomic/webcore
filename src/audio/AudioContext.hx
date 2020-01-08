@@ -9,6 +9,7 @@ typedef AudioContext = js.html.audio.AudioContext;
 import cpp.*;
 
 import audio.native.AudioDecoder;
+import audio.native.MiniAudio;
 import audio.native.MiniAudio.Device;
 import audio.native.MiniAudio.DeviceConfig;
 
@@ -79,6 +80,27 @@ class AudioContext {
         // maybe call finalizer but make sure it's not called twice (again by the GC) because this will be invalid
     }
 
+    /**
+		Creates a new, empty `AudioBuffer` object, which can then be populated by data and played via an `AudioBufferSourceNode`.
+		@throws String
+	**/
+	public function createBuffer(numberOfChannels: Int, frameCount: Int, sampleRate: Float): AudioBuffer {
+        // allocate bytes
+        var bytesPerFrame = MiniAudio.get_bytes_per_frame(F32, numberOfChannels);
+        var totalBytes = bytesPerFrame * frameCount;
+        var bytes = haxe.io.Bytes.alloc(totalBytes);
+        // we should initialize to 0 to match WebAudio behavior
+        bytes.fill(0, bytes.length, 0);
+        return new AudioBuffer(bytes, @:fixed {
+            channels: numberOfChannels,
+            sampleRate: Std.int(sampleRate)
+        });
+    }
+    
+    /**
+        Creates an `AudioBufferSourceNode`, which can be used to play and manipulate audio data contained within an `AudioBuffer` object. `AudioBuffer`s are created using `AudioContext.createBuffer` or returned by `AudioContext.decodeAudioData` when it successfully decodes an audio track.
+        @throws String
+    **/
     public function createBufferSource() {
         return new AudioNode.AudioBufferSourceNode(this);
     }
@@ -88,7 +110,7 @@ class AudioContext {
             // decode file into raw pcm frame bytes
             var tmpDecoder = new FileBytesDecoder(this, haxe.io.Bytes.ofData(audioFileBytes), false);
             var bytes = tmpDecoder.getInterleavedPcmFrames(0);
-            var audioBuffer = new AudioBuffer(bytes);
+            var audioBuffer = new AudioBuffer(bytes, tmpDecoder);
             if (successCallback != null) {
                 successCallback(audioBuffer);
             }

@@ -140,12 +140,12 @@ class PcmBufferDecoder extends AudioDecoder {
     /**
         @throws string
     **/
-    public function new(context: AudioContext, interleavedPcmBuffer: haxe.io.Bytes, copyBytes: Bool = true) {
+    public function new(context: AudioContext, interleavedPcmBuffer: haxe.io.Bytes, inputConfig: MiniAudio.DecoderConfig, copyBytes: Bool = true) {
         super(context);
         // copy bytes by default
         bytes = copyBytes ? interleavedPcmBuffer.sub(0, interleavedPcmBuffer.length) : interleavedPcmBuffer;
         var bytesAddress: ConstStar<cpp.Void> = cast cpp.NativeArray.address(bytes.getData(), 0).raw;
-        var result = this.nativeAudioDecoder.maDecoder.init_memory_raw(bytesAddress, bytes.length, Native.addressOf(config), Native.addressOf(config));
+        var result = this.nativeAudioDecoder.maDecoder.init_memory_raw(bytesAddress, bytes.length, Native.addressOf(inputConfig), Native.addressOf(config));
         if (result != SUCCESS) {
             throw 'Failed to initialize a FileBytesDecoder: $result';
         }
