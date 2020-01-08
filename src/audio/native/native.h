@@ -54,12 +54,11 @@ ma_result AudioDecoder_seekToPcmFrame(AudioDecoder* decoder, ma_uint64 frameInde
  */
 
 typedef struct {
-    ma_mutex*           lock;
+    ma_mutex*     lock;
     AudioDecoder* decoder;
-    // use atomics access for the following
-    ma_bool32           playing;
-    ma_bool32           loop;
-    ma_bool32           onReachEofFlag;
+    ma_bool32     playing;
+    ma_bool32     loop;
+    ma_bool32     onReachEofFlag;
 } AudioSource;
 
 
