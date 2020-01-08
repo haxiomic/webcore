@@ -97,7 +97,11 @@ int       AudioSourceList_sourceCount(AudioSourceList* list);
  * Global Audio Functions
  */
 
-void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma_uint32 frameCount);
+/**
+ * The sourceList must have decoders with output format Float32 channelCount that matches the output buffer channel count
+ * If channel count and format mismatches are detected mixing will be skipped for that decoder
+ */
+void Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_uint32 frameCount, void* pOutput);
 
 #ifdef __cplusplus
 }

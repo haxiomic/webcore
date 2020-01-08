@@ -9,6 +9,7 @@ typedef AudioContext = js.html.audio.AudioContext;
 import cpp.*;
 
 import audio.native.AudioDecoder;
+import audio.native.NativeAudioSource.NativeAudioSourceList;
 import audio.native.MiniAudio;
 import audio.native.MiniAudio.Device;
 import audio.native.MiniAudio.DeviceConfig;
@@ -41,7 +42,7 @@ class AudioContext {
         deviceConfig.sampleRate = options.sampleRate != null ? options.sampleRate : 0;
         deviceConfig.playback.format = F32;
         deviceConfig.performanceProfile = options.latencyHint != "interactive" ? CONSERVATIVE : LOW_LATENCY;
-        deviceConfig.dataCallback = untyped __global__.Audio_mixSources;
+        deviceConfig.dataCallback = Function.fromStaticFunction(audioThread_deviceDataCallbackMixSources);
 
         // initialize device
         var initResult = maDevice.init(null, Native.addressOf(deviceConfig));
@@ -126,6 +127,17 @@ class AudioContext {
     }
 
     static var gcReference = new List<AudioContext>();
+
+    /**
+        Device data callback to mix its source list (stored in user data) to the output buffer
+        *You should not perform any haxe allocation here as it is executed on the unmanaged audio thread*
+        The `@:noDebug` meta here is critical to prevent hxcpp's thread-unsafe tracking stack information
+    **/
+    @:noDebug
+    static function audioThread_deviceDataCallbackMixSources(maDevice: Star<Device>, output: Star<cpp.Void>, input: ConstStar<cpp.Void>, frameCount: UInt32) {
+        var audioSourceList: Star<NativeAudioSourceList> = cast maDevice.pUserData;
+        untyped __global__.Audio_mixSources(audioSourceList, maDevice.playback.channels, frameCount, output);
+    }
 
     static function finalizer(instance: AudioContext) {
         #if debug

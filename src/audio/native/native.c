@@ -139,16 +139,16 @@ int AudioSourceList_sourceCount(AudioSourceList* audioSourceList) {
  * Global Audio Methods
  */
 
-void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
-    AudioSourceList* sourceList = (AudioSourceList*) maDevice->pUserData;
-
+/**
+ * Sample rate and channels must be the same for the all decoders in sourceList and output
+ */
+void Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_uint32 frameCount, void* pOutput) {
     if (sourceList == NULL) {
         return;
     }
 
     static float decoderOutputBuffer[4096];
 
-    ma_uint32 channelCount = maDevice->playback.channels;
     ma_uint32 bufferMaxFrames = ma_countof(decoderOutputBuffer) / channelCount;
 
     ma_mutex_lock(&sourceList->lock);
@@ -179,13 +179,13 @@ void Audio_mixSources(ma_device* maDevice, void* pOutput, const void* pInput, ma
 
             // decoder should be setup to read into float buffers, if not then something has gone wrong
             if (decoder->maDecoder->outputFormat != ma_format_f32) {
-                ma_post_error(maDevice, MA_LOG_LEVEL_ERROR, "decoder outputFormat was not ma_format_f32", MA_INVALID_OPERATION);
+                // error, output format must be F32
                 continue;
             }
 
             // we expect the decoder to have the same number of channels as the output
-            if (decoder->maDecoder->outputChannels != maDevice->playback.channels) {
-                ma_post_error(maDevice, MA_LOG_LEVEL_ERROR, "decoder / device channel number mismatch", MA_INVALID_OPERATION);
+            if (decoder->maDecoder->outputChannels != channelCount) {
+                // error, channel count mismatch
                 continue;
             }
 
