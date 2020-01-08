@@ -59,6 +59,7 @@ class MinimalGL implements MinimalGLNativeInterface {
 		// alternatively a AudioSprite which does the above internally
 		var audioSprite = new AudioSprite(Assets.my_triangle_mp3);
 		audioSprite.play();
+		audioSprite.loop = true;
 		
 		// browsers require a user gesture to enable audio output, so call play() on window.onclick
 		#if js
