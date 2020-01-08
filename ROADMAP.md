@@ -1,8 +1,8 @@
-- [ ] Decide Assets path resolution rules
-
-- [ ] createBuffer( numberOfChannels : Int, length : Int, sampleRate : Float ) : AudioBuffer;
 - [ ] volume
+    - Don't use a decoder for this, instead we can use a read samples callback in AudioSource, which is used in place of a decoder
     - GainNode –> Custom decoder, store nativeAudioSources in userData, call mixSources in onRead and then apply transform
+        - transform decoder should be implemented in C, probably?
+- AudioSprite play/pause support
 - [ ] end-of-source handling
     - onEnd callback
     - flag that's ready in a haxe main loop
