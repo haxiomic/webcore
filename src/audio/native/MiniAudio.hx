@@ -23,7 +23,7 @@ extern class MiniAudio {
 /*
     MINIAUDIO Enums
 */
-extern enum abstract Backend(MaBackend) {
+@:notNull extern enum abstract Backend(MaBackend) {
     @:native('ma_backend_wasapi') var WASAPI;
     @:native('ma_backend_dsound') var DSOUND;
     @:native('ma_backend_winmm') var WINMM;
@@ -49,7 +49,7 @@ extern enum abstract Backend(MaBackend) {
 @:unreflective @:native('ma_backend')
 private extern class MaBackend {}
 
-extern enum abstract ThreadPriority(MaThreadPriority) {
+@:notNull extern enum abstract ThreadPriority(MaThreadPriority) {
     @:native('ma_thread_priority_idle') var IDLE;
     @:native('ma_thread_priority_lowest') var LOWEST;
     @:native('ma_thread_priority_low') var LOW;
@@ -66,7 +66,7 @@ extern enum abstract ThreadPriority(MaThreadPriority) {
 @:native('ma_thread_priority') @:unreflective 
 private extern class MaThreadPriority {}
 
-extern enum abstract Format(MaFormat) {
+@:notNull extern enum abstract Format(MaFormat){
     /*
     I like to keep these explicitly defined because they're used as a key into a lookup table. When items are
     added to this, make sure there are no gaps and that they're added to the lookup table in ma_get_bytes_per_sample().
@@ -89,7 +89,7 @@ extern enum abstract Format(MaFormat) {
 @:native('ma_format') @:unreflective
 private extern class MaFormat {}
 
-extern enum abstract DeviceType(MaDeviceType) {
+@:notNull extern enum abstract DeviceType(MaDeviceType) {
     @:native('ma_device_type_playback') var PLAYBACK;
     @:native('ma_device_type_capture') var CAPTURE;
     @:native('ma_device_type_duplex') var DUPLEX;
@@ -100,7 +100,7 @@ extern enum abstract DeviceType(MaDeviceType) {
 @:native('ma_device_type') @:unreflective
 private extern class MaDeviceType {}
 
-extern enum abstract PerformanceProfile(MaPerformanceProfile) {
+@:notNull extern enum abstract PerformanceProfile(MaPerformanceProfile) {
     @:native('ma_performance_profile_low_latency') var LOW_LATENCY;
     @:native('ma_performance_profile_conservative') var CONSERVATIVE;
 }
@@ -109,7 +109,7 @@ extern enum abstract PerformanceProfile(MaPerformanceProfile) {
 @:native('ma_performance_profile') @:unreflective
 private extern class MaPerformanceProfile {}
 
-extern enum abstract ShareMode(MaShareMode) {
+@:notNull extern enum abstract ShareMode(MaShareMode) {
     @:native('ma_share_mode_shared') var SHARED;
     @:native('ma_share_mode_exclusive') var EXCLUSIVE;
 }
@@ -118,7 +118,7 @@ extern enum abstract ShareMode(MaShareMode) {
 @:native('ma_share_mode') @:unreflective
 private extern class MaShareMode {}
 
-extern enum abstract SeekOrigin(MaSeekOrigin) {
+@:notNull extern enum abstract SeekOrigin(MaSeekOrigin) {
     @:native('ma_seek_origin_start') var START;
     @:native('ma_seek_origin_current') var CURRENT;
 }
@@ -129,7 +129,7 @@ private extern class MaSeekOrigin {}
 
 @:include('./native.h')
 @:sourceFile(#if winrt './native.c' #else './native.m' #end)
-extern enum abstract Result(MaResult) {
+@:notNull extern enum abstract Result(MaResult) {
     @:native('MA_SUCCESS') var SUCCESS;
     @:native('MA_ERROR') var ERROR;
     @:native('MA_INVALID_ARGS') var INVALID_ARGS;
@@ -222,7 +222,7 @@ class ResultLookup {
 
 @:include('./native.h')
 @:sourceFile(#if winrt './native.c' #else './native.m' #end)
-extern enum abstract Channel(MaChannel) {
+@:notNull extern enum abstract Channel(MaChannel) {
 
     @:native('MA_CHANNEL_NONE') var NONE;
     @:native('MA_CHANNEL_MONO') var MONO;
