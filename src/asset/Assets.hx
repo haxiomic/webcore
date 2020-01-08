@@ -9,10 +9,12 @@ import haxe.io.Bytes;
 
     **Supported metadata**
     - `@embedFile(path: String, ?variableName: String)`    embeds a single file into the output
+
+    Paths are relative to this class's file
     
 **/
 @:build(asset.Assets.Macro.build())
-@embedFile('../assets/my-triangle.mp3')
+@embedFile('../../assets/my-triangle.mp3')
 class Assets {
 
 }
@@ -40,7 +42,8 @@ class Macro {
         for (embedMeta in embedMetas) {
             switch embedMeta.params[0] {
                 case {expr: EConst(CString(path)), pos: pos}:
-                    var absPath = sys.FileSystem.absolutePath(Context.resolvePath(path));
+                    // paths are relative to this file
+                    var absPath = sys.FileSystem.absolutePath(Path.join([classDir, path]));
 
                     var filename = Path.withoutDirectory(path);
 
