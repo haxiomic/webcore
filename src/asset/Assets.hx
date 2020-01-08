@@ -8,7 +8,8 @@ import haxe.io.Bytes;
     Assets Macro Class
 
     **Supported metadata**
-    - @embedFile(path: String)    embeds a single file into the output
+    - `@embedFile(path: String, ?variableName: String)`    embeds a single file into the output
+    
 **/
 @:build(asset.Assets.Macro.build())
 @embedFile('../assets/my-triangle.mp3')
