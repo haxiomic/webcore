@@ -106,6 +106,14 @@ class AudioContext {
         return new AudioNode.AudioBufferSourceNode(this);
     }
 
+    /**
+        Creates a `GainNode`, which can be used to control the overall volume of the audio graph.
+        @throws DOMError
+    **/
+    public function createGain() {
+        return new AudioNode.GainNode(this);
+    }
+
     public function decodeAudioData(audioFileBytes: haxe.io.BytesData, ?successCallback: AudioBuffer -> Void, ?errorCallback: String -> Void): Void {
         try {
             // decode file into raw pcm frame bytes
