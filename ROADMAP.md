@@ -1,6 +1,5 @@
 - [ ] Gain node
     - Better approach for passing data into the audio thread (LockedValue will not do)
-    - Clear buffer to zeros – applying gain after output is complete ends up with junk data
 - [ ] Fix iOS web
 - [ ] Timelines
     - currentTime, updated each step
