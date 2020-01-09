@@ -1,14 +1,29 @@
-- [ ] volume
-    - Don't use a decoder for this, instead we can use a read samples callback in AudioSource, which is used in place of a decoder
-    - GainNode –> Custom decoder, store nativeAudioSources in userData, call mixSources in onRead and then apply transform
-        - transform decoder should be implemented in C, probably?
-- AudioSprite play/pause support
+- [ ] Fix iOS web
+- [ ] Timelines
+    - currentTime, updated each step
+    - use sample offset to scnhedule exact sample (that way we don't need 128 sample quanta)
+    - mark each node with currentTime when last processed, that way we can detect cycles
+    - [ ] start(t, offset)
+- [ ] AudioSprite play/pause support
 - [ ] end-of-source handling
     - onEnd callback
     - flag that's ready in a haxe main loop
-- [ ] WebAudio timing system (currentTime and start(t, offset))
+- [ ] Move audio to lib
 
-- [ ] Fix iOS web
+- [ ] Image via stb_image
+- [ ] Asset system
+    - [ ] Platform native code
+- [ ] App main + platform native code
+    - [ ] View resized
+    - [ ] App life cycle
+    - [ ] Keyboard events
+- [ ] Settings files per system
+    - [ ] local storage?
+    - [ ] iOS settings
+    - [ ] Android settings
+    - [ ] Desktop to file? Or Windows/mac settings?
+- [ ] Less boilerplate per platform -> code generation
+
 - [ ] Switch to dynamic libraries so we can link with system libraries during haxe compile (and not platform compile)
     - [ ] Link with AVFoundation and AudioToolbox when building lib for iOS and OpenSLES for Android
 - [ ] Can we include the JNI code inside the main codebase so it's not compiled separately with Android?

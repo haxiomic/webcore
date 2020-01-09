@@ -106,6 +106,14 @@ class AudioContext {
         return new AudioNode.AudioBufferSourceNode(this);
     }
 
+    /**
+        Creates a `GainNode`, which can be used to control the overall volume of the audio graph.
+        @throws DOMError
+    **/
+    public function createGain() {
+        return new AudioNode.GainNode(this);
+    }
+
     public function decodeAudioData(audioFileBytes: haxe.io.BytesData, ?successCallback: AudioBuffer -> Void, ?errorCallback: String -> Void): Void {
         try {
             // decode file into raw pcm frame bytes
@@ -136,7 +144,13 @@ class AudioContext {
     @:noDebug
     static function audioThread_deviceDataCallbackMixSources(maDevice: Star<Device>, output: Star<cpp.Void>, input: ConstStar<cpp.Void>, frameCount: UInt32) {
         var audioSourceList: Star<NativeAudioSourceList> = cast maDevice.pUserData;
-        untyped __global__.Audio_mixSources(audioSourceList, maDevice.playback.channels, frameCount, output);
+        var schedulingCurrentFrameBlock: UInt64 = 0;
+        mixSources(audioSourceList, maDevice.playback.channels, frameCount, schedulingCurrentFrameBlock, cast output);
+    }
+
+    @:noDebug
+    static inline function mixSources(sources: Star<NativeAudioSourceList>, nChannels: UInt32, frameCount: UInt32, schedulingCurrentFrameBlock: UInt64, output: Star<Float32>): UInt32 {
+        return untyped __global__.Audio_mixSources(sources, nChannels, frameCount, schedulingCurrentFrameBlock, output);
     }
 
     static function finalizer(instance: AudioContext) {

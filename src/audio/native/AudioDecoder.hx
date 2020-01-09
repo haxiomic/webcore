@@ -140,11 +140,26 @@ class PcmBufferDecoder extends AudioDecoder {
     /**
         @throws string
     **/
-    public function new(context: AudioContext, interleavedPcmBuffer: haxe.io.Bytes, inputConfig: MiniAudio.DecoderConfig, copyBytes: Bool = true) {
+    public function new(
+        context: AudioContext,
+        interleavedPcmBytes: haxe.io.Bytes,
+        interleavedPcmBytesConfig: {
+            final channels: UInt32;
+            final sampleRate: UInt32;
+        },
+        copyBytes: Bool = true
+    ) {
         super(context);
         // copy bytes by default
-        bytes = copyBytes ? interleavedPcmBuffer.sub(0, interleavedPcmBuffer.length) : interleavedPcmBuffer;
+        bytes = copyBytes ? interleavedPcmBytes.sub(0, interleavedPcmBytes.length) : interleavedPcmBytes;
         var bytesAddress: ConstStar<cpp.Void> = cast cpp.NativeArray.address(bytes.getData(), 0).raw;
+
+        var inputConfig = MiniAudio.DecoderConfig.init(
+            F32,
+            interleavedPcmBytesConfig.channels,
+            interleavedPcmBytesConfig.sampleRate
+        );
+
         var result = this.nativeAudioDecoder.maDecoder.init_memory_raw(bytesAddress, bytes.length, Native.addressOf(inputConfig), Native.addressOf(config));
         if (result != SUCCESS) {
             throw 'Failed to initialize a FileBytesDecoder: $result';
@@ -164,7 +179,7 @@ extern class NativeAudioDecoder {
     private var frameIndex: UInt64;
 
     inline function readPcmFrames(pFramesOut: Star<cpp.Void>, frameCount: UInt64): UInt64 {
-        return untyped __global__.AudioDecoder_readPcmFrames((this: Star<NativeAudioDecoder>), pFramesOut, frameCount);
+        return untyped __global__.AudioDecoder_readPcmFrames((this: Star<NativeAudioDecoder>), frameCount, pFramesOut);
     }
 
     inline function getLengthInPcmFrames(): UInt64 {

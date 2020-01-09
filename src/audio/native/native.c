@@ -13,7 +13,7 @@
  * AudioDecoder
  */
 
-ma_uint64 AudioDecoder_readPcmFrames(AudioDecoder* decoder, void* pFramesOut, ma_uint64 frameCount) {
+ma_uint64 AudioDecoder_readPcmFrames(AudioDecoder* decoder, ma_uint64 frameCount, void* pFramesOut) {
     ma_uint64 framesRead = 0;
     ma_mutex_lock(decoder->lock);
     framesRead = ma_decoder_read_pcm_frames(decoder->maDecoder, pFramesOut, frameCount);
@@ -142,14 +142,17 @@ int AudioSourceList_sourceCount(AudioSourceList* audioSourceList) {
 /**
  * Sample rate and channels must be the same for the all decoders in sourceList and output
  */
-void Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_uint32 frameCount, void* pOutput) {
+ma_uint32 Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_uint32 frameCount, ma_uint64 schedulingCurrentFrameBlock, float* pOutput) {
     if (sourceList == NULL) {
-        return;
+        return 0;
     }
 
     static float decoderOutputBuffer[4096];
+    // clear to 0 shouldn't be necessary if readCalls properly overwrite 
+    // memset(decoderOutputBuffer, 0, frameCount * channelCount);
 
     ma_uint32 bufferMaxFrames = ma_countof(decoderOutputBuffer) / channelCount;
+    ma_uint32 totalFramesReadMax = 0;
 
     ma_mutex_lock(&sourceList->lock);
     {
@@ -160,33 +163,38 @@ void Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_ui
 
             ma_assert(source != NULL);
 
-            ma_bool32 playing = MA_FALSE;
+            AudioSource_ReadFramesCallback readFramesCallback = NULL;
             AudioDecoder* decoder = NULL;
+            ma_bool32 active = MA_FALSE;
             ma_bool32 loop = MA_FALSE;
             ma_mutex_lock(source->lock); {
-                playing = source->playing;
+                readFramesCallback = source->readFramesCallback;
                 decoder = source->decoder;
+                active = source->active;
                 loop = source->loop;
             }
             ma_mutex_unlock(source->lock);
 
-            if (playing != MA_TRUE) {
+            if (active != MA_TRUE) {
                 continue;
             }
 
-            // maDecoder is allowed to be NULL
-            if (decoder == NULL) continue;
+            // if we have neither a read frames callback or a decoder then we can't read anything
+            if (readFramesCallback == NULL && decoder == NULL) continue;
 
-            // decoder should be setup to read into float buffers, if not then something has gone wrong
-            if (decoder->maDecoder->outputFormat != ma_format_f32) {
-                // error, output format must be F32
-                continue;
-            }
+            // if we do have a decoder, validate that it has the right output format and channel count
+            if (decoder != NULL) {
+                // decoder should be setup to read into float buffers, if not then something has gone wrong
+                if (decoder->maDecoder->outputFormat != ma_format_f32) {
+                    // error, output format must be F32
+                    continue;
+                }
 
-            // we expect the decoder to have the same number of channels as the output
-            if (decoder->maDecoder->outputChannels != channelCount) {
-                // error, channel count mismatch
-                continue;
+                // we expect the decoder to have the same number of channels as the output
+                if (decoder->maDecoder->outputChannels != channelCount) {
+                    // error, channel count mismatch
+                    continue;
+                }
             }
 
             // read and mix frames in chunks of decoderOutputBuffer length
@@ -197,14 +205,21 @@ void Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_ui
                 loopIndex++;
                 ma_uint32 framesRemaining = frameCount - totalFramesRead;
                 ma_uint32 framesToRead = ma_min(framesRemaining, bufferMaxFrames);
-
-                ma_uint32 framesRead = (ma_uint32) AudioDecoder_readPcmFrames(decoder, decoderOutputBuffer, framesToRead);
+                
+                ma_uint32 framesRead;
+                if (readFramesCallback != NULL) {
+                    framesRead = readFramesCallback(source, channelCount, framesToRead, schedulingCurrentFrameBlock, decoderOutputBuffer);
+                } else if (decoder != NULL) {
+                    framesRead = (ma_uint32) AudioDecoder_readPcmFrames(decoder, framesToRead, decoderOutputBuffer);
+                } else {
+                    break;
+                }
 
                 // mix decoderOutputBuffer with pOutput, applying conversions if the playback format is not float
                 ma_uint32 sampleCount = framesRead * channelCount;
                 ma_uint32 outputOffset = totalFramesRead * channelCount;
 
-                float* mixBuffer = (float*)pOutput + outputOffset;
+                float* mixBuffer = pOutput + outputOffset;
 
                 // with compiler optimizations enabled, this should vectorize
                 for(ma_uint32 sampleIdx = 0; sampleIdx < sampleCount; ++sampleIdx) {
@@ -223,7 +238,7 @@ void Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_ui
                     }
 
                     // if looping, seek to start and continue to read more frames
-                    if (loop == MA_TRUE) {
+                    if (loop == MA_TRUE && decoder != NULL) {
                         AudioDecoder_seekToPcmFrame(decoder, 0);
                         continue;
                     } else {
@@ -231,6 +246,8 @@ void Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_ui
                     }
                 }
             }
+
+            totalFramesReadMax = ma_max(totalFramesReadMax, totalFramesRead);
 
             if (reachedEOF) {
                 ma_mutex_lock(source->lock); {
@@ -241,4 +258,6 @@ void Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_ui
         }
     }
     ma_mutex_unlock(&sourceList->lock);
+
+    return totalFramesReadMax;
 }
