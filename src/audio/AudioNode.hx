@@ -142,13 +142,17 @@ private typedef PcmTransformFunction<T> = Callable<(data: Star<T>, nChannels: UI
 @:access(audio.AudioContext)
 private class PcmTransform {
     
+    /**
+        This is called from the unmanaged audio thread. It's critical that no haxe-allocation or haxe vm interaction occurs here
+        @! maybe move this to C
+    **/
     @:noDebug static public function readFramesCallback<T>(source: Star<NativeAudioSource>, nChannels: UInt32, frameCount: UInt64, schedulingCurrentFrameBlock: UInt64, interleavedSamples: Star<Float32>): UInt64 {
         var readFramesData: Star<PcmTransformData<T>> = cast source.getUserData();
-        AudioContext.mixSources(readFramesData.nativeSourceList, nChannels, frameCount, schedulingCurrentFrameBlock, interleavedSamples);
+        var framesRead = AudioContext.mixSources(readFramesData.nativeSourceList, nChannels, frameCount, schedulingCurrentFrameBlock, interleavedSamples);
         // apply user transform
         // @! should only apply the transform function to frames that are actually read
         readFramesData.transformFunction(readFramesData.transformData, nChannels, frameCount, cast interleavedSamples);
-        return frameCount;
+        return framesRead;
     }
 
 }

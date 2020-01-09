@@ -107,7 +107,7 @@ int       AudioSourceList_sourceCount(AudioSourceList* list);
  * The sourceList must have decoders with output format Float32 channelCount that matches the output buffer channel count
  * If channel count and format mismatches are detected mixing will be skipped for that decoder
  */
-void Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_uint32 frameCount, ma_uint64 schedulingCurrentFrameBlock, float* pOutput);
+ma_uint32 Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_uint32 frameCount, ma_uint64 schedulingCurrentFrameBlock, float* pOutput);
 
 #ifdef __cplusplus
 }

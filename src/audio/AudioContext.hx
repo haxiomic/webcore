@@ -149,7 +149,7 @@ class AudioContext {
     }
 
     @:noDebug
-    static inline function mixSources(sources: Star<NativeAudioSourceList>, nChannels: UInt32, frameCount: UInt32, schedulingCurrentFrameBlock: UInt64, output: Star<Float32>) {
+    static inline function mixSources(sources: Star<NativeAudioSourceList>, nChannels: UInt32, frameCount: UInt32, schedulingCurrentFrameBlock: UInt64, output: Star<Float32>): UInt32 {
         return untyped __global__.Audio_mixSources(sources, nChannels, frameCount, schedulingCurrentFrameBlock, output);
     }
 

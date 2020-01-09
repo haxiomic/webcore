@@ -142,14 +142,17 @@ int AudioSourceList_sourceCount(AudioSourceList* audioSourceList) {
 /**
  * Sample rate and channels must be the same for the all decoders in sourceList and output
  */
-void Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_uint32 frameCount, ma_uint64 schedulingCurrentFrameBlock, float* pOutput) {
+ma_uint32 Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_uint32 frameCount, ma_uint64 schedulingCurrentFrameBlock, float* pOutput) {
     if (sourceList == NULL) {
-        return;
+        return 0;
     }
 
     static float decoderOutputBuffer[4096];
+    // clear to 0 shouldn't be necessary if readCalls properly overwrite 
+    // memset(decoderOutputBuffer, 0, frameCount * channelCount);
 
     ma_uint32 bufferMaxFrames = ma_countof(decoderOutputBuffer) / channelCount;
+    ma_uint32 totalFramesReadMax = 0;
 
     ma_mutex_lock(&sourceList->lock);
     {
@@ -203,7 +206,6 @@ void Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_ui
                 ma_uint32 framesRemaining = frameCount - totalFramesRead;
                 ma_uint32 framesToRead = ma_min(framesRemaining, bufferMaxFrames);
                 
-                
                 ma_uint32 framesRead;
                 if (readFramesCallback != NULL) {
                     framesRead = readFramesCallback(source, channelCount, framesToRead, schedulingCurrentFrameBlock, decoderOutputBuffer);
@@ -245,6 +247,8 @@ void Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_ui
                 }
             }
 
+            totalFramesReadMax = ma_max(totalFramesReadMax, totalFramesRead);
+
             if (reachedEOF) {
                 ma_mutex_lock(source->lock); {
                     source->onReachEofFlag = MA_TRUE;
@@ -254,4 +258,6 @@ void Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_ui
         }
     }
     ma_mutex_unlock(&sourceList->lock);
+
+    return totalFramesReadMax;
 }
