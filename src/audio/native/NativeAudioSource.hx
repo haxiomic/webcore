@@ -3,6 +3,8 @@ package audio.native;
 import cpp.*;
 import audio.native.AudioDecoder;
 
+typedef ReadFramesCallback = Callable<(source: Star<NativeAudioSource>, nChannels: UInt32, frameCount: UInt64, schedulingCurrentFrameBlock: UInt64, interleavedSamples: Star<Float32>) -> UInt64>;
+
 @:include('./native.h')
 @:sourceFile(#if winrt './native.c' #else './native.m' #end)
 @:native('AudioSource') @:unreflective
@@ -10,18 +12,36 @@ import audio.native.AudioDecoder;
 @:access(audio.AudioContext)
 extern class NativeAudioSource {
 
-    var decoder: Star<NativeAudioDecoder>;
     var lock: Star<audio.native.MiniAudio.Mutex>;
-    private var playing: Bool;
+    private var readFramesCallback: ReadFramesCallback;
+    private var decoder: Star<NativeAudioDecoder>;
+    private var active: Bool;
     private var loop: Bool;
     private var onReachEofFlag: Bool;
+    private var userData: Star<cpp.Void>;
 
-    inline function getPlaying(): Bool {
-        return lock.locked(() -> playing);
+    inline function setReadFramesCallback(callback: ReadFramesCallback): ReadFramesCallback {
+        return lock.locked(() -> readFramesCallback = callback);
     }
 
-    inline function setPlaying(v: Bool): Bool {
-        return lock.locked(() -> playing = v);
+    inline function getReadFramesCallback(): ReadFramesCallback {
+        return lock.locked(() -> readFramesCallback);
+    }
+
+    inline function setDecoder(newDecoder: Star<NativeAudioDecoder>): Star<NativeAudioDecoder> {
+        return lock.locked(() -> decoder = newDecoder);
+    }
+
+    inline function getDecoder(): Star<NativeAudioDecoder> {
+        return lock.locked(() -> decoder);
+    }
+
+    inline function getActive(): Bool {
+        return lock.locked(() -> active);
+    }
+
+    inline function setActive(v: Bool): Bool {
+        return lock.locked(() -> active = v);
     }
 
     inline function getLoop(): Bool {
@@ -40,6 +60,14 @@ extern class NativeAudioSource {
         return lock.locked(() -> onReachEofFlag = v);
     }
 
+    inline function setUserData(newUserData: Star<cpp.Void>): Star<cpp.Void> {
+        return lock.locked(() -> userData = newUserData);
+    }
+
+    inline function getUserData(): Star<cpp.Void> {
+        return lock.locked(() -> userData);
+    }
+
     @:native('~AudioSource')
     function free(): Void;
 
@@ -51,9 +79,11 @@ extern class NativeAudioSource {
         instance.lock = audio.native.MiniAudio.Mutex.alloc();
         instance.lock.init(maContext);
         instance.decoder = null;
-        instance.playing = false;
+        instance.readFramesCallback = null;
+        instance.active = false;
         instance.loop = false;
         instance.onReachEofFlag = false;
+        instance.userData = null;
         return instance;
     }
 

@@ -43,7 +43,7 @@ typedef struct {
 /**
  * Thread-safe decoder functions
  */ 
-ma_uint64 AudioDecoder_readPcmFrames(AudioDecoder* decoder, void* pFramesOut, ma_uint64 frameCount);
+ma_uint64 AudioDecoder_readPcmFrames(AudioDecoder* decoder, ma_uint64 frameCount, void* pFramesOut);
 ma_uint64 AudioDecoder_getLengthInPcmFrames(AudioDecoder* decoder);
 ma_result AudioDecoder_seekToPcmFrame(AudioDecoder* decoder, ma_uint64 frameIndex);
 
@@ -53,13 +53,20 @@ ma_result AudioDecoder_seekToPcmFrame(AudioDecoder* decoder, ma_uint64 frameInde
  * lock should be used when reading or writing to any of the fields
  */
 
-typedef struct {
-    ma_mutex*     lock;
-    AudioDecoder* decoder;
-    ma_bool32     playing;
-    ma_bool32     loop;
-    ma_bool32     onReachEofFlag;
-} AudioSource;
+typedef struct AudioSource AudioSource;
+
+typedef ma_uint64 (* AudioSource_ReadFramesCallback) (AudioSource* audioSource, ma_uint32 nChannels, ma_uint64 frameCount, ma_uint64 schedulingCurrentFrameBlock, float* buffer);
+
+struct AudioSource {
+    AudioSource_ReadFramesCallback readFramesCallback; // allowed to be  NULL, when not null, this takes priority over reading from the decoder
+    ma_mutex*                      lock;
+    AudioDecoder*                  decoder; // allowed to be  NULL
+    ma_bool32                      active;
+    ma_bool32                      loop;
+    ma_bool32                      onReachEofFlag;
+    void*                          userData;
+} ;
+
 
 
 /**
@@ -100,7 +107,7 @@ int       AudioSourceList_sourceCount(AudioSourceList* list);
  * The sourceList must have decoders with output format Float32 channelCount that matches the output buffer channel count
  * If channel count and format mismatches are detected mixing will be skipped for that decoder
  */
-void Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_uint32 frameCount, void* pOutput);
+void Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_uint32 frameCount, ma_uint64 schedulingCurrentFrameBlock, float* pOutput);
 
 #ifdef __cplusplus
 }
