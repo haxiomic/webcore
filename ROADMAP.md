@@ -1,5 +1,3 @@
-- [ ] Gain node
-    - Better approach for passing data into the audio thread (LockedValue will not do)
 - [ ] Fix iOS web
 - [ ] Timelines
     - currentTime, updated each step
