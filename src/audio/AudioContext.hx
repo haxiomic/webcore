@@ -111,7 +111,7 @@ class AudioContext {
         @throws String
     **/
     public function createBufferSource() {
-        return new AudioNode.AudioBufferSourceNode(this);
+        return new AudioBufferSourceNode(this);
     }
 
     /**
@@ -119,7 +119,7 @@ class AudioContext {
         @throws DOMError
     **/
     public function createGain() {
-        return new AudioNode.GainNode(this);
+        return new GainNode(this);
     }
 
     public function decodeAudioData(audioFileBytes: haxe.io.BytesData, ?successCallback: AudioBuffer -> Void, ?errorCallback: String -> Void): Void {

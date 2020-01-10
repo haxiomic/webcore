@@ -3,9 +3,6 @@ package audio;
 #if js
 
 typedef AudioNode = js.html.audio.AudioNode;
-typedef AudioScheduledSourceNode = js.html.audio.AudioScheduledSourceNode;
-typedef AudioBufferSourceNode = js.html.audio.AudioBufferSourceNode;
-typedef GainNode = js.html.audio.GainNode;
 
 #else
 
@@ -92,47 +89,23 @@ class AudioNode {
 
 }
 
-@:allow(audio.native.AudioContext)
-class AudioScheduledSourceNode extends AudioNode {
+/**
+    `transformFunction` is executed on the audio thread, mutex locking must be used is the transform data is changed from the haxe thread
+    Additionally, it's critical no haxe-allocation or vm interaction occurs within `transformFunction`.
+**/
+@:generic class PcmTransformNode<T> extends AudioNode {
 
-    public inline function start() {
+    // we pass the address to these fields as function data (not their values)
+    final readFramesData: PcmTransformData<T>;
+
+    public function new(context: AudioContext, audioThreadTransformFunction: PcmTransformFunction<T>, transformData: T) {
+        super(context);
+        
+        this.readFramesData = new PcmTransformData(Pointer.fromHandle(this.nativeSourceList), audioThreadTransformFunction, transformData);
+
+        this.nativeSource.setUserData(cast Native.addressOf(this.readFramesData));
+        this.nativeSource.setReadFramesCallback(Function.fromStaticFunction(PcmTransform.readFramesCallback));
         this.nativeSource.setActive(true);
-    }
-
-    public inline function stop() {
-        this.nativeSource.setActive(false);
-    }
-
-}
-
-@:allow(audio.AudioContext)
-class AudioBufferSourceNode extends AudioScheduledSourceNode {
-
-    public var loop (get, set): Bool;
-
-    public var buffer (get, set): AudioBuffer;
-    var _buffer: AudioBuffer;
-
-    inline function get_buffer(): AudioBuffer {
-        return this._buffer;
-    }
-
-    inline function set_buffer(b: AudioBuffer): AudioBuffer {
-        // create a decoder for this buffer
-        var bytesDecoder = new PcmBufferDecoder(context, b.interleavedPcmBytes, {
-            channels: b.config.channels,
-            sampleRate: b.config.sampleRate
-        });
-        setDecoder(bytesDecoder);
-        return _buffer = b;
-    }
-
-    inline function get_loop(): Bool {
-        return this.nativeSource.getLoop();
-    }
-
-    inline function set_loop(v: Bool): Bool {
-        return this.nativeSource.setLoop(v);
     }
 
 }
@@ -156,27 +129,6 @@ private class PcmTransform {
 
 }
 
-/**
-    `transformFunction` is executed on the audio thread, mutex locking must be used is the transform data is changed from the haxe thread
-    Additionally, it's critical no haxe-allocation or vm interaction occurs within `transformFunction`.
-**/
-@:generic private class PcmTransformNode<T> extends AudioNode {
-
-    // we pass the address to these fields as function data (not their values)
-    final readFramesData: PcmTransformData<T>;
-
-    public function new(context: AudioContext, audioThreadTransformFunction: PcmTransformFunction<T>, transformData: T) {
-        super(context);
-        
-        this.readFramesData = new PcmTransformData(Pointer.fromHandle(this.nativeSourceList), audioThreadTransformFunction, transformData);
-
-        this.nativeSource.setUserData(cast Native.addressOf(this.readFramesData));
-        this.nativeSource.setReadFramesCallback(Function.fromStaticFunction(PcmTransform.readFramesCallback));
-        this.nativeSource.setActive(true);
-    }
-
-}
-
 @:generic private class PcmTransformData<T> {
 
     public final nativeSourceList: Star<NativeAudioSourceList>;
@@ -193,28 +145,6 @@ private class PcmTransform {
         this.transformFunction = transformFunction;
         this.transformData = transformData;
         this.transformDataStar = cast Native.addressOf(this.transformData); // must be this.transformData
-    }
-
-}
-
-class GainNode extends PcmTransformNode<Float> {
-
-    public function new(context: AudioContext,  ?options: {
-        var ?gain: Float;
-    }) {
-        var gainValue = options != null && options.gain != null ? options.gain : 1.0;
-        super(context, Function.fromStaticFunction(applyGain), gainValue);
-    }
-
-    @:noDebug static function applyGain(gainStar: Star<Float>, nChannels: UInt32, frameCount: UInt32, schedulingCurrentFrameBlock: Int64, interleavedPcmSamples: RawPointer<Float32>) {
-        var gain: Float = Native.star(gainStar);
-        // we use inline C++ here because a for-loop will vectorize better than hxcpp's while-loop
-        untyped __cpp__('
-            int totalSamples = frameCount*nChannels;
-            for (int i = 0; i < totalSamples; i++) {
-                {0}[i] *= {1};
-            }
-        ', interleavedPcmSamples, gain);
     }
 
 }
