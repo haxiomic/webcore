@@ -12,7 +12,7 @@ typedef ReadFramesCallback = Callable<(source: Star<NativeAudioNode>, nChannels:
 @:access(audio.AudioContext)
 extern class NativeAudioNode {
 
-    var lock: Star<audio.native.MiniAudio.Mutex>;
+    var lock: audio.native.MiniAudio.Mutex;
     private var readFramesCallback: ReadFramesCallback;
     private var decoder: Star<NativeAudioDecoder>;
     private var active: Bool;
@@ -68,30 +68,11 @@ extern class NativeAudioNode {
         return lock.locked(() -> userData);
     }
 
-    @:native('~AudioNode')
-    function free(): Void;
+    @:native('AudioNode_create')
+    static function create(maContext: Star<audio.native.MiniAudio.Context>): Star<NativeAudioNode>;
 
-    @:native('new AudioNode')
-    static function alloc(): Star<NativeAudioNode>;
-
-    static inline function create(maContext: Star<audio.native.MiniAudio.Context>): Star<NativeAudioNode> {
-        var instance = alloc();
-        instance.lock = audio.native.MiniAudio.Mutex.alloc();
-        instance.lock.init(maContext);
-        instance.decoder = null;
-        instance.readFramesCallback = null;
-        instance.active = false;
-        instance.loop = false;
-        instance.onReachEofFlag = false;
-        instance.userData = null;
-        return instance;
-    }
-
-    static inline function destroy(instance: NativeAudioNode): Void {
-        instance.free();
-        instance.lock.uninit();
-        instance.lock.free();
-    }
+    @:native('AudioNode_destroy')
+    static function destroy(instance: Star<NativeAudioNode>): Void;
 
 }
 

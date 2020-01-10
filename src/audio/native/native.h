@@ -35,7 +35,7 @@ extern "C" {
  */
 
 typedef struct {
-    ma_mutex*   lock;
+    ma_mutex    lock;
     ma_decoder* maDecoder;
     ma_uint64   frameIndex;
 } AudioDecoder;
@@ -43,9 +43,11 @@ typedef struct {
 /**
  * Thread-safe decoder functions
  */ 
-ma_uint64 AudioDecoder_readPcmFrames(AudioDecoder* decoder, ma_uint64 frameCount, void* pFramesOut);
-ma_uint64 AudioDecoder_getLengthInPcmFrames(AudioDecoder* decoder);
-ma_result AudioDecoder_seekToPcmFrame(AudioDecoder* decoder, ma_uint64 frameIndex);
+AudioDecoder* AudioDecoder_create(ma_context* context);
+void          AudioDecoder_destroy(AudioDecoder* instance);
+ma_uint64     AudioDecoder_readPcmFrames(AudioDecoder* decoder, ma_uint64 frameCount, void* pFramesOut);
+ma_uint64     AudioDecoder_getLengthInPcmFrames(AudioDecoder* decoder);
+ma_result     AudioDecoder_seekToPcmFrame(AudioDecoder* decoder, ma_uint64 frameIndex);
 
 /**
  * AudioNode
@@ -59,7 +61,7 @@ typedef ma_uint64 (* AudioNode_ReadFramesCallback) (AudioNode* AudioNode, ma_uin
 
 struct AudioNode {
     AudioNode_ReadFramesCallback readFramesCallback; // allowed to be  NULL, when not null, this takes priority over reading from the decoder
-    ma_mutex*                    lock;
+    ma_mutex                     lock;
     AudioDecoder*                decoder; // allowed to be  NULL
     ma_bool32                    active;
     ma_bool32                    loop;
@@ -67,7 +69,8 @@ struct AudioNode {
     void*                        userData;
 };
 
-
+AudioNode* AudioNode_create(ma_context* context);
+void       AudioNode_destroy(AudioNode* instance);
 
 /**
  * AudioNodeListNode
@@ -93,10 +96,9 @@ typedef struct {
 
 AudioNodeList* AudioNodeList_create(ma_context* context);
 void           AudioNodeList_destroy(AudioNodeList* instance);
-
-void      AudioNodeList_add(AudioNodeList* list, AudioNode* source);
-ma_bool32 AudioNodeList_remove(AudioNodeList* list, AudioNode* source);
-int       AudioNodeList_sourceCount(AudioNodeList* list);
+void           AudioNodeList_add(AudioNodeList* list, AudioNode* source);
+ma_bool32      AudioNodeList_remove(AudioNodeList* list, AudioNode* source);
+int            AudioNodeList_sourceCount(AudioNodeList* list);
 
 
 /**

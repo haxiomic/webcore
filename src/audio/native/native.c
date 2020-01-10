@@ -13,30 +13,91 @@
  * AudioDecoder
  */
 
+AudioDecoder* AudioDecoder_create(ma_context* context) {
+    AudioDecoder* instance;
+
+    instance = (AudioDecoder*)ma_malloc(sizeof(*instance));
+    ma_zero_object(instance);
+
+    // initialize audioNodeList fields
+    ma_result r = ma_mutex_init(context, &instance->lock);
+    if (r != MA_SUCCESS) {
+        ma_mutex_uninit(&instance->lock);
+        return NULL;
+    }
+
+    instance->maDecoder = (ma_decoder*)ma_malloc(sizeof(*instance->maDecoder));
+    instance->frameIndex = 0;
+
+    // maDecoder is uninitialized – should be initialized after calling create
+
+    return instance;
+}
+
+void AudioDecoder_destroy(AudioDecoder* instance) {
+    ma_mutex_uninit(&instance->lock);
+
+    ma_decoder_uninit(instance->maDecoder);
+    ma_free(instance->maDecoder);
+
+    ma_free(instance);
+}
+
 ma_uint64 AudioDecoder_readPcmFrames(AudioDecoder* decoder, ma_uint64 frameCount, void* pFramesOut) {
     ma_uint64 framesRead = 0;
-    ma_mutex_lock(decoder->lock);
+    ma_mutex_lock(&decoder->lock);
     framesRead = ma_decoder_read_pcm_frames(decoder->maDecoder, pFramesOut, frameCount);
     decoder->frameIndex += framesRead;
-    ma_mutex_unlock(decoder->lock);
+    ma_mutex_unlock(&decoder->lock);
     return framesRead;
 }
 
 ma_uint64 AudioDecoder_getLengthInPcmFrames(AudioDecoder* decoder) {
     ma_uint64 length = 0;
-    ma_mutex_lock(decoder->lock);
+    ma_mutex_lock(&decoder->lock);
     length = ma_decoder_get_length_in_pcm_frames(decoder->maDecoder);
-    ma_mutex_unlock(decoder->lock);
+    ma_mutex_unlock(&decoder->lock);
     return length;
 }
 
 ma_result AudioDecoder_seekToPcmFrame(AudioDecoder* decoder, ma_uint64 frameIndex) {
     ma_result result = MA_ERROR;
-    ma_mutex_lock(decoder->lock);
+    ma_mutex_lock(&decoder->lock);
     result = ma_decoder_seek_to_pcm_frame(decoder->maDecoder, frameIndex);
     decoder->frameIndex = frameIndex;
-    ma_mutex_unlock(decoder->lock);
+    ma_mutex_unlock(&decoder->lock);
     return result;
+}
+
+/**
+ * AudioNode
+ */
+
+AudioNode* AudioNode_create(ma_context* context) {
+    AudioNode* instance;
+
+    instance = (AudioNode*)ma_malloc(sizeof(*instance));
+    ma_zero_object(instance);
+
+    ma_result r = ma_mutex_init(context, &instance->lock);
+    if (r != MA_SUCCESS) {
+        ma_mutex_uninit(&instance->lock);
+        return NULL;
+    }
+
+    instance->readFramesCallback = NULL;
+    instance->decoder = NULL;
+    instance->active = MA_FALSE;
+    instance->loop = MA_FALSE;
+    instance->onReachEofFlag = MA_FALSE;
+    instance->userData = NULL;
+
+    return instance;
+}
+
+void AudioNode_destroy(AudioNode* instance) {
+    ma_mutex_uninit(&instance->lock);
+    ma_free(instance);
 }
 
 /**
@@ -44,7 +105,7 @@ ma_result AudioDecoder_seekToPcmFrame(AudioDecoder* decoder, ma_uint64 frameInde
  */
 
 AudioNodeList* AudioNodeList_create(ma_context* context) {
-    AudioNodeList* instance = NULL;
+    AudioNodeList* instance;
 
     instance = (AudioNodeList*)ma_malloc(sizeof(*instance));
     ma_zero_object(instance);
@@ -167,13 +228,13 @@ ma_uint32 Audio_mixSources(AudioNodeList* sourceList, ma_uint32 channelCount, ma
             AudioDecoder* decoder = NULL;
             ma_bool32 active = MA_FALSE;
             ma_bool32 loop = MA_FALSE;
-            ma_mutex_lock(source->lock); {
+            ma_mutex_lock(&source->lock); {
                 readFramesCallback = source->readFramesCallback;
                 decoder = source->decoder;
                 active = source->active;
                 loop = source->loop;
             }
-            ma_mutex_unlock(source->lock);
+            ma_mutex_unlock(&source->lock);
 
             if (active != MA_TRUE) {
                 continue;
@@ -250,10 +311,10 @@ ma_uint32 Audio_mixSources(AudioNodeList* sourceList, ma_uint32 channelCount, ma
             totalFramesReadMax = ma_max(totalFramesReadMax, totalFramesRead);
 
             if (reachedEOF) {
-                ma_mutex_lock(source->lock); {
+                ma_mutex_lock(&source->lock); {
                     source->onReachEofFlag = MA_TRUE;
                 }
-                ma_mutex_unlock(source->lock);
+                ma_mutex_unlock(&source->lock);
             }
         }
     }

@@ -29,7 +29,7 @@ class AudioDecoder {
         this.sampleRate = this.config.sampleRate;
         this.channels = this.config.channels;
 
-        this.nativeAudioDecoder = NativeAudioDecoder.create(context.maDevice.pContext, config);
+        this.nativeAudioDecoder = NativeAudioDecoder.create(context.maDevice.pContext);
         cpp.vm.Gc.setFinalizer(this, Function.fromStaticFunction(finalizer));
     }
 
@@ -175,7 +175,7 @@ class PcmBufferDecoder extends AudioDecoder {
 extern class NativeAudioDecoder {
 
     var maDecoder: Star<MiniAudio.Decoder>;
-    var lock: Star<MiniAudio.Mutex>;
+    var lock: MiniAudio.Mutex;
     private var frameIndex: UInt64;
 
     inline function readPcmFrames(pFramesOut: Star<cpp.Void>, frameCount: UInt64): UInt64 {
@@ -194,32 +194,10 @@ extern class NativeAudioDecoder {
         return lock.locked(() -> this.frameIndex);
     }
 
-    @:native('~AudioDecoder')
-    function free(): Void;
+    @:native('AudioDecoder_create')
+    static function create(maContext: Star<MiniAudio.Context>): Star<NativeAudioDecoder>;
 
-    @:native('new AudioDecoder')
-    static function alloc(): Star<NativeAudioDecoder>;
-
-    static inline function create(maContext: Star<MiniAudio.Context>, config: Star<MiniAudio.DecoderConfig>): Star<NativeAudioDecoder> {
-        var instance = alloc();
-        instance.frameIndex = 0;
-
-        instance.lock = MiniAudio.Mutex.alloc();
-        instance.lock.init(maContext);
-
-        instance.maDecoder = MiniAudio.Decoder.alloc();
-        
-        return instance;
-    }
-
-    static inline function destroy(instance: NativeAudioDecoder): Void {
-        instance.free();
-
-        instance.lock.uninit();
-        instance.lock.free();
-
-        instance.maDecoder.uninit();
-        instance.maDecoder.free();
-    }
+    @:native('AudioDecoder_destroy')
+    static function destroy(instance: Star<NativeAudioDecoder>): Void;
 
 }
