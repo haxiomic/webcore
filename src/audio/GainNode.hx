@@ -19,6 +19,11 @@ class GainNode extends AudioNode.PcmTransformNode<Float> {
 
     @:noDebug static function applyGain(gainStar: Star<Float>, nChannels: UInt32, frameCount: UInt32, schedulingCurrentFrameBlock: Int64, interleavedPcmSamples: RawPointer<Float32>) {
         var gain: Float = Native.star(gainStar);
+        if (gain == 1.0) return;
+        if (gain == 0.0) {
+            untyped __cpp__('memset({0}, 0, {1})', interleavedPcmSamples, frameCount * nChannels);
+            return;
+        }
         // we use inline C++ here because a for-loop will vectorize better than hxcpp's while-loop
         untyped __cpp__('
             int totalSamples = frameCount*nChannels;
