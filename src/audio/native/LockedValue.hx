@@ -2,6 +2,10 @@ package audio.native;
 
 import cpp.*;
 
+/**
+    Guards a value behind an mutex lock
+    If the value is not primitive (and therefore not copied on return) you should keep read/write to the `acquire()` callback rather than using `get()` and `set()`
+**/
 @:access(audio.AudioContext)
 @:generic class LockedValue<T> {
 
@@ -21,6 +25,12 @@ import cpp.*;
 
     @:noDebug public inline function set(v: T): T {
         return mutex.locked(() -> value = v);
+    }
+
+    @:noDebug public inline function acquire<R>(cb: (v: T) -> R): R {
+        return mutex.locked(() -> {
+            return cb(value);
+        });
     }
 
 }
