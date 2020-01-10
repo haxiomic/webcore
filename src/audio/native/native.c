@@ -91,6 +91,7 @@ AudioNode* AudioNode_create(ma_context* context) {
     instance->loop = MA_FALSE;
     instance->onReachEofFlag = MA_FALSE;
     instance->userData = NULL;
+    instance->_lastReadFrameBlock = -1;
 
     return instance;
 }
@@ -228,15 +229,24 @@ ma_uint32 Audio_mixSources(AudioNodeList* sourceList, ma_uint32 channelCount, ma
             AudioDecoder* decoder = NULL;
             ma_bool32 active = MA_FALSE;
             ma_bool32 loop = MA_FALSE;
+            ma_int64 _lastReadFrameBlock;
             ma_mutex_lock(&source->lock); {
                 readFramesCallback = source->readFramesCallback;
                 decoder = source->decoder;
                 active = source->active;
                 loop = source->loop;
+                _lastReadFrameBlock = source->_lastReadFrameBlock;
+                // mark for this frame block
+                source->_lastReadFrameBlock = schedulingCurrentFrameBlock;
             }
             ma_mutex_unlock(&source->lock);
 
             if (active != MA_TRUE) {
+                continue;
+            }
+
+            // if we've already read from this node for this frame block, then don't read again (this prevent cycles in the node tree)
+            if (source->_lastReadFrameBlock == schedulingCurrentFrameBlock) {
                 continue;
             }
 
