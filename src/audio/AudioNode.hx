@@ -136,7 +136,7 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
 
 }
 
-private typedef PcmTransformFunction<T> = Callable<(data: Star<T>, nChannels: UInt32, frameCount: UInt32, interleavedPcmSamples: RawPointer<Float32>) -> Void>;
+private typedef PcmTransformFunction<T> = Callable<(data: Star<T>, nChannels: UInt32, frameCount: UInt32, schedulingCurrentFrameBlock: UInt64, interleavedPcmSamples: RawPointer<Float32>) -> Void>;
 
 @:access(audio.AudioContext)
 private class PcmTransform {
@@ -149,7 +149,7 @@ private class PcmTransform {
         var readFramesData: Star<PcmTransformData<T>> = cast source.getUserData();
         var framesRead = AudioContext.mixSources(readFramesData.nativeSourceList, nChannels, frameCount, schedulingCurrentFrameBlock, interleavedSamples);
         // apply user transform to frames read
-        readFramesData.transformFunction(readFramesData.transformDataStar, nChannels, framesRead, cast interleavedSamples);
+        readFramesData.transformFunction(readFramesData.transformDataStar, nChannels, framesRead, schedulingCurrentFrameBlock, cast interleavedSamples);
         return framesRead;
     }
 
@@ -164,10 +164,10 @@ private class PcmTransform {
     // we pass the address to these fields as function data (not their values)
     final readFramesData: PcmTransformData<T>;
 
-    public function new(context: AudioContext, transformFunction: PcmTransformFunction<T>, transformData: T) {
+    public function new(context: AudioContext, audioThreadTransformFunction: PcmTransformFunction<T>, transformData: T) {
         super(context);
         
-        this.readFramesData = new PcmTransformData(Pointer.fromHandle(this.nativeSourceList), transformFunction, transformData);
+        this.readFramesData = new PcmTransformData(Pointer.fromHandle(this.nativeSourceList), audioThreadTransformFunction, transformData);
 
         this.nativeSource.setUserData(cast Native.addressOf(this.readFramesData));
         this.nativeSource.setReadFramesCallback(Function.fromStaticFunction(PcmTransform.readFramesCallback));
@@ -205,7 +205,7 @@ class GainNode extends PcmTransformNode<Float> {
         super(context, Function.fromStaticFunction(applyGain), gainValue);
     }
 
-    @:noDebug static function applyGain(gainStar: Star<Float>, nChannels: UInt32, frameCount: UInt32, interleavedPcmSamples: RawPointer<Float32>) {
+    @:noDebug static function applyGain(gainStar: Star<Float>, nChannels: UInt32, frameCount: UInt32, schedulingCurrentFrameBlock: UInt64, interleavedPcmSamples: RawPointer<Float32>) {
         var gain: Float = Native.star(gainStar);
         // we use inline C++ here because a for-loop will vectorize better than hxcpp's while-loop
         untyped __cpp__('
