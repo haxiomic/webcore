@@ -3,14 +3,14 @@ package audio.native;
 import cpp.*;
 import audio.native.AudioDecoder;
 
-typedef ReadFramesCallback = Callable<(source: Star<NativeAudioSource>, nChannels: UInt32, frameCount: UInt64, schedulingCurrentFrameBlock: Int64, interleavedSamples: Star<Float32>) -> UInt64>;
+typedef ReadFramesCallback = Callable<(source: Star<NativeAudioNode>, nChannels: UInt32, frameCount: UInt64, schedulingCurrentFrameBlock: Int64, interleavedSamples: Star<Float32>) -> UInt64>;
 
 @:include('./native.h')
 @:sourceFile(#if winrt './native.c' #else './native.m' #end)
-@:native('AudioSource') @:unreflective
+@:native('AudioNode') @:unreflective
 @:structAccess
 @:access(audio.AudioContext)
-extern class NativeAudioSource {
+extern class NativeAudioNode {
 
     var lock: Star<audio.native.MiniAudio.Mutex>;
     private var readFramesCallback: ReadFramesCallback;
@@ -68,13 +68,13 @@ extern class NativeAudioSource {
         return lock.locked(() -> userData);
     }
 
-    @:native('~AudioSource')
+    @:native('~AudioNode')
     function free(): Void;
 
-    @:native('new AudioSource')
-    static function alloc(): Star<NativeAudioSource>;
+    @:native('new AudioNode')
+    static function alloc(): Star<NativeAudioNode>;
 
-    static inline function create(maContext: Star<audio.native.MiniAudio.Context>): Star<NativeAudioSource> {
+    static inline function create(maContext: Star<audio.native.MiniAudio.Context>): Star<NativeAudioNode> {
         var instance = alloc();
         instance.lock = audio.native.MiniAudio.Mutex.alloc();
         instance.lock.init(maContext);
@@ -87,7 +87,7 @@ extern class NativeAudioSource {
         return instance;
     }
 
-    static inline function destroy(instance: NativeAudioSource): Void {
+    static inline function destroy(instance: NativeAudioNode): Void {
         instance.free();
         instance.lock.uninit();
         instance.lock.free();
@@ -97,22 +97,22 @@ extern class NativeAudioSource {
 
 @:include('./native.h')
 @:sourceFile(#if winrt './native.c' #else './native.m' #end)
-@:native('AudioSourceList') @:unreflective
+@:native('AudioNodeList') @:unreflective
 @:structAccess
-extern class NativeAudioSourceList {
+extern class NativeAudioNodeList {
 
-    inline function add(source: Star<NativeAudioSource>): Void {
-        untyped __global__.AudioSourceList_add(this, source);
+    inline function add(source: Star<NativeAudioNode>): Void {
+        untyped __global__.AudioNodeList_add(this, source);
     }
 
-    inline function remove(source: Star<NativeAudioSource>): Bool {
-        return untyped __global__.AudioSourceList_remove(this, source);
+    inline function remove(source: Star<NativeAudioNode>): Bool {
+        return untyped __global__.AudioNodeList_remove(this, source);
     }
 
-    @:native('AudioSourceList_create')
-    static function create(maContext: Star<audio.native.MiniAudio.Context>): Star<NativeAudioSourceList>;
+    @:native('AudioNodeList_create')
+    static function create(maContext: Star<audio.native.MiniAudio.Context>): Star<NativeAudioNodeList>;
 
-    @:native('AudioSourceList_destroy')
-    static function destroy(instance: Star<NativeAudioSourceList>): Void;
+    @:native('AudioNodeList_destroy')
+    static function destroy(instance: Star<NativeAudioNodeList>): Void;
 
 }

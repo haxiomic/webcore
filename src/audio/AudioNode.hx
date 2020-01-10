@@ -8,9 +8,10 @@ typedef AudioNode = js.html.audio.AudioNode;
 
 import cpp.*;
 import audio.native.AudioDecoder;
-import audio.native.NativeAudioSource;
+import audio.native.NativeAudioNode;
 
 @:allow(audio.AudioContext)
+@:native('audio.AudioNodeHx')
 class AudioNode {
 
     public final context: AudioContext;
@@ -18,16 +19,16 @@ class AudioNode {
     public var numberOfOutputs(get, null): Int;
 
     var decoder: Null<AudioDecoder>;
-    final nativeSource: Star<NativeAudioSource>;
+    final nativeNode: Star<NativeAudioNode>;
 
-    final nativeSourceList: Star<NativeAudioSourceList>;
+    final nativeNodeList: Star<NativeAudioNodeList>;
     final connectedSources = new List<AudioNode>();
     final connectedDestinations = new List<AudioNode>();
 
     function new(context: AudioContext, ?decoder: AudioDecoder) {
         this.context = context;
-        this.nativeSource = NativeAudioSource.create(context.maDevice.pContext);
-        this.nativeSourceList = NativeAudioSourceList.create(context.maDevice.pContext);
+        this.nativeNode = NativeAudioNode.create(context.maDevice.pContext);
+        this.nativeNodeList = NativeAudioNodeList.create(context.maDevice.pContext);
 
         if (decoder != null) {
             setDecoder(decoder);
@@ -50,24 +51,24 @@ class AudioNode {
 
     function setDecoder(decoder: AudioDecoder) {
         this.decoder = decoder;
-        if (nativeSource != null) {
-            this.nativeSource.setDecoder(decoder.nativeAudioDecoder);
+        if (nativeNode != null) {
+            this.nativeNode.setDecoder(decoder.nativeAudioDecoder);
         }
     }
 
     function addSourceNode(node: AudioNode) {
         if (!Lambda.has(connectedSources, node)) {
             connectedSources.add(node);
-            if (node.nativeSource != null) {
-                this.nativeSourceList.add(node.nativeSource);
+            if (node.nativeNode != null) {
+                this.nativeNodeList.add(node.nativeNode);
             }
         }
     }
 
     function removeSourceNode(node: AudioNode) {
         connectedSources.remove(node);
-        if (node.nativeSource != null) {
-            this.nativeSourceList.remove(node.nativeSource);
+        if (node.nativeNode != null) {
+            this.nativeNodeList.remove(node.nativeNode);
         }
     }
 
@@ -83,8 +84,8 @@ class AudioNode {
         #if debug
         Stdio.printf("%s\n", "[debug] AudioNode.finalizer()");
         #end
-        NativeAudioSource.destroy(instance.nativeSource);
-        NativeAudioSourceList.destroy(instance.nativeSourceList);
+        NativeAudioNode.destroy(instance.nativeNode);
+        NativeAudioNodeList.destroy(instance.nativeNodeList);
     }
 
 }
@@ -101,11 +102,11 @@ class AudioNode {
     public function new(context: AudioContext, audioThreadTransformFunction: PcmTransformFunction<T>, transformData: T) {
         super(context);
         
-        this.readFramesData = new PcmTransformData(Pointer.fromHandle(this.nativeSourceList), audioThreadTransformFunction, transformData);
+        this.readFramesData = new PcmTransformData(Pointer.fromHandle(this.nativeNodeList), audioThreadTransformFunction, transformData);
 
-        this.nativeSource.setUserData(cast Native.addressOf(this.readFramesData));
-        this.nativeSource.setReadFramesCallback(Function.fromStaticFunction(PcmTransform.readFramesCallback));
-        this.nativeSource.setActive(true);
+        this.nativeNode.setUserData(cast Native.addressOf(this.readFramesData));
+        this.nativeNode.setReadFramesCallback(Function.fromStaticFunction(PcmTransform.readFramesCallback));
+        this.nativeNode.setActive(true);
     }
 
 }
@@ -119,9 +120,9 @@ private class PcmTransform {
         This is called from the unmanaged audio thread. It's critical that no haxe-allocation or haxe vm interaction occurs here
         @! maybe move this and PcmTransformData to C
     **/
-    @:noDebug static public function readFramesCallback<T>(source: Star<NativeAudioSource>, nChannels: UInt32, frameCount: UInt64, schedulingCurrentFrameBlock: Int64, interleavedSamples: Star<Float32>): UInt64 {
+    @:noDebug static public function readFramesCallback<T>(source: Star<NativeAudioNode>, nChannels: UInt32, frameCount: UInt64, schedulingCurrentFrameBlock: Int64, interleavedSamples: Star<Float32>): UInt64 {
         var readFramesData: Star<PcmTransformData<T>> = cast source.getUserData();
-        var framesRead = AudioContext.mixSources(readFramesData.nativeSourceList, nChannels, frameCount, schedulingCurrentFrameBlock, interleavedSamples);
+        var framesRead = AudioContext.mixSources(readFramesData.nativeNodeList, nChannels, frameCount, schedulingCurrentFrameBlock, interleavedSamples);
         // apply user transform to frames read
         readFramesData.transformFunction(readFramesData.transformDataStar, nChannels, framesRead, schedulingCurrentFrameBlock, cast interleavedSamples);
         return framesRead;
@@ -131,17 +132,17 @@ private class PcmTransform {
 
 @:generic private class PcmTransformData<T> {
 
-    public final nativeSourceList: Star<NativeAudioSourceList>;
+    public final nativeNodeList: Star<NativeAudioNodeList>;
     public final transformFunction: PcmTransformFunction<T>;
     public final transformDataStar: Star<T>;
     final transformData: T;
 
     public function new(
-        nativeSourceList: Pointer<NativeAudioSourceList>,
+        nativeNodeList: Pointer<NativeAudioNodeList>,
         transformFunction: PcmTransformFunction<T>,
         transformData: T
     ) {
-        this.nativeSourceList = nativeSourceList.ptr;
+        this.nativeNodeList = nativeNodeList.ptr;
         this.transformFunction = transformFunction;
         this.transformData = transformData;
         this.transformDataStar = cast Native.addressOf(this.transformData); // must be this.transformData

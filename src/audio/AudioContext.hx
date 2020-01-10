@@ -9,7 +9,7 @@ typedef AudioContext = js.html.audio.AudioContext;
 import cpp.*;
 
 import audio.native.AudioDecoder;
-import audio.native.NativeAudioSource.NativeAudioSourceList;
+import audio.native.NativeAudioNode.NativeAudioNodeList;
 import audio.native.MiniAudio;
 import audio.native.LockedValue;
 
@@ -58,7 +58,7 @@ class AudioContext {
 
         destination = new AudioNode(this);
 
-        userData = new DeviceUserData(this, Pointer.fromStar(destination.nativeSourceList));
+        userData = new DeviceUserData(this, Pointer.fromStar(destination.nativeNodeList));
 
         maDevice.pUserData = cast Native.addressOf(userData);
 
@@ -167,14 +167,14 @@ class AudioContext {
         var userData: DeviceUserData = (cast maDevice.pUserData: Star<DeviceUserData>);
         var schedulingCurrentFrameBlock: Int64 = userData.schedulingCurrentFrameBlock.get();
 
-        mixSources(userData.nativeSourceList, maDevice.playback.channels, frameCount, schedulingCurrentFrameBlock, cast output);
+        mixSources(userData.nativeNodeList, maDevice.playback.channels, frameCount, schedulingCurrentFrameBlock, cast output);
 
         schedulingCurrentFrameBlock += (cast frameCount: Int64);
         userData.schedulingCurrentFrameBlock.set(schedulingCurrentFrameBlock);
     }
 
     @:noDebug
-    static inline function mixSources(sources: Star<NativeAudioSourceList>, nChannels: UInt32, frameCount: UInt32, schedulingCurrentFrameBlock: Int64, output: Star<Float32>): UInt32 {
+    static inline function mixSources(sources: Star<NativeAudioNodeList>, nChannels: UInt32, frameCount: UInt32, schedulingCurrentFrameBlock: Int64, output: Star<Float32>): UInt32 {
         return untyped __global__.Audio_mixSources(sources, nChannels, frameCount, schedulingCurrentFrameBlock, output);
     }
 
@@ -192,11 +192,11 @@ class AudioContext {
 
 class DeviceUserData {
 
-    public final nativeSourceList: Star<NativeAudioSourceList>;
+    public final nativeNodeList: Star<NativeAudioNodeList>;
     public final schedulingCurrentFrameBlock: audio.native.LockedValue<Int64>;
 
-    public function new(context: AudioContext, nativeSourceList: Pointer<NativeAudioSourceList>) {
-        this.nativeSourceList = nativeSourceList.ptr;
+    public function new(context: AudioContext, nativeNodeList: Pointer<NativeAudioNodeList>) {
+        this.nativeNodeList = nativeNodeList.ptr;
         this.schedulingCurrentFrameBlock = new LockedValue(context);
     }
 

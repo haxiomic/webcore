@@ -40,16 +40,16 @@ ma_result AudioDecoder_seekToPcmFrame(AudioDecoder* decoder, ma_uint64 frameInde
 }
 
 /**
- * AudioSourceList
+ * AudioNodeList
  */
 
-AudioSourceList* AudioSourceList_create(ma_context* context) {
-    AudioSourceList* instance = NULL;
+AudioNodeList* AudioNodeList_create(ma_context* context) {
+    AudioNodeList* instance = NULL;
 
-    instance = (AudioSourceList*)ma_malloc(sizeof(*instance));
+    instance = (AudioNodeList*)ma_malloc(sizeof(*instance));
     ma_zero_object(instance);
 
-    // initialize audioSourceList fields
+    // initialize audioNodeList fields
     ma_result r = ma_mutex_init(context, &instance->lock);
     if (r != MA_SUCCESS) {
         ma_mutex_uninit(&instance->lock);
@@ -59,11 +59,11 @@ AudioSourceList* AudioSourceList_create(ma_context* context) {
     return instance;
 }
 
-void AudioSourceList_destroy(AudioSourceList* instance) {
+void AudioNodeList_destroy(AudioNodeList* instance) {
     ma_mutex_uninit(&instance->lock);
 
     // free source list nodes
-    AudioSourceListNode* currentSourceListNode = instance->sourceNext;
+    AudioNodeListNode* currentSourceListNode = instance->sourceNext;
     while (currentSourceListNode != NULL) {
         ma_free(currentSourceListNode);
         currentSourceListNode = currentSourceListNode->next;
@@ -72,34 +72,34 @@ void AudioSourceList_destroy(AudioSourceList* instance) {
     ma_free(instance);
 }
 
-void AudioSourceList_add(AudioSourceList* audioSourceList, AudioSource* source) {
+void AudioNodeList_add(AudioNodeList* audioNodeList, AudioNode* source) {
 
     // create an empty list node
-    AudioSourceListNode* newListNode;
-    newListNode = (AudioSourceListNode*)ma_malloc(sizeof(*newListNode));
+    AudioNodeListNode* newListNode;
+    newListNode = (AudioNodeListNode*)ma_malloc(sizeof(*newListNode));
     ma_zero_object(newListNode);
     newListNode->item = source;
 
-    ma_mutex_lock(&audioSourceList->lock);
+    ma_mutex_lock(&audioNodeList->lock);
     {
         // find last next-item pointer
-        AudioSourceListNode** currentSourceListNodePtr = &(audioSourceList->sourceNext);
+        AudioNodeListNode** currentSourceListNodePtr = &(audioNodeList->sourceNext);
         while ((*currentSourceListNodePtr) != NULL) {
             currentSourceListNodePtr = &((*currentSourceListNodePtr)->next);
         }
         (*currentSourceListNodePtr) = newListNode;
     }
-    ma_mutex_unlock(&audioSourceList->lock);
+    ma_mutex_unlock(&audioNodeList->lock);
 }
 
-ma_bool32 AudioSourceList_remove(AudioSourceList* audioSourceList, AudioSource* source) {
+ma_bool32 AudioNodeList_remove(AudioNodeList* audioNodeList, AudioNode* source) {
     ma_bool32 removed = MA_FALSE;
 
-    ma_mutex_lock(&audioSourceList->lock);
+    ma_mutex_lock(&audioNodeList->lock);
     {
         // iterate list searching for source and remove when found
-        AudioSourceListNode** parentSourceListNodePtr = &(audioSourceList->sourceNext);
-        AudioSourceListNode* currentSourceListNode = audioSourceList->sourceNext;
+        AudioNodeListNode** parentSourceListNodePtr = &(audioNodeList->sourceNext);
+        AudioNodeListNode* currentSourceListNode = audioNodeList->sourceNext;
         while (currentSourceListNode != NULL) {
 
             if (currentSourceListNode->item == source) {
@@ -114,23 +114,23 @@ ma_bool32 AudioSourceList_remove(AudioSourceList* audioSourceList, AudioSource* 
             currentSourceListNode = currentSourceListNode->next;
         }
     }
-    ma_mutex_unlock(&audioSourceList->lock);
+    ma_mutex_unlock(&audioNodeList->lock);
 
     return removed;
 }
 
-int AudioSourceList_sourceCount(AudioSourceList* audioSourceList) {
+int AudioNodeList_sourceCount(AudioNodeList* audioNodeList) {
     int count = 0;
 
-    ma_mutex_lock(&audioSourceList->lock);
+    ma_mutex_lock(&audioNodeList->lock);
     {
-        AudioSourceListNode* currentSourceListNode = audioSourceList->sourceNext;
+        AudioNodeListNode* currentSourceListNode = audioNodeList->sourceNext;
         while (currentSourceListNode != NULL) {
             count++;
             currentSourceListNode = currentSourceListNode->next;
         }
     }
-    ma_mutex_unlock(&audioSourceList->lock);
+    ma_mutex_unlock(&audioNodeList->lock);
 
     return count;
 }
@@ -142,7 +142,7 @@ int AudioSourceList_sourceCount(AudioSourceList* audioSourceList) {
 /**
  * Sample rate and channels must be the same for the all decoders in sourceList and output
  */
-ma_uint32 Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_uint32 frameCount, ma_int64 schedulingCurrentFrameBlock, float* pOutput) {
+ma_uint32 Audio_mixSources(AudioNodeList* sourceList, ma_uint32 channelCount, ma_uint32 frameCount, ma_int64 schedulingCurrentFrameBlock, float* pOutput) {
     if (sourceList == NULL) {
         return 0;
     }
@@ -156,14 +156,14 @@ ma_uint32 Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, 
 
     ma_mutex_lock(&sourceList->lock);
     {
-        AudioSourceListNode* currentSourceListNode = sourceList->sourceNext;
+        AudioNodeListNode* currentSourceListNode = sourceList->sourceNext;
         while (currentSourceListNode != NULL) {
-            AudioSource* source = currentSourceListNode->item;
+            AudioNode* source = currentSourceListNode->item;
             currentSourceListNode = currentSourceListNode->next;
 
             ma_assert(source != NULL);
 
-            AudioSource_ReadFramesCallback readFramesCallback = NULL;
+            AudioNode_ReadFramesCallback readFramesCallback = NULL;
             AudioDecoder* decoder = NULL;
             ma_bool32 active = MA_FALSE;
             ma_bool32 loop = MA_FALSE;

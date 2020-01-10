@@ -31,11 +31,11 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
     }
 
     inline function get_loop(): Bool {
-        return this.nativeSource.getLoop();
+        return this.nativeNode.getLoop();
     }
 
     inline function set_loop(v: Bool): Bool {
-        return this.nativeSource.setLoop(v);
+        return this.nativeNode.setLoop(v);
     }
 
 }

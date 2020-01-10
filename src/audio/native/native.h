@@ -48,55 +48,55 @@ ma_uint64 AudioDecoder_getLengthInPcmFrames(AudioDecoder* decoder);
 ma_result AudioDecoder_seekToPcmFrame(AudioDecoder* decoder, ma_uint64 frameIndex);
 
 /**
- * AudioSource
+ * AudioNode
  * 
  * lock should be used when reading or writing to any of the fields
  */
 
-typedef struct AudioSource AudioSource;
+typedef struct AudioNode AudioNode;
 
-typedef ma_uint64 (* AudioSource_ReadFramesCallback) (AudioSource* audioSource, ma_uint32 nChannels, ma_uint64 frameCount, ma_int64 schedulingCurrentFrameBlock, float* buffer);
+typedef ma_uint64 (* AudioNode_ReadFramesCallback) (AudioNode* AudioNode, ma_uint32 nChannels, ma_uint64 frameCount, ma_int64 schedulingCurrentFrameBlock, float* buffer);
 
-struct AudioSource {
-    AudioSource_ReadFramesCallback readFramesCallback; // allowed to be  NULL, when not null, this takes priority over reading from the decoder
-    ma_mutex*                      lock;
-    AudioDecoder*                  decoder; // allowed to be  NULL
-    ma_bool32                      active;
-    ma_bool32                      loop;
-    ma_bool32                      onReachEofFlag;
-    void*                          userData;
-} ;
+struct AudioNode {
+    AudioNode_ReadFramesCallback readFramesCallback; // allowed to be  NULL, when not null, this takes priority over reading from the decoder
+    ma_mutex*                    lock;
+    AudioDecoder*                decoder; // allowed to be  NULL
+    ma_bool32                    active;
+    ma_bool32                    loop;
+    ma_bool32                    onReachEofFlag;
+    void*                        userData;
+};
 
 
 
 /**
- * AudioSourceListNode
+ * AudioNodeListNode
  * 
  */
 
-typedef struct AudioSourceListNode {
-    AudioSource*                item;
-    struct AudioSourceListNode* next;
-} AudioSourceListNode;
+typedef struct AudioNodeListNode {
+    AudioNode*                item;
+    struct AudioNodeListNode* next;
+} AudioNodeListNode;
 
 
 /**
- * AudioSourceList
- * Linked-list of AudioSources with a miniaudio mutex lock
+ * AudioNodeList
+ * Linked-list of AudioNodes with a miniaudio mutex lock
  */
 
 typedef struct {
-    ma_mutex             lock; // acquire when accessing sourceNext list
-    AudioSourceListNode* sourceNext;
-} AudioSourceList;
+    ma_mutex           lock; // acquire when accessing sourceNext list
+    AudioNodeListNode* sourceNext;
+} AudioNodeList;
 
 
-AudioSourceList* AudioSourceList_create(ma_context* context);
-void             AudioSourceList_destroy(AudioSourceList* instance);
+AudioNodeList* AudioNodeList_create(ma_context* context);
+void           AudioNodeList_destroy(AudioNodeList* instance);
 
-void      AudioSourceList_add(AudioSourceList* list, AudioSource* source);
-ma_bool32 AudioSourceList_remove(AudioSourceList* list, AudioSource* source);
-int       AudioSourceList_sourceCount(AudioSourceList* list);
+void      AudioNodeList_add(AudioNodeList* list, AudioNode* source);
+ma_bool32 AudioNodeList_remove(AudioNodeList* list, AudioNode* source);
+int       AudioNodeList_sourceCount(AudioNodeList* list);
 
 
 /**
@@ -107,7 +107,7 @@ int       AudioSourceList_sourceCount(AudioSourceList* list);
  * The sourceList must have decoders with output format Float32 channelCount that matches the output buffer channel count
  * If channel count and format mismatches are detected mixing will be skipped for that decoder
  */
-ma_uint32 Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_uint32 frameCount, ma_int64 schedulingCurrentFrameBlock, float* pOutput);
+ma_uint32 Audio_mixSources(AudioNodeList* sourceList, ma_uint32 channelCount, ma_uint32 frameCount, ma_int64 schedulingCurrentFrameBlock, float* pOutput);
 
 #ifdef __cplusplus
 }

@@ -10,11 +10,11 @@ typedef AudioScheduledSourceNode = js.html.audio.AudioScheduledSourceNode;
 class AudioScheduledSourceNode extends AudioNode {
 
     public inline function start() {
-        this.nativeSource.setActive(true);
+        this.nativeNode.setActive(true);
     }
 
     public inline function stop() {
-        this.nativeSource.setActive(false);
+        this.nativeNode.setActive(false);
     }
 
 }
