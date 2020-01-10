@@ -19,7 +19,7 @@ extern class NativeAudioNode {
     private var scheduledStartFrame: Int64;
     private var scheduledStopFrame: Int64;
     private var loop: Bool;
-    private var onReachEofFlag: Bool;
+    private var onReachEndFlag: Bool;
     private var userData: Star<cpp.Void>;
 
     inline function setReadFramesCallback(callback: ReadFramesCallback): ReadFramesCallback {
@@ -70,12 +70,12 @@ extern class NativeAudioNode {
         return lock.locked(() -> loop = v);
     }
 
-    inline function getOnReachEofFlag(): Bool {
-        return lock.locked(() -> onReachEofFlag);
+    inline function getOnReachEndFlag(): Bool {
+        return lock.locked(() -> onReachEndFlag);
     }
 
-    inline function setOnReachEofFlag(v: Bool): Bool {
-        return lock.locked(() -> onReachEofFlag = v);
+    inline function setOnReachEndFlag(v: Bool): Bool {
+        return lock.locked(() -> onReachEndFlag = v);
     }
 
     inline function setUserData(newUserData: Star<cpp.Void>): Star<cpp.Void> {

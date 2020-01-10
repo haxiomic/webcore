@@ -9,6 +9,8 @@ typedef AudioScheduledSourceNode = js.html.audio.AudioScheduledSourceNode;
 @:allow(audio.native.AudioContext)
 class AudioScheduledSourceNode extends AudioNode {
 
+    public var onended: Null<haxe.Constraints.Function>;
+
     /**
         @throws String
     **/
@@ -27,6 +29,9 @@ class AudioScheduledSourceNode extends AudioNode {
         if (duration != null) {
             stop(when + duration);
         }
+
+        // while running, we poll onReachEndFlag to trigger the onend event
+        pollReachedEndFlag();
     }
 
     /**
@@ -37,6 +42,26 @@ class AudioScheduledSourceNode extends AudioNode {
             throw "Failed to execute 'stop' on 'AudioScheduledSourceNode': cannot call stop without calling start first";
         }
         nativeNode.setScheduledStopFrame(cast context.sampleRate * when);
+    }
+
+    function handledReachedEnd() {
+        // disconnect from all down-stream nodes
+        // @! this changes the connected node count (which doesn't change on browser WebAudio), however the node _is_ disconnected in browser WebAudio
+        // see https://bugs.chromium.org/p/chromium/issues/detail?id=452966
+        this.disconnect();
+
+        if (onended != null) {
+            onended();
+        }
+    }
+
+    function pollReachedEndFlag() {
+        if (nativeNode.getOnReachEndFlag()) {
+            handledReachedEnd();
+        } else {
+            // keep polling until end
+            haxe.Timer.delay(pollReachedEndFlag, 0);
+        }
     }
 
 }

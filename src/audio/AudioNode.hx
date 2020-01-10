@@ -42,11 +42,21 @@ class AudioNode {
             connectedDestinations.add(destination);
         }
         destination.addSourceNode(this);
+        return destination;
     }
 
-    public function disconnect(destination: AudioNode) {
-        connectedDestinations.remove(destination);
-        destination.removeSourceNode(this);
+    public function disconnect(?destination: AudioNode) {
+        if (destination == null) {
+            // disconnect from all connected destinations
+            for (n in connectedDestinations) {
+                n.removeSourceNode(this);
+            }
+            connectedDestinations.clear();
+        } else {
+            // disconnect from single destination
+            connectedDestinations.remove(destination);
+            destination.removeSourceNode(this);
+        }
     }
 
     function setDecoder(decoder: AudioDecoder) {

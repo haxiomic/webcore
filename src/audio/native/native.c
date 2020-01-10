@@ -91,7 +91,7 @@ AudioNode* AudioNode_create(ma_context* context) {
     instance->scheduledStartFrame = -1;
     instance->scheduledStopFrame = -1;
     instance->loop = MA_FALSE;
-    instance->onReachEofFlag = MA_FALSE;
+    instance->onReachEndFlag = MA_FALSE;
     instance->userData = NULL;
     instance->_lastReadFrameBlock = -1;
 
@@ -257,8 +257,6 @@ ma_uint32 Audio_mixSources(AudioNodeList* sourceList, ma_uint32 channelCount, ma
                 continue;
             }
 
-            ma_bool32 reachedEndFlag = MA_FALSE;
-
             ma_int64 localStartFrame = 0;
             ma_int64 localEndFrame = frameCount; // exclusive
 
@@ -278,7 +276,10 @@ ma_uint32 Audio_mixSources(AudioNodeList* sourceList, ma_uint32 channelCount, ma
 
                 // if stop is scheduled within this block, then this triggers end flag
                 if (localEndFrame < frameCount) {
-                    reachedEndFlag = MA_TRUE;
+                    ma_mutex_lock(&source->lock); {
+                        source->onReachEndFlag = MA_TRUE;
+                    }
+                    ma_mutex_unlock(&source->lock);
                 }
             }
 
@@ -311,6 +312,7 @@ ma_uint32 Audio_mixSources(AudioNodeList* sourceList, ma_uint32 channelCount, ma
             // read and mix frames in chunks of decoderOutputBuffer length
             ma_uint32 totalFramesRead = 0;
             int loopIndex = -1;
+            ma_bool32 reachedBytesEndFlag = MA_FALSE;
             while (totalFramesRead < totalFramesToRead) {
                 loopIndex++;
                 ma_uint32 framesRemaining = totalFramesToRead - totalFramesRead;
@@ -350,7 +352,7 @@ ma_uint32 Audio_mixSources(AudioNodeList* sourceList, ma_uint32 channelCount, ma
 
                 if (framesRead < chunkFrameCount) {
                     // we read less frames than we requested so we must have reached the end of this decoder
-                    reachedEndFlag = MA_TRUE;
+                    reachedBytesEndFlag = MA_TRUE;
 
                     // if the decoder returns 0 frames after the first iteration (we've given it a chance to loop), then the decoder is probably empty; break to avoid infinite loop
                     if (framesRead == 0 && loopIndex >= 1) {
@@ -370,9 +372,9 @@ ma_uint32 Audio_mixSources(AudioNodeList* sourceList, ma_uint32 channelCount, ma
             // update high water mark for width of data written
             writtenDataWidth = ma_max(writtenDataWidth, localStartFrame + totalFramesRead);
 
-            if (reachedEndFlag) {
+            if (reachedBytesEndFlag) {
                 ma_mutex_lock(&source->lock); {
-                    source->onReachEofFlag = MA_TRUE;
+                    source->onReachEndFlag = MA_TRUE;
                 }
                 ma_mutex_unlock(&source->lock);
             }
