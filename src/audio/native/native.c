@@ -258,7 +258,9 @@ ma_uint32 Audio_mixSources(AudioNodeList* sourceList, ma_uint32 channelCount, ma
             }
 
             ma_bool32 reachedEndFlag = MA_FALSE;
+
             ma_int64 localStartFrame = 0;
+            ma_int64 localEndFrame = frameCount; // exclusive
 
             // if we have a scheduled start frame, then compute the frame count subset and block offset
             if (scheduledStartFrame != -1) {
@@ -270,8 +272,7 @@ ma_uint32 Audio_mixSources(AudioNodeList* sourceList, ma_uint32 channelCount, ma
                 }
             }
 
-            ma_int64 localEndFrame = frameCount; // exclusive
-
+            // clamp localEndFrame to scheduledStopFrame if we have a scheduled stop
             if (scheduledStopFrame != -1) {
                 localEndFrame = ma_min(scheduledStopFrame - schedulingCurrentFrameBlock, frameCount);
 
