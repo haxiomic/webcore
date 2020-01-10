@@ -1,13 +1,7 @@
+- Implement AudioParam and GainNode value
+- Review calling finalizers if throw when contructing
 - [ ] Fix iOS web
-- [ ] Timelines
-    - currentTime, updated each step
-    - use sample offset to scnhedule exact sample (that way we don't need 128 sample quanta)
-    - mark each node with currentTime when last processed, that way we can detect cycles
-    - [ ] start(t, offset)
 - [ ] AudioSprite play/pause support
-- [ ] end-of-source handling
-    - onEnd callback
-    - flag that's ready in a haxe main loop
 - [ ] Move audio to lib
 
 - [ ] Image via stb_image
