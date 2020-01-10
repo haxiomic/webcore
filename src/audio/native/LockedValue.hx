@@ -9,7 +9,7 @@ import cpp.*;
 @:access(audio.AudioContext)
 @:generic class LockedValue<T> {
 
-    final mutex: Star<MiniAudio.Mutex>;
+    public final mutex: Star<MiniAudio.Mutex>;
 
     var value: T;
     
@@ -27,10 +27,18 @@ import cpp.*;
         return mutex.locked(() -> value = v);
     }
 
-    @:noDebug public inline function acquire<R>(cb: (v: T) -> R): R {
-        return mutex.locked(() -> {
-            return cb(value);
-        });
+    @:noDebug public inline function acquire(cb: T -> Void): Void {
+        mutex.lock();
+        cb(value);
+        mutex.unlock();
+    }
+
+    @:noDebug public inline function getUnsafe(): T {
+        return value;
+    }
+
+    @:noDebug public inline function setUnsafe(v: T): T {
+        return value = v;
     }
 
 }

@@ -165,12 +165,18 @@ class AudioContext {
     @:noDebug
     static function audioThread_deviceDataCallbackMixSources(maDevice: Star<Device>, output: Star<cpp.Void>, input: ConstStar<cpp.Void>, frameCount: UInt32) {
         var userData: DeviceUserData = (cast maDevice.pUserData: Star<DeviceUserData>);
-        var schedulingCurrentFrameBlock: Int64 = userData.schedulingCurrentFrameBlock.get();
+
+        userData.schedulingCurrentFrameBlock.mutex.lock();
+        var schedulingCurrentFrameBlock: Int64 = userData.schedulingCurrentFrameBlock.getUnsafe();
+        userData.schedulingCurrentFrameBlock.mutex.unlock();
 
         mixSources(userData.nativeNodeList, maDevice.playback.channels, frameCount, schedulingCurrentFrameBlock, cast output);
 
         schedulingCurrentFrameBlock += (cast frameCount: Int64);
-        userData.schedulingCurrentFrameBlock.set(schedulingCurrentFrameBlock);
+
+        userData.schedulingCurrentFrameBlock.mutex.lock();
+        userData.schedulingCurrentFrameBlock.setUnsafe(schedulingCurrentFrameBlock);
+        userData.schedulingCurrentFrameBlock.mutex.unlock();
     }
 
     @:noDebug
