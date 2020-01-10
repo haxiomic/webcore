@@ -16,6 +16,8 @@ extern class NativeAudioNode {
     private var readFramesCallback: ReadFramesCallback;
     private var decoder: Star<NativeAudioDecoder>;
     private var active: Bool;
+    private var scheduledStartFrame: Int64;
+    private var scheduledStopFrame: Int64;
     private var loop: Bool;
     private var onReachEofFlag: Bool;
     private var userData: Star<cpp.Void>;
@@ -42,6 +44,22 @@ extern class NativeAudioNode {
 
     inline function setActive(v: Bool): Bool {
         return lock.locked(() -> active = v);
+    }
+
+    inline function getScheduledStartFrame(): Int64 {
+        return lock.locked(() -> scheduledStartFrame);
+    }
+
+    inline function setScheduledStartFrame(v: Int64): Int64 {
+        return lock.locked(() -> scheduledStartFrame = v);
+    }
+
+    inline function getScheduledStopFrame(): Int64 {
+        return lock.locked(() -> scheduledStopFrame);
+    }
+
+    inline function setScheduledStopFrame(v: Int64): Int64 {
+        return lock.locked(() -> scheduledStopFrame = v);
     }
 
     inline function getLoop(): Bool {

@@ -9,12 +9,13 @@ typedef AudioScheduledSourceNode = js.html.audio.AudioScheduledSourceNode;
 @:allow(audio.native.AudioContext)
 class AudioScheduledSourceNode extends AudioNode {
 
-    public inline function start() {
+    public function start(when: Float = 0.0) {
         this.nativeNode.setActive(true);
+        this.nativeNode.setScheduledStartFrame(cast this.context.sampleRate * when);
     }
 
-    public inline function stop() {
-        this.nativeNode.setActive(false);
+    public function stop(when: Float = 0.0) {
+        this.nativeNode.setScheduledStopFrame(cast this.context.sampleRate * when);
     }
 
 }
