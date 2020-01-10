@@ -329,6 +329,15 @@ ma_uint32 Audio_mixSources(AudioNodeList* sourceList, ma_uint32 channelCount, ma
                 ma_uint32 chunkOffset = totalFramesRead * channelCount;
                 ma_uint32 startOffset = localStartFrame * channelCount;
 
+                #ifdef HXCPP_DEBUG
+                // validate we don't overflow
+                ma_uint32 sampleEnd = (chunkOffset + startOffset + sampleCount);
+                ma_uint32 sampleLimit = (frameCount * channelCount);
+                if (sampleEnd > sampleLimit) {
+                    printf("Error: Overflowing mixBuffer, %d > %d\n", sampleEnd, sampleLimit);
+                }
+                #endif
+
                 float* mixBuffer = pOutput + chunkOffset + startOffset;
 
                 // with compiler optimizations enabled, this should vectorize
