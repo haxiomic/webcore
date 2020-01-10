@@ -5,6 +5,7 @@ package audio;
 typedef AudioNode = js.html.audio.AudioNode;
 typedef AudioScheduledSourceNode = js.html.audio.AudioScheduledSourceNode;
 typedef AudioBufferSourceNode = js.html.audio.AudioBufferSourceNode;
+typedef GainNode = js.html.audio.GainNode;
 
 #else
 
@@ -136,7 +137,7 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
 
 }
 
-private typedef PcmTransformFunction<T> = Callable<(data: Star<T>, nChannels: UInt32, frameCount: UInt32, schedulingCurrentFrameBlock: UInt64, interleavedPcmSamples: RawPointer<Float32>) -> Void>;
+private typedef PcmTransformFunction<T> = Callable<(data: Star<T>, nChannels: UInt32, frameCount: UInt32, schedulingCurrentFrameBlock: Int64, interleavedPcmSamples: RawPointer<Float32>) -> Void>;
 
 @:access(audio.AudioContext)
 private class PcmTransform {
@@ -145,7 +146,7 @@ private class PcmTransform {
         This is called from the unmanaged audio thread. It's critical that no haxe-allocation or haxe vm interaction occurs here
         @! maybe move this and PcmTransformData to C
     **/
-    @:noDebug static public function readFramesCallback<T>(source: Star<NativeAudioSource>, nChannels: UInt32, frameCount: UInt64, schedulingCurrentFrameBlock: UInt64, interleavedSamples: Star<Float32>): UInt64 {
+    @:noDebug static public function readFramesCallback<T>(source: Star<NativeAudioSource>, nChannels: UInt32, frameCount: UInt64, schedulingCurrentFrameBlock: Int64, interleavedSamples: Star<Float32>): UInt64 {
         var readFramesData: Star<PcmTransformData<T>> = cast source.getUserData();
         var framesRead = AudioContext.mixSources(readFramesData.nativeSourceList, nChannels, frameCount, schedulingCurrentFrameBlock, interleavedSamples);
         // apply user transform to frames read
@@ -205,7 +206,7 @@ class GainNode extends PcmTransformNode<Float> {
         super(context, Function.fromStaticFunction(applyGain), gainValue);
     }
 
-    @:noDebug static function applyGain(gainStar: Star<Float>, nChannels: UInt32, frameCount: UInt32, schedulingCurrentFrameBlock: UInt64, interleavedPcmSamples: RawPointer<Float32>) {
+    @:noDebug static function applyGain(gainStar: Star<Float>, nChannels: UInt32, frameCount: UInt32, schedulingCurrentFrameBlock: Int64, interleavedPcmSamples: RawPointer<Float32>) {
         var gain: Float = Native.star(gainStar);
         // we use inline C++ here because a for-loop will vectorize better than hxcpp's while-loop
         untyped __cpp__('

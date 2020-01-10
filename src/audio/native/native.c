@@ -142,7 +142,7 @@ int AudioSourceList_sourceCount(AudioSourceList* audioSourceList) {
 /**
  * Sample rate and channels must be the same for the all decoders in sourceList and output
  */
-ma_uint32 Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_uint32 frameCount, ma_uint64 schedulingCurrentFrameBlock, float* pOutput) {
+ma_uint32 Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_uint32 frameCount, ma_int64 schedulingCurrentFrameBlock, float* pOutput) {
     if (sourceList == NULL) {
         return 0;
     }

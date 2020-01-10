@@ -3,7 +3,7 @@ package audio.native;
 import cpp.*;
 import audio.native.AudioDecoder;
 
-typedef ReadFramesCallback = Callable<(source: Star<NativeAudioSource>, nChannels: UInt32, frameCount: UInt64, schedulingCurrentFrameBlock: UInt64, interleavedSamples: Star<Float32>) -> UInt64>;
+typedef ReadFramesCallback = Callable<(source: Star<NativeAudioSource>, nChannels: UInt32, frameCount: UInt64, schedulingCurrentFrameBlock: Int64, interleavedSamples: Star<Float32>) -> UInt64>;
 
 @:include('./native.h')
 @:sourceFile(#if winrt './native.c' #else './native.m' #end)

@@ -11,8 +11,7 @@ import cpp.*;
 import audio.native.AudioDecoder;
 import audio.native.NativeAudioSource.NativeAudioSourceList;
 import audio.native.MiniAudio;
-import audio.native.MiniAudio.Device;
-import audio.native.MiniAudio.DeviceConfig;
+import audio.native.LockedValue;
 
 @:include('./native.h')
 @:sourceFile(#if winrt './native.c' #else './native.m' #end)
@@ -21,9 +20,12 @@ import audio.native.MiniAudio.DeviceConfig;
 class AudioContext {
 
     public final destination: AudioNode;
+    public var currentTime (get, null): Float;
+    public var sampleRate (get, null): Float;
     public var state (get, null): AudioContextState;
 
     final maDevice: Star<Device>;
+    final userData: DeviceUserData;
     var _state: AudioContextState = SUSPENDED;
 
     public function new(?options: {
@@ -41,7 +43,11 @@ class AudioContext {
         var deviceConfig = DeviceConfig.init(PLAYBACK);
         deviceConfig.sampleRate = options.sampleRate != null ? options.sampleRate : 0;
         deviceConfig.playback.format = F32;
-        deviceConfig.performanceProfile = options.latencyHint != "interactive" ? CONSERVATIVE : LOW_LATENCY;
+        deviceConfig.performanceProfile = switch options.latencyHint {
+            case null, INTERACTIVE: LOW_LATENCY;
+            case PLAYBACK, BALANCED: CONSERVATIVE; 
+            
+        };
         deviceConfig.dataCallback = Function.fromStaticFunction(audioThread_deviceDataCallbackMixSources);
 
         // initialize device
@@ -52,7 +58,9 @@ class AudioContext {
 
         destination = new AudioNode(this);
 
-        maDevice.pUserData = cast destination.nativeSourceList;
+        userData = new DeviceUserData(this, Pointer.fromStar(destination.nativeSourceList));
+
+        maDevice.pUserData = cast Native.addressOf(userData);
 
         cpp.vm.Gc.setFinalizer(this, Function.fromStaticFunction(finalizer));
 
@@ -130,8 +138,17 @@ class AudioContext {
         }
     }
 
-    function get_state() {
+    inline function get_state() {
         return this._state;
+    }
+
+    inline function get_currentTime() {
+        var schedulingCurrentFrameBlock = userData.schedulingCurrentFrameBlock.get();
+        return schedulingCurrentFrameBlock / sampleRate;
+    }
+
+    inline function get_sampleRate() {
+        return this.maDevice.sampleRate;
     }
 
     static var gcReference = new List<AudioContext>();
@@ -139,17 +156,21 @@ class AudioContext {
     /**
         Device data callback to mix its source list (stored in user data) to the output buffer
         *You should not perform any haxe allocation here as it is executed on the unmanaged audio thread*
-        The `@:noDebug` meta here is critical to prevent hxcpp's thread-unsafe tracking stack information
+        The `@:noDebug` meta here is critical to prevent generation of hxcpp's thread-unsafe stack tracking code 
     **/
     @:noDebug
     static function audioThread_deviceDataCallbackMixSources(maDevice: Star<Device>, output: Star<cpp.Void>, input: ConstStar<cpp.Void>, frameCount: UInt32) {
-        var audioSourceList: Star<NativeAudioSourceList> = cast maDevice.pUserData;
-        var schedulingCurrentFrameBlock: UInt64 = 0;
-        mixSources(audioSourceList, maDevice.playback.channels, frameCount, schedulingCurrentFrameBlock, cast output);
+        var userData: DeviceUserData = (cast maDevice.pUserData: Star<DeviceUserData>);
+        var schedulingCurrentFrameBlock: Int64 = userData.schedulingCurrentFrameBlock.get();
+
+        mixSources(userData.nativeSourceList, maDevice.playback.channels, frameCount, schedulingCurrentFrameBlock, cast output);
+
+        schedulingCurrentFrameBlock += (cast frameCount: Int64);
+        userData.schedulingCurrentFrameBlock.set(schedulingCurrentFrameBlock);
     }
 
     @:noDebug
-    static inline function mixSources(sources: Star<NativeAudioSourceList>, nChannels: UInt32, frameCount: UInt32, schedulingCurrentFrameBlock: UInt64, output: Star<Float32>): UInt32 {
+    static inline function mixSources(sources: Star<NativeAudioSourceList>, nChannels: UInt32, frameCount: UInt32, schedulingCurrentFrameBlock: Int64, output: Star<Float32>): UInt32 {
         return untyped __global__.Audio_mixSources(sources, nChannels, frameCount, schedulingCurrentFrameBlock, output);
     }
 
@@ -161,6 +182,18 @@ class AudioContext {
         instance.maDevice.uninit();
         instance.maDevice.free();
         // @! should uninit context too
+    }
+
+}
+
+class DeviceUserData {
+
+    public final nativeSourceList: Star<NativeAudioSourceList>;
+    public final schedulingCurrentFrameBlock: audio.native.LockedValue<Int64>;
+
+    public function new(context: AudioContext, nativeSourceList: Pointer<NativeAudioSourceList>) {
+        this.nativeSourceList = nativeSourceList.ptr;
+        this.schedulingCurrentFrameBlock = new LockedValue(context);
     }
 
 }

@@ -55,7 +55,7 @@ ma_result AudioDecoder_seekToPcmFrame(AudioDecoder* decoder, ma_uint64 frameInde
 
 typedef struct AudioSource AudioSource;
 
-typedef ma_uint64 (* AudioSource_ReadFramesCallback) (AudioSource* audioSource, ma_uint32 nChannels, ma_uint64 frameCount, ma_uint64 schedulingCurrentFrameBlock, float* buffer);
+typedef ma_uint64 (* AudioSource_ReadFramesCallback) (AudioSource* audioSource, ma_uint32 nChannels, ma_uint64 frameCount, ma_int64 schedulingCurrentFrameBlock, float* buffer);
 
 struct AudioSource {
     AudioSource_ReadFramesCallback readFramesCallback; // allowed to be  NULL, when not null, this takes priority over reading from the decoder
@@ -107,7 +107,7 @@ int       AudioSourceList_sourceCount(AudioSourceList* list);
  * The sourceList must have decoders with output format Float32 channelCount that matches the output buffer channel count
  * If channel count and format mismatches are detected mixing will be skipped for that decoder
  */
-ma_uint32 Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_uint32 frameCount, ma_uint64 schedulingCurrentFrameBlock, float* pOutput);
+ma_uint32 Audio_mixSources(AudioSourceList* sourceList, ma_uint32 channelCount, ma_uint32 frameCount, ma_int64 schedulingCurrentFrameBlock, float* pOutput);
 
 #ifdef __cplusplus
 }
