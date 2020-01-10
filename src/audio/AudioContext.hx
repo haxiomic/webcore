@@ -123,19 +123,23 @@ class AudioContext {
     }
 
     public function decodeAudioData(audioFileBytes: haxe.io.BytesData, ?successCallback: AudioBuffer -> Void, ?errorCallback: String -> Void): Void {
-        try {
-            // decode file into raw pcm frame bytes
-            var tmpDecoder = new FileBytesDecoder(this, haxe.io.Bytes.ofData(audioFileBytes), false);
-            var bytes = tmpDecoder.getInterleavedPcmFrames(0);
-            var audioBuffer = new AudioBuffer(bytes, tmpDecoder);
-            if (successCallback != null) {
-                successCallback(audioBuffer);
+        var copiedBytes = audioFileBytes.copy(); // we must copy because these bytes are read from another thread
+        
+        sys.thread.Thread.create(() -> {
+            try {
+                // decode file into raw pcm frame bytes
+                var tmpDecoder = new FileBytesDecoder(this, haxe.io.Bytes.ofData(copiedBytes), false);
+                var bytes = tmpDecoder.getInterleavedPcmFrames(0);
+                var audioBuffer = new AudioBuffer(bytes, tmpDecoder);
+                if (successCallback != null) {
+                    haxe.MainLoop.runInMainThread(() -> successCallback(audioBuffer));
+                }
+            } catch (e: String) {
+                if (errorCallback != null) {
+                    haxe.MainLoop.runInMainThread(() -> errorCallback(e));
+                }
             }
-        } catch (e: String) {
-            if (errorCallback != null) {
-                errorCallback(e);
-            }
-        }
+        });
     }
 
     inline function get_state() {
@@ -181,7 +185,7 @@ class AudioContext {
         
         instance.maDevice.uninit();
         instance.maDevice.free();
-        // @! should uninit context too
+        // @! should maybe uninit context too
     }
 
 }
