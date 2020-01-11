@@ -8,6 +8,7 @@ import audio.native.AudioDecoder;
 /**
     Audio sprite to enable playback of audio files, specified either by their file path or as bytes
 **/
+/*
 @:access(audio.AudioNode)
 class AudioSprite {
 
@@ -134,3 +135,4 @@ class AudioSprite {
     }
 
 }
+*/
