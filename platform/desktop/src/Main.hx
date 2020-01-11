@@ -14,6 +14,10 @@ class Main {
     static var mainLoopHandle: MainEvent;
     static var minimalGL: MinimalGL;
 
+    /**
+        @! Because this blocks while waiting for GLFW events, it synchronizes the haxe event loop with the framerate
+        We should decouple these before deploying in a real-world product
+    **/
     static function main() {
         glfwSetErrorCallback(onGLFWError);
 
