@@ -1,3 +1,21 @@
+! Main loop does not occur on iOS and Android !
+    - It's because there is no `main()` and 
+        "If `haxe.MainLoop` is kept from DCE, then we will insert an `haxe.EntryPoint.run()` call just at then end of `main()`.
+        This class can be redefined by custom frameworks so they can handle their own main loop logic."
+! Ensure initialization thread is the same as drawFrame thread on iOS and Android !
+! To solve the connection gc issue, maybe we don't make the connection two-way until start() occurs !
+That is
+{
+    var node = audioContext.createNode();
+    node.connect(audioContext.destination) // only store connected destination in node, not in destination
+    // node.start(), now a two-way link is created
+    node = null;
+    // node should get collected if used or not
+}
+
+- [ ] iOS event loop
+- [ ] Android event loop
+
 - Implement AudioParam and GainNode value
 - Review calling finalizers if throw when contructing
 - [ ] Fix iOS web

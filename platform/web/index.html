@@ -62,13 +62,13 @@
 			canvas.addEventListener('webglcontextlost', function() { window.location.reload() } );
 			canvas.addEventListener('webglcontextrestored', function() { console.log('webglcontextrestored') });
 
-			// initialize our minimal-gl example, supplying it with the OpenGL context
-			let haxeApp = new MinimalGL(gl);
+			// initialize our haxe example, supplying it with the OpenGL context
+			HaxeNativeBridge.onNativeGraphicsContextReady(gl);
 
 			// native browser frame-loop
 			function frameLoop(t_ms) {
 				// tell app to draw a frame 
-				haxeApp.drawFrame();
+				HaxeNativeBridge.onDrawFrame();
 
 				window.requestAnimationFrame(frameLoop);
 			}

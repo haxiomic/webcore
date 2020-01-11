@@ -1,3 +1,14 @@
---cwd platform/desktop
+-main Main
 
-build.hxml
+-debug
+
+--class-path lib
+--class-path src
+
+--library hxcpp:4.0.52
+--cpp _hxcpp-bin
+
+-dce full
+
+# --cwd platform/desktop
+# build.hxml

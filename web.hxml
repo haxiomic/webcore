@@ -1,8 +1,8 @@
-# Build app without an entrypoint
-MinimalGL
--js platform/web/app.js
+-main Main
 
 --class-path lib
 --class-path src
+
+-js platform/web/app.js
 
 -dce full
