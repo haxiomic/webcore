@@ -1,6 +1,3 @@
-[submodule "lib/gluon"]
-	path = lib/gluon
-	url = https://github.com/haxiomic/gluon
 [submodule "platform/desktop/lib/glfw"]
 	path = platform/desktop/lib/glfw
 	url = https://github.com/haxiomic/linc_glfw
