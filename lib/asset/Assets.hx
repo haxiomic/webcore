@@ -16,6 +16,17 @@ package asset;
 **/
 @:autoBuild(asset.Assets.Macro.build())
 class Assets {
+    
+    /**
+        Read bytes from platform's native file store
+
+        **Implementations**
+        - iOS: read file from mainBundle
+        - Android: read file from APK assets using the AssetManager
+        - Desktop: read file relative to executable
+        - Web: read file relative to current page path
+    **/
+    public function readFile(path: String, onComplete: (haxe.io.Bytes) -> Void, onError: (String) -> Void) {}
 
 }
 
