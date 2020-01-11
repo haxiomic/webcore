@@ -2,19 +2,19 @@ package asset;
 
 
 #if !macro
-import haxe.io.Bytes;
 
 /**
-    Assets Macro Class
+    # Assets Macro Class
+
+    Extend this class to use metadata
 
     **Supported metadata**
     - `@embedFile(path: String, ?variableName: String)`    embeds a single file into the output
 
-    Paths are relative to this class's file
+    **Paths are relative to the class used**
     
 **/
-@:build(asset.Assets.Macro.build())
-@embedFile('../../assets/my-triangle.mp3')
+@:autoBuild(asset.Assets.Macro.build())
 class Assets {
 
 }
@@ -33,8 +33,8 @@ class Macro {
         var classDir = Path.directory(classFilePath);
         var fields = Context.getBuildFields();
         var metas = localClass.meta;
-        
-        // single file embeds
+
+        // metadata to embed a single file
         var embedMetas = metas.extract('embedFile');
 
         var incbinLines = new Array<String>();
@@ -54,53 +54,25 @@ class Macro {
                         }
                     );
 
-                    switch Context.getDefines().get('target.name') {
-                        case 'cpp':
-                            // add INCBIN() file embed directive
-                            // using INCBIN is faster than generating a haxe file with a byte string but that would work too
-                            incbinLines.push('INCBIN($variableName, "$absPath");');
-                            var dataIdent = 'g${variableName}Data'; // const unsigned char
-                            var endIdent = 'g${variableName}End'; // const unsigned char - a marker to the end, take the address to get the ending pointer
-                            var sizeIdent = 'g${variableName}Size'; // const unsigned int
-                            var initializeVariableName = '__initialize_$variableName';
-
-                            // wrap raw bytes in a haxe Bytes object
-                            var newFields = (macro class X {
-
-                                static public final $variableName: haxe.io.Bytes = $i{initializeVariableName}();
-                                static private inline function $initializeVariableName() {
-                                    var bytesData = new haxe.io.BytesData();
-                                    cpp.NativeArray.setUnmanagedData(bytesData, cpp.ConstPointer.fromStar(untyped __global__.$dataIdent), untyped __global__.$sizeIdent);
-                                    return haxe.io.Bytes.ofData(bytesData);
-                                }
-
-                            }).fields;
-
-                            fields = fields.concat(newFields);
-
-                        case 'js':
-                            var bytes = sys.io.File.getBytes(absPath);
-                            var base64 = haxe.crypto.Base64.encode(bytes);
-
-                            var newFields = (macro class X {
-
-                                static public final $variableName: haxe.io.Bytes = haxe.crypto.Base64.decode($v{base64});
-
-                            }).fields;
-
-                            fields = fields.concat(newFields);
-
-                        case null, _:
+                    var resourceId = path;
+                    var fileBytes = try sys.io.File.getBytes(absPath) catch (e: Any) {
+                        Context.fatalError('Failed to embed file: $e', pos);
                     }
+
+                    // embed bytes using the haxe resource system
+                    Context.addResource(resourceId, fileBytes);
+
+                    var newFields = (macro class X {
+
+                        static public final $variableName: haxe.io.Bytes = haxe.Resource.getBytes($v{resourceId});
+
+                    }).fields;
+
+                    fields = fields.concat(newFields);
 
                 case null, _:
                     Context.error('@embedFile requires a file path string as an argument', embedMeta.pos);
             }
-        }
-
-        if (incbinLines.length > 0) {
-            var str = '#include "${Path.join([classDir, 'incbin.h'])}"' + '\n' + incbinLines.join('\n');
-            localClass.meta.add(':cppFileCode', [macro $v{str} ], localClass.pos);
         }
 
         return fields;
