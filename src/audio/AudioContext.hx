@@ -124,7 +124,6 @@ class AudioContext {
 
     public function decodeAudioData(audioFileBytes: haxe.io.BytesData, ?successCallback: AudioBuffer -> Void, ?errorCallback: String -> Void): Void {
         var copiedBytes = audioFileBytes.copy(); // we must copy because these bytes are read from another thread
-        
         sys.thread.Thread.create(() -> {
             try {
                 // decode file into raw pcm frame bytes
@@ -132,11 +131,11 @@ class AudioContext {
                 var bytes = tmpDecoder.getInterleavedPcmFrames(0);
                 var audioBuffer = new AudioBuffer(bytes, tmpDecoder);
                 if (successCallback != null) {
-                    haxe.MainLoop.runInMainThread(() -> successCallback(audioBuffer));
+                    haxe.EntryPoint.runInMainThread(() -> successCallback(audioBuffer));
                 }
             } catch (e: String) {
                 if (errorCallback != null) {
-                    haxe.MainLoop.runInMainThread(() -> errorCallback(e));
+                    haxe.EntryPoint.runInMainThread(() -> errorCallback(e));
                 }
             }
         });
