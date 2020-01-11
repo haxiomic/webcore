@@ -638,7 +638,7 @@ extern class Mutex {
 
     inline function locked<T>(callback: () -> T): T {
         // disable the GC while we're locked; this is so that if the native audio thread needs to acquire this lock it's not waiting on a GC pause (which could cause a audio stutter if long enough)
-        // cpp.vm.Gc.enable(false);
+        // cpp.vm.Gc.enable(false); // this is commented out because I'm not convinced it's thread safe enough to call this (although it's just flipping a bool)
         this.lock();
         var returnVal = callback();
         this.unlock();
