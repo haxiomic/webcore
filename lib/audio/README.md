@@ -6,3 +6,6 @@
 
 ### iOS
 - Link with AVFoundation and AudioToolbox when building your app
+
+### Android
+- Link with OpenSLES
