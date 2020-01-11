@@ -2,7 +2,7 @@
 MinimalGL
 -js platform/web/app.js
 
+--class-path lib
 --class-path src
---class-path lib/gluon
 
 -dce full

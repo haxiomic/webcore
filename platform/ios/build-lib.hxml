@@ -9,8 +9,8 @@ NativeApi
 
 -cpp _hxcpp-bin
 
+--class-path ../../lib
 --class-path ../../src
---class-path ../../lib/gluon
 
 --library hxcpp:4.0.52
 

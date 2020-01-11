@@ -15,8 +15,8 @@ NativeApi
 -cpp _hxcpp-bin
 -D android
 
+--class-path ../../lib
 --class-path ../../src
---class-path ../../lib/gluon
 
 --library hxcpp:4.0.52
 

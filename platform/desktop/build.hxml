@@ -1,7 +1,7 @@
 --library hxcpp:4.0.52
 
 # MinimalGL source
---class-path ../../lib/gluon
+--class-path ../../lib
 --class-path ../../src
 
 --class-path lib/glfw
