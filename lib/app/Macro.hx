@@ -5,6 +5,7 @@ import haxe.macro.Context;
 import haxe.macro.TypeTools;
 import haxe.macro.Expr.TypePath;
 import haxe.macro.ComplexTypeTools;
+import haxe.io.Path;
 using Lambda;
 
 class Macro {
@@ -22,9 +23,9 @@ class Macro {
             sub: localClass.name,
         }
 
-        var initExpr = macro app.HaxeNativeBridge.setCreateAppCallback(() -> new $localTypePath());
+        var initExpr = macro @:privateAccess app.HaxeNativeBridge.createAppCallback = () -> new $localTypePath();
 
-        // add __init__ function if we don't have one already
+        // add initExpr to __init__
         var initField = fields.find(f -> f.name == '__init__');
 
         if (initField != null) {
@@ -51,11 +52,28 @@ class Macro {
         return fields;
     }
 
-    static function generateC() {
-        var localClass = Context.getLocalClass();
-        var fields = Context.getBuildFields();
-        // trace(fields);
-        return fields;
+    /**
+        Adds :buildXml metadata that copies native interface code into the hxcpp output directory
+    **/
+    static function addNativeCode(headerFilePath: String, implementationFilePath: String) {
+        var classPosInfo = Context.getPosInfos(Context.currentPos());
+        var classFilePath = Path.isAbsolute(classPosInfo.file) ? classPosInfo.file : Path.join([Sys.getCwd(), classPosInfo.file]);
+        var classDir = Path.directory(classFilePath);
+
+        var buildXml = '
+            <copy from="$classDir/$headerFilePath" to="include" />
+
+            <files id="haxe">
+                <file name="$classDir/$implementationFilePath">
+                    <depend name="$classDir/$headerFilePath"/>
+                </file>
+            </files>
+        ';
+
+        // add @:buildXml
+        Context.getLocalClass().get().meta.add(':buildXml', [macro $v{buildXml}], Context.currentPos());
+
+        return Context.getBuildFields();
     }
 
 }
