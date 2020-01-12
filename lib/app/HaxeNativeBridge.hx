@@ -2,21 +2,13 @@ package app;
 
 import gluon.es2.GLContext;
 
-typedef EventHandler = {
-    @:optional function onNativeGraphicsContextReady(gl: GLContext): Void;
-    @:optional function onDrawFrame(): Void;
-}
 
 class HaxeNativeBridge {
 
-    static var eventHandlers = new Array<EventHandler>();
+    static var createAppCallback: Null<() -> App> = null;
 
-    static public function addEventHandler(handler: EventHandler) {
-        eventHandlers.push(handler);
-    }
-
-    static public function removeEventHandler(handler: EventHandler) {
-        return eventHandlers.remove(handler);
+    public static function setCreateAppCallback(cb: () -> App) {
+        createAppCallback = cb;
     }
 
 }
@@ -32,22 +24,7 @@ class HaxeNativeBridge {
 @:expose // js
 @:native('HaxeNativeBridge')
 @:access(app.HaxeNativeBridge)
-@:keep
 class HaxeNativeBridgeImpl {
-
-    // Events
-
-    static public function onNativeGraphicsContextReady(gl: GLContext) {
-        for (handler in HaxeNativeBridge.eventHandlers) {
-            if (handler.onNativeGraphicsContextReady != null) handler.onNativeGraphicsContextReady(gl);
-        }
-    }
-
-    static public function onDrawFrame() {
-        for (handler in HaxeNativeBridge.eventHandlers) {
-            if (handler.onDrawFrame != null) handler.onDrawFrame();
-        }
-    }
 
     /**
         Initialize hxcpp, call `main()` and block until event queue is empty (or return if no `main()` is defined)
@@ -68,5 +45,13 @@ class HaxeNativeBridgeImpl {
         return haxe.EntryPoint.processEvents();
     }
     #end
+
+    static public function createAppInstance(): App {
+        if (HaxeNativeBridge.createAppCallback != null) {
+            return HaxeNativeBridge.createAppCallback();
+        } else {
+            throw 'App instance not defined; be sure to initialize hxcpp and implement the App class';
+        }
+    }
 
 }
