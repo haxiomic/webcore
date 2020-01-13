@@ -13,10 +13,11 @@ extern "C" {
 
     const char*         HaxeMainApp_haxeInitializeAndRun();
     AppInterfaceHandle* HaxeMainApp_createInstance();
+    void                HaxeMainApp_releaseInstance(AppInterfaceHandle* appHandle);
 
-    void AppInterface_onGraphicsContextReady(AppInterfaceHandle* app);
-    void AppInterface_onGraphicsContextLost(AppInterfaceHandle* app);
-    void AppInterface_onDrawFrame(AppInterfaceHandle* app);
+    void AppInterface_onGraphicsContextReady(AppInterfaceHandle* appHandle);
+    void AppInterface_onGraphicsContextLost(AppInterfaceHandle* appHandle);
+    void AppInterface_onDrawFrame(AppInterfaceHandle* appHandle);
 
 #ifdef __cplusplus
 }

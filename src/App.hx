@@ -57,7 +57,7 @@ class App implements app.AppInterface {
 		trace('Graphics context lost');
 	}
 
-	public function onDrawFrame(gl: GLContext) {
+	public function onDrawFrame() {
 		var t_s = haxe.Timer.stamp();
 
 		// execute commands on the OpenGL context

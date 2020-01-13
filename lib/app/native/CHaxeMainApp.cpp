@@ -11,24 +11,43 @@
 
 #include "CHaxeMainApp.h"
 
+#include <app/AppInterface.h>
+#include <gluon/webgl/native/GLContext.h>
+
+struct AppHandle {
+    hx::Ref<app::AppInterface*> haxeRef;
+    AppHandle(hx::Native<app::AppInterface*> app) {
+        haxeRef = app;
+    }
+    ~AppHandle() {
+        haxeRef = 0;
+    }
+};
+
 const char* HaxeMainApp_haxeInitializeAndRun() {
     return HaxeMainApp::haxeInitializeAndRun();
 }
 
 AppInterfaceHandle* HaxeMainApp_createInstance() {
-    return HaxeMainApp::createInstance();
+    hx::Native<app::AppInterface*> app = HaxeMainApp::createInstance();
+    return new AppHandle(app);
 }
 
-void AppInterface_onGraphicsContextReady(AppInterfaceHandle* app) {
-    // HX_JUST_GC_STACKFRAME
-    // hx::ObjectPtr< ::gluon::es2::impl::ES2Context_obj > gl = ::gluon::es2::impl::ES2Context_obj::__alloc( HX_CTX );
-
-    // ((hx::Native< app::AppInterface* >)app)-> onNativeGraphicsContextReady(gl);  
+void HaxeMainApp_releaseInstance(AppHandle* appHandle) {
+    delete appHandle;
 }
 
-void AppInterface_onGraphicsContextLost(AppInterfaceHandle* app) {
+void AppInterface_onGraphicsContextReady(AppHandle* appHandle) {
+    HX_JUST_GC_STACKFRAME
+    // create an gl context wrapper (the real context must already be created)
+    gluon::webgl::native::GLContext gl = gluon::webgl::native::GLContext_obj::__alloc(HX_CTX);
+    appHandle->haxeRef->onGraphicsContextReady(gl);
 }
 
-void AppInterface_onDrawFrame(AppInterfaceHandle* app) {
+void AppInterface_onGraphicsContextLost(AppHandle* appHandle) {
+    appHandle->haxeRef->onGraphicsContextLost();
+}
 
+void AppInterface_onDrawFrame(AppHandle* appHandle) {
+    appHandle->haxeRef->onDrawFrame();
 }

@@ -15,6 +15,6 @@ interface AppInterface {
 
     function onGraphicsContextReady(gl: GLContext): Void;
     function onGraphicsContextLost(): Void;
-    function onDrawFrame(gl: GLContext): Void;
+    function onDrawFrame(): Void;
 
 }
