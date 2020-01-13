@@ -8,7 +8,9 @@ import gluon.es2.GLContext;
 **/
 @:nativeGen
 @:keep
+#if !display
 @:autoBuild(app.Macro.makeMainApp())
+#end
 interface AppInterface {
 
     function onGraphicsContextReady(gl: GLContext): Void;
