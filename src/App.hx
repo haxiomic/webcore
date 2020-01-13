@@ -1,9 +1,17 @@
-import gluon.es2.GLBuffer;
-import gluon.es2.GLProgram;
-import gluon.es2.GLShader;
-import gluon.es2.GLContext;
+import gluon.webgl.GLBuffer;
+import gluon.webgl.GLProgram;
+import gluon.webgl.GLShader;
+import gluon.webgl.GLContext;
 import typedarray.Float32Array;
 
+#if debug
+@:buildXml('
+<target id="haxe">
+	<flag value="-fsanitize=address" />
+	<flag value="-fno-omit-frame-pointer" />
+</target>
+')
+#end
 class App implements app.AppInterface {
 
 	var gl: GLContext;
@@ -27,7 +35,7 @@ class App implements app.AppInterface {
 			linkProgram(vertexShader, fragmentShader);
 		} catch (e: String) {
 			trace(e);
-			NONE;
+			null;
 		}
 
 		// create triangle buffer
