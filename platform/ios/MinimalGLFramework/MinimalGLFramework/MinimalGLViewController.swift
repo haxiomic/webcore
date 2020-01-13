@@ -17,10 +17,17 @@ public class MinimalGLViewController: GLKViewController {
     public var context: EAGLContext?
     
     deinit {
-        tearDownGL()
+        releaseGraphicsContext()
+
+        //@! todo: free minimalGL
+    }
+
+    override public func viewDidLoad() {
+        super.viewDidLoad()
+        initializeGraphicsContext()
     }
     
-    private func setupGL() {
+    private func initializeGraphicsContext() {
         // Create an OpenGL ES context and store it in our local variable.
         context = EAGLContext(api: .openGLES3)
         
@@ -38,7 +45,7 @@ public class MinimalGLViewController: GLKViewController {
     
     
     /// Perform cleanup, and delete buffers and memory.
-    private func tearDownGL() {
+    private func releaseGraphicsContext() {
         // Set the current EAGLContext to our context. This ensures we are deleting buffers against it and potentially not a
         // different context.
         EAGLContext.setCurrent(context)
@@ -61,9 +68,5 @@ public class MinimalGLViewController: GLKViewController {
         
         minimalGL!.drawFrame()
     }
-    
-    override public func viewDidLoad() {
-        super.viewDidLoad()
-        setupGL()
-    }
+
 }
