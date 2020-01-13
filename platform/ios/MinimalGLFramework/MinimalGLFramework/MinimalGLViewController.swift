@@ -18,8 +18,6 @@ public class MinimalGLViewController: GLKViewController {
     
     deinit {
         releaseGraphicsContext()
-
-        //@! todo: free minimalGL
     }
 
     override public func viewDidLoad() {
