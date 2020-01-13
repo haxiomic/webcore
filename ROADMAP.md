@@ -11,7 +11,7 @@
     => Users then do `-cmd _hxcpp-bin/generate-lib.sh`
 
     => A compiler macro could be used to make this easy, so adding something like
-        `--macro Tool.generateFramework('com.example.MyFrameworkName')`
+        `--macro Tool.generateIOSFramework('com.example.MyFrameworkName')`
         This might also add `-D HAXE_OUTPUT_PART=MinimalGL` and
             ```
             --each
@@ -23,14 +23,18 @@
             ```
         Ideally this generate the native platform glue code – C-API and Swift/Java/JNI
 
+- [ ] Switch to dynamic libraries so we can link with system libraries during haxe compile (and not platform compile)
+    - [ ] Link with AVFoundation and AudioToolbox when building lib for iOS and OpenSLES for Android
+
+- Move gluon to HaxeNativeWeb.webgl
+- Move audio to HaxeNativeWeb.webaudio
+- Maybe move asset too?
+
+- [ ] iOS event loop via GCD `dispatch_after`
+- [ ] Android event loop
 
 
-! Main loop does not occur on iOS and Android !
-    - It's because there is no `main()` and 
-        "If `haxe.MainLoop` is kept from DCE, then we will insert an `haxe.EntryPoint.run()` call just at then end of `main()`.
-        This class can be redefined by custom frameworks so they can handle their own main loop logic."
-! Ensure initialization thread is the same as drawFrame thread on iOS and Android !
-! To solve the connection gc issue, maybe we don't make the connection two-way until start() occurs !
+- AudioNode GC improvement: don't make the connection two-way until start() occurs
 That is
 {
     var node = audioContext.createNode();
@@ -39,9 +43,6 @@ That is
     node = null;
     // node should get collected if used or not
 }
-
-- [ ] iOS event loop
-- [ ] Android event loop
 
 - Implement AudioParam and GainNode value
 - Review calling finalizers if throw when contructing
@@ -62,8 +63,3 @@ That is
     - [ ] Android settings
     - [ ] Desktop to file? Or Windows/mac settings?
 - [ ] Less boilerplate per platform -> code generation
-
-- [ ] Switch to dynamic libraries so we can link with system libraries during haxe compile (and not platform compile)
-    - [ ] Link with AVFoundation and AudioToolbox when building lib for iOS and OpenSLES for Android
-- [ ] Can we include the JNI code inside the main codebase so it's not compiled separately with Android?
-- [ ] Explicit path resolution in Assets.hx
