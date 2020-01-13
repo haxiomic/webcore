@@ -11,7 +11,7 @@ using Lambda;
 class Macro {
 
     /**
-        Adds sets `HaxeNativeBridge.createMainApp` in the class' __init__ method
+        Adds sets `MainAppInterface.Static.createMainApp` in the class' __init__ method
     **/
     static function makeMainApp() {
         var localClass = Context.getLocalClass().get();
@@ -25,7 +25,7 @@ class Macro {
             sub: localClass.name,
         }
 
-        var initExpr = macro @:privateAccess app.AppInterface.Static.createMainApp = () -> new $localTypePath();
+        var initExpr = macro @:privateAccess app.MainAppInterface.Static.createMainApp = () -> new $localTypePath();
 
         // add initExpr to __init__
         var initField = fields.find(f -> f.name == '__init__');

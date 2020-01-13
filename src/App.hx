@@ -4,7 +4,7 @@ import gluon.es2.GLShader;
 import gluon.es2.GLContext;
 import typedarray.Float32Array;
 
-class App implements app.AppInterface {
+class App implements app.MainAppInterface {
 
 	var gl: GLContext;
 	var program: GLProgram;
@@ -17,7 +17,7 @@ class App implements app.AppInterface {
 		#end
 	}
 
-	public function onNativeGraphicsContextReady(gl: GLContext) {
+	public function onGraphicsContextReady(gl: GLContext) {
 		this.gl = gl;
 
 		// create programs
@@ -45,7 +45,7 @@ class App implements app.AppInterface {
 		gl.disable(CULL_FACE);
 	}
 
-	public function onNativeGraphicsContextLost() {
+	public function onGraphicsContextLost() {
 		trace('Graphics context lost');
 	}
 
@@ -134,7 +134,9 @@ class App implements app.AppInterface {
 
 	static function finalizer(instance: App) {
 		trace('[debug] App.finalizer()');
-		instance.releaseGraphicsResources();
+		if (instance.gl != null) {
+			instance.releaseGraphicsResources();
+		}
 	}
 
 }
