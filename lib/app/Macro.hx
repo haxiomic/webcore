@@ -25,7 +25,23 @@ class Macro {
             sub: localClass.name,
         }
 
-        var initExpr = macro @:privateAccess app.HaxeMainApp.Static.createMainApp = () -> new $localTypePath();
+        var isCpp = Context.getDefines().has('cpp');
+        
+        var initExpr = if (isCpp) {
+            // add static constructor function
+            fields = fields.concat((macro class X {
+                static function __construct__(): app.AppInterface {
+                    return new $localTypePath();
+                }
+            }).fields);
+            macro @:privateAccess {
+                app.HaxeMainApp.Static.createMainApp = cpp.Function.fromStaticFunction($i{localClass.module}.__construct__);
+            };
+        } else {
+            macro @:privateAccess {
+                app.HaxeMainApp.Static.createMainApp = () -> new $localTypePath();
+            };
+        }
 
         // add initExpr to __init__
         var initField = fields.find(f -> f.name == '__init__');

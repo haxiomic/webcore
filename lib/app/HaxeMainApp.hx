@@ -9,7 +9,7 @@ package app;
 @:keep
 class HaxeMainApp {
 
-    static public function createInstance(): #if cpp cpp.Star<AppInterface> #else AppInterface #end {
+    static public function createInstance(): AppInterface {
         return Static.createMainApp();
     }
 
@@ -39,8 +39,13 @@ class HaxeMainApp {
 @:allow(app.AppInterface)
 @:allow(app.HaxeMainApp)
 class Static {
-
+    
+    #if cpp
+    static var createMainApp: cpp.Callable<() -> AppInterface>;
+    #else
     static var createMainApp: () -> AppInterface;
+    #end
+
 
 }
 
