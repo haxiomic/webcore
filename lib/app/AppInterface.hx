@@ -1,6 +1,6 @@
 package app;
 
-import gluon.es2.GLContext;
+import gluon.webgl.GLContext;
 
 /**
     Implement this interface to set the main app class.
