@@ -11,7 +11,7 @@ using Lambda;
 class Macro {
 
     /**
-        Adds `HaxeNativeBridge.setCreateAppCallback` to __init__ method
+        Adds sets `HaxeNativeBridge.createAppCallback` in the class' __init__ method
     **/
     static function addAppInitialization() {
         var localClass = Context.getLocalClass().get();

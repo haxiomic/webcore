@@ -29,7 +29,7 @@ class HaxeNativeBridgeImpl {
     **/
     #if cpp
     @:noDebug static public function initializeAndRun(): cpp.ConstCharStar {
-        var result = untyped __cpp__('hx::Init()');
+        var result = untyped __cpp__('hx::Init()'); // requires hx/native.h
         return result;
     }
 

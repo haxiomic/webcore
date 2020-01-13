@@ -20,7 +20,10 @@ AppInterface* HaxeNativeBridge_createAppInstance() {
 }
 
 void AppInterface_onNativeGraphicsContextReady(AppInterface* app) {
+    HX_JUST_GC_STACKFRAME
+    hx::ObjectPtr< ::gluon::es2::impl::ES2Context_obj > gl = ::gluon::es2::impl::ES2Context_obj::__alloc( HX_CTX );
 
+    ((hx::Native< app::AppInterface* >)app)-> onNativeGraphicsContextReady(gl);  
 }
 
 void AppInterface_onDrawFrame(AppInterface* app) {
