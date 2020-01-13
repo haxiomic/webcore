@@ -10,6 +10,21 @@
     => Maybe a macro generates a bash/bat script in the hxcpp output directory that creates the frameworks when executed
     => Users then do `-cmd _hxcpp-bin/generate-lib.sh`
 
+    => A compiler macro could be used to make this easy, so adding something like
+        `--macro Tool.generateFramework('com.example.MyFrameworkName')`
+        This might also add `-D HAXE_OUTPUT_PART=MinimalGL` and
+            ```
+            --each
+            -D iphoneos
+            -D HXCPP_ARM64
+            --next
+            -D iphonesim
+            -D HXCPP_M64
+            ```
+        Ideally this generate the native platform glue code – C-API and Swift/Java/JNI
+
+
+
 ! Main loop does not occur on iOS and Android !
     - It's because there is no `main()` and 
         "If `haxe.MainLoop` is kept from DCE, then we will insert an `haxe.EntryPoint.run()` call just at then end of `main()`.
