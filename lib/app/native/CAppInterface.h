@@ -14,7 +14,8 @@ extern "C" {
     const char* AppInterface_haxeInitializeAndRun();
     AppInterfaceHandle* AppInterface_createAppInstance();
 
-    void AppInterface_onNativeGraphicsContextReady(AppInterfaceHandle* app);
+    void AppInterface_onGraphicsContextReady(AppInterfaceHandle* app);
+    void AppInterface_onGraphicsContextLost(AppInterfaceHandle* app);
     void AppInterface_onDrawFrame(AppInterfaceHandle* app);
 
 #ifdef __cplusplus

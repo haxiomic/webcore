@@ -61,15 +61,15 @@
 			
 			// initialize our haxe app
 			let appInstance = AppInterface.createAppInstance();
-			appInstance.onNativeGraphicsContextReady(gl);
+			appInstance.onGraphicsContextReady(gl);
 
 			// add canvas gl context listeners to encourage powerPreference to be respected
 			canvas.addEventListener('webglcontextlost', () => {
-				appInstance.onNativeGraphicsContextLost();
+				appInstance.oonNativeGraphicsContextLost();
 				cancelAnimationFrame(requestAnimationFrameHandle);
 			});
 			canvas.addEventListener('webglcontextrestored', () => {
-				appInstance.onNativeGraphicsContextReady(gl);
+				appInstance.onGraphicsContextReady(gl);
 				frameLoop(performance.now());
 			});
 

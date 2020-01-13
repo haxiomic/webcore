@@ -19,11 +19,14 @@ AppInterfaceHandle* AppInterface_createAppInstance() {
     return AppInterface::createAppInstance();
 }
 
-void AppInterface_onNativeGraphicsContextReady(AppInterfaceHandle* app) {
+void AppInterface_onGraphicsContextReady(AppInterfaceHandle* app) {
     // HX_JUST_GC_STACKFRAME
     // hx::ObjectPtr< ::gluon::es2::impl::ES2Context_obj > gl = ::gluon::es2::impl::ES2Context_obj::__alloc( HX_CTX );
 
     // ((hx::Native< app::AppInterface* >)app)-> onNativeGraphicsContextReady(gl);  
+}
+
+void AppInterface_onGraphicsContextLost(AppInterfaceHandle* app) {
 }
 
 void AppInterface_onDrawFrame(AppInterfaceHandle* app) {
