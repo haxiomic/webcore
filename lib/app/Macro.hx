@@ -11,19 +11,21 @@ using Lambda;
 class Macro {
 
     /**
-        Adds sets `HaxeNativeBridge.createAppCallback` in the class' __init__ method
+        Adds sets `HaxeNativeBridge.createMainApp` in the class' __init__ method
     **/
-    static function addAppInitialization() {
+    static function makeMainApp() {
         var localClass = Context.getLocalClass().get();
         var fields = Context.getBuildFields();
 
+        if (localClass.meta.has(':notMainApp')) return fields;
+
         var localTypePath: TypePath = {
             pack: localClass.pack,
-            name: localClass.module,
+            name: localClass.module.split('.').pop(),
             sub: localClass.name,
         }
 
-        var initExpr = macro @:privateAccess app.AppInterface.Static.createAppCallback = () -> new $localTypePath();
+        var initExpr = macro @:privateAccess app.AppInterface.Static.createMainApp = () -> new $localTypePath();
 
         // add initExpr to __init__
         var initField = fields.find(f -> f.name == '__init__');

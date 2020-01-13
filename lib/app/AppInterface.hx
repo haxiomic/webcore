@@ -2,13 +2,16 @@ package app;
 
 import gluon.es2.GLContext;
 
+/**
+    Implement this interface to set the main app class
+**/
 @:nativeGen
 @:keep
-@:autoBuild(app.Macro.addAppInitialization())
+@:autoBuild(app.Macro.makeMainApp())
 interface AppInterface {
 
-    function onNativeGraphicsContextReady(gl: GLContext): Void;
-    function onNativeGraphicsContextLost(): Void;
+    function onGraphicsContextReady(gl: GLContext): Void;
+    function onGraphicsContextLost(): Void;
     function onDrawFrame(gl: GLContext): Void;
 
 }
@@ -21,7 +24,7 @@ interface AppInterface {
 class AppInterfaceNative {
 
     static public function createAppInstance(): #if cpp cpp.Star<AppInterface> #else AppInterface #end {
-        return Static.createAppCallback();
+        return Static.createMainApp();
     }
 
     /**
@@ -51,7 +54,7 @@ class AppInterfaceNative {
 @:allow(app.AppInterfaceNative)
 class Static {
 
-    static var createAppCallback: () -> AppInterface;
+    static var createMainApp: () -> AppInterface;
 
 }
 
