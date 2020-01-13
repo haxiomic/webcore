@@ -45,6 +45,10 @@ class App implements app.AppInterface {
 		gl.disable(CULL_FACE);
 	}
 
+	public function onNativeGraphicsContextLost() {
+		trace('Graphics context lost');
+	}
+
 	public function onDrawFrame(gl: GLContext) {
 		var t_s = haxe.Timer.stamp();
 

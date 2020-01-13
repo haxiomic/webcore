@@ -8,6 +8,7 @@ import gluon.es2.GLContext;
 interface AppInterface {
 
     function onNativeGraphicsContextReady(gl: GLContext): Void;
+    function onNativeGraphicsContextLost(): Void;
     function onDrawFrame(gl: GLContext): Void;
 
 }

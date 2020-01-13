@@ -57,25 +57,32 @@
 			}
 
 			let gl = canvas.getContext('webgl', webglContextAttributes);
+			let requestAnimationFrameHandle = -1;
 			
-			// add canvas gl context listeners to encourage powerPreference to be respected
-			canvas.addEventListener('webglcontextlost', function() { window.location.reload() } );
-			canvas.addEventListener('webglcontextrestored', function() { console.log('webglcontextrestored') });
-
-			// initialize our haxe example, supplying it with the OpenGL context
-			let appInstance = AppInterface.createAppInstance(gl);
+			// initialize our haxe app
+			let appInstance = AppInterface.createAppInstance();
 			appInstance.onNativeGraphicsContextReady(gl);
+
+			// add canvas gl context listeners to encourage powerPreference to be respected
+			canvas.addEventListener('webglcontextlost', () => {
+				appInstance.onNativeGraphicsContextLost();
+				cancelAnimationFrame(requestAnimationFrameHandle);
+			});
+			canvas.addEventListener('webglcontextrestored', () => {
+				appInstance.onNativeGraphicsContextReady(gl);
+				frameLoop(performance.now());
+			});
 
 			// native browser frame-loop
 			function frameLoop(t_ms) {
 				// tell app to draw a frame 
 				appInstance.onDrawFrame(gl);
 
-				window.requestAnimationFrame(frameLoop);
+				requestAnimationFrameHandle = requestAnimationFrame(frameLoop);
 			}
 
 			// start the frame loop
-			frameLoop(window.performance.now());
+			frameLoop(performance.now());
 		</script>
 	</body>
 </html>
