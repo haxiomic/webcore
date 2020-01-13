@@ -60,7 +60,7 @@
 			let requestAnimationFrameHandle = -1;
 			
 			// initialize our haxe app
-			let appInstance = MainAppInterface.createAppInstance();
+			let appInstance = HaxeMainApp.createInstance();
 			appInstance.onGraphicsContextReady(gl);
 
 			// add canvas gl context listeners to encourage powerPreference to be respected

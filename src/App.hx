@@ -4,7 +4,7 @@ import gluon.es2.GLShader;
 import gluon.es2.GLContext;
 import typedarray.Float32Array;
 
-class App implements app.MainAppInterface {
+class App implements app.AppInterface {
 
 	var gl: GLContext;
 	var program: GLProgram;

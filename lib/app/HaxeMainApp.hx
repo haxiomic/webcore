@@ -1,29 +1,13 @@
 package app;
 
-import gluon.es2.GLContext;
-
-/**
-    Implement this interface to set the main app class
-**/
-@:nativeGen
-@:keep
-@:autoBuild(app.Macro.makeMainApp())
-interface MainAppInterface {
-
-    function onGraphicsContextReady(gl: GLContext): Void;
-    function onGraphicsContextLost(): Void;
-    function onDrawFrame(gl: GLContext): Void;
-
-}
-
-@:native('MainAppInterface')
+@:native('HaxeMainApp')
 @:nativeGen // cpp
 @:expose // js
-@:build(app.Macro.addNativeCode('./native/CMainAppInterface.h', './native/CMainAppInterface.cpp'))
+@:build(app.Macro.addNativeCode('./native/CHaxeMainApp.h', './native/CHaxeMainApp.cpp'))
 @:keep
-class MainAppInterfaceNative {
+class HaxeMainApp {
 
-    static public function createAppInstance(): #if cpp cpp.Star<MainAppInterface> #else MainAppInterface #end {
+    static public function createInstance(): #if cpp cpp.Star<AppInterface> #else AppInterface #end {
         return Static.createMainApp();
     }
 
@@ -50,13 +34,14 @@ class MainAppInterfaceNative {
     We have to use a separate class to store data because `@:nativeGen` doesn't properly handle all references
     If the `@:nativeGen` class is added to __boot__.cpp to initialize fields, it will be incorrectly referenced
 **/
-@:allow(app.MainAppInterface)
-@:allow(app.MainAppInterfaceNative)
+@:allow(app.AppInterface)
+@:allow(app.HaxeMainApp)
 class Static {
 
-    static var createMainApp: () -> MainAppInterface;
+    static var createMainApp: () -> AppInterface;
 
 }
+
 
 /*
 @:include('dispatch/dispatch.h')
