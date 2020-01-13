@@ -23,7 +23,7 @@ class Macro {
             sub: localClass.name,
         }
 
-        var initExpr = macro @:privateAccess app.HaxeNativeBridge.createAppCallback = () -> new $localTypePath();
+        var initExpr = macro @:privateAccess app.AppInterface.Static.createAppCallback = () -> new $localTypePath();
 
         // add initExpr to __init__
         var initField = fields.find(f -> f.name == '__init__');
@@ -48,6 +48,9 @@ class Macro {
                 }
             }).fields);
         }
+
+        // add @:keep metadata because we want this class to be initialized
+        localClass.meta.add(':keep', [], localClass.pos);
 
         return fields;
     }

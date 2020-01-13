@@ -63,7 +63,7 @@
 			canvas.addEventListener('webglcontextrestored', function() { console.log('webglcontextrestored') });
 
 			// initialize our haxe example, supplying it with the OpenGL context
-			let appInstance = HaxeNativeBridge.createAppInstance(gl);
+			let appInstance = AppInterface.createAppInstance(gl);
 			appInstance.onNativeGraphicsContextReady(gl);
 
 			// native browser frame-loop
