@@ -9,6 +9,7 @@ App
 --cpp _hxcpp-bin
 
 -dce full
+-D analyzer-optimize
 
 # --cwd platform/desktop
 # build.hxml

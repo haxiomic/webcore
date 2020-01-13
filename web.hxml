@@ -6,3 +6,4 @@ App
 -js platform/web/app.js
 
 -dce full
+-D analyzer-optimize
