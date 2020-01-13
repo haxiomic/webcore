@@ -1,3 +1,15 @@
+- C interface for App 
+- https://stackoverflow.com/questions/15496862/delay-a-method-call-in-objective-c/15496921
+
+- Can we generate a .framework for iOS?
+    https://theswiftdev.com/2018/01/25/deep-dive-into-swift-frameworks/
+- And generate an .aar for Android?
+    https://medium.com/@yushulx/how-to-build-so-library-files-into-aar-bundle-in-android-studio-a44387c9a012
+
+    => The bundling code should be independent from the AppInterface (so you can make non-graphics bundles)
+    => Maybe a macro generates a bash/bat script in the hxcpp output directory that creates the frameworks when executed
+    => Users then do `-cmd _hxcpp-bin/generate-lib.sh`
+
 ! Main loop does not occur on iOS and Android !
     - It's because there is no `main()` and 
         "If `haxe.MainLoop` is kept from DCE, then we will insert an `haxe.EntryPoint.run()` call just at then end of `main()`.
