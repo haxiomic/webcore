@@ -1,5 +1,5 @@
 /**
- * This file include miniaudio.h with #define flags and provides helper utilities, including
+ * This file includes and configures miniaudio.h and provides helper utilities, including:
  * - Thread-safe linked list to track audio source references between the audio thread and haxe thread
  * - Audio source abstraction with looping and play-state
  * - An audio mixer function to use as the dataCallback in miniaudio.h
