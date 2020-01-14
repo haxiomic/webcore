@@ -63,8 +63,8 @@ struct AudioNode {
     AudioNode_ReadFramesCallback readFramesCallback; // allowed to be  NULL, when not null, this takes priority over reading from the decoder
     ma_mutex                     lock;
     AudioDecoder*                decoder; // allowed to be  NULL
-    ma_int64                     scheduledStartFrame; //-1 for none
-    ma_int64                     scheduledStopFrame;  //-1 for none
+    ma_int64                     scheduledStartFrame; // -1 for none
+    ma_int64                     scheduledStopFrame;  // -1 for none
     ma_bool32                    loop;
     ma_bool32                    active;
     ma_bool32                    onReachEndFlag;
