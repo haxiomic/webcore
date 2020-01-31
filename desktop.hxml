@@ -1,15 +1,12 @@
 App
 
--debug
-
 --class-path lib
 --class-path src
 
 --library hxcpp:4.0.52
---cpp _hxcpp-bin
+--cpp _hxcpp-bin/desktop
 
 -dce full
 -D analyzer-optimize
 
-# --cwd platform/desktop
-# build.hxml
+-debug

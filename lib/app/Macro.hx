@@ -5,6 +5,7 @@ import haxe.macro.Context;
 import haxe.macro.TypeTools;
 import haxe.macro.Expr.TypePath;
 import haxe.macro.ComplexTypeTools;
+import haxe.macro.Compiler;
 import haxe.io.Path;
 using Lambda;
 
@@ -95,6 +96,18 @@ class Macro {
         Context.getLocalClass().get().meta.add(':buildXml', [macro $v{buildXml}], Context.currentPos());
 
         return Context.getBuildFields();
+    }
+
+    /**
+
+    **/
+    static function generateFramework(frameworkName: String) {
+        var outputPath = Compiler.getOutput();
+        
+        /*
+        <set name="HAXE_OUTPUT_PART" value="${HAXE_OUTPUT}" unless="HAXE_OUTPUT_PART" />
+        <set name="HAXE_OUTPUT_FILE" value="${LIBPREFIX}${HAXE_OUTPUT_PART}${DBG}" unless="HAXE_OUTPUT_FILE" />
+        */
     }
 
 }
