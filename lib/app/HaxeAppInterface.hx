@@ -11,7 +11,7 @@ import gluon.webgl.GLContext;
 #if !display
 @:autoBuild(app.Macro.makeMainApp())
 #end
-interface AppInterface {
+interface HaxeAppInterface {
 
     function onGraphicsContextReady(gl: GLContext): Void;
     function onGraphicsContextLost(): Void;

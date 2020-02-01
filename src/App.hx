@@ -6,15 +6,15 @@ import typedarray.Float32Array;
 
 #if debug
 // In debug mode we enable sanitizers to help validate correctness (at a performance cost)
-@:buildXml('
-<target id="haxe">
-	<flag value="-fsanitize=address" />
-	<flag value="-fsanitize=undefined" />
-	<flag value="-fno-omit-frame-pointer" />
-</target>
-')
+// @:buildXml('
+// <target id="haxe">
+// 	<flag value="-fsanitize=address" />
+// 	<flag value="-fsanitize=undefined" />
+// 	<flag value="-fno-omit-frame-pointer" />
+// </target>
+// ')
 #end
-class App implements app.AppInterface {
+class App implements app.HaxeAppInterface {
 
 	var gl: GLContext;
 	var program: GLProgram;
@@ -42,7 +42,7 @@ class App implements app.AppInterface {
 
 		// create triangle buffer
 		var angle = Math.PI * 2 / 3;
-		var trianglePositionArray = new Float32Array(null, [
+		var trianglePositionArray = new Float32Array([
 			Math.sin(angle * 0), Math.cos(angle * 0),
 			Math.sin(angle * 1), Math.cos(angle * 1),
 			Math.sin(angle * 2), Math.cos(angle * 2),

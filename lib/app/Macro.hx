@@ -7,12 +7,13 @@ import haxe.macro.Expr.TypePath;
 import haxe.macro.ComplexTypeTools;
 import haxe.macro.Compiler;
 import haxe.io.Path;
+import sys.FileSystem;
 using Lambda;
 
 class Macro {
 
     /**
-        Adds sets `AppInterface.Static.createMainApp` in the class' __init__ method
+        Adds sets `HaxeAppInterface.Static.createMainApp` in the class' __init__ method
     **/
     static function makeMainApp() {
         var localClass = Context.getLocalClass().get();
@@ -31,16 +32,16 @@ class Macro {
         var initExpr = if (isCpp) {
             // add static constructor function
             fields = fields.concat((macro class X {
-                static function __construct__(): app.AppInterface {
+                static function __construct__(): app.HaxeAppInterface {
                     return new $localTypePath();
                 }
             }).fields);
             macro @:privateAccess {
-                app.HaxeMainApp.Static.createMainApp = cpp.Function.fromStaticFunction($i{localClass.module}.__construct__);
+                app.HaxeApp.Static.createMainApp = cpp.Function.fromStaticFunction($i{localClass.module}.__construct__);
             };
         } else {
             macro @:privateAccess {
-                app.HaxeMainApp.Static.createMainApp = () -> new $localTypePath();
+                app.HaxeApp.Static.createMainApp = () -> new $localTypePath();
             };
         }
 
@@ -98,16 +99,29 @@ class Macro {
         return Context.getBuildFields();
     }
 
-    /**
+    static function platformLibrary() {
+        #if display return; #end
 
-    **/
-    static function generateFramework(frameworkName: String) {
-        var outputPath = Compiler.getOutput();
+        var defines = Context.getDefines();
+
+        var ios = false;
+        for (d in ['iphoneos', 'iphonesim', 'appletvos', 'appletvsim'])
+            if (defines.exists(d)) {
+                ios = true;
+                break;
+            }
         
-        /*
-        <set name="HAXE_OUTPUT_PART" value="${HAXE_OUTPUT}" unless="HAXE_OUTPUT_PART" />
-        <set name="HAXE_OUTPUT_FILE" value="${LIBPREFIX}${HAXE_OUTPUT_PART}${DBG}" unless="HAXE_OUTPUT_FILE" />
-        */
+        var android  = defines.exists('android');
+
+        var outputPath = Compiler.getOutput();
+
+        trace('platformLibrary $outputPath', ios, android);
+        Context.onAfterGenerate(() -> {
+            var staticLibs = FileSystem.readDirectory(outputPath).filter((name) ->
+                Path.extension(name).toLowerCase() == 'a'
+            );
+            trace('Context.onAfterGenerate', staticLibs);
+        });
     }
 
 }

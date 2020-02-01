@@ -1,20 +1,22 @@
 package app;
 
-@:native('HaxeMainApp')
+@:native('HaxeApp')
 @:nativeGen // cpp
 @:expose // js
 #if !display
-@:build(app.Macro.addNativeCode('./HaxeMainAppC.h', './HaxeMainAppC.cpp'))
+@:build(app.Macro.addNativeCode('./HaxeAppC.h', './HaxeAppC.cpp'))
 #end
 @:keep
-class HaxeMainApp {
+class HaxeApp {
 
-    static public function createInstance(): AppInterface {
+    static public function create(): HaxeAppInterface {
         return Static.createMainApp();
     }
 
     /**
         Initialize hxcpp, call `main()` and block until event queue is empty (or return if no `main()` is defined)
+
+        Only initializes once, subsequent calls do nothing if already successfully initialized
 
         - Initializes the hxcpp GC (`hx:SetTopOfStack`)
         - Initializes defined classes (`__boot__.cpp`)
@@ -24,26 +26,34 @@ class HaxeMainApp {
         `hx::Init()` is defined in hxcpp/src/StdLibs.cpp
     **/
     #if cpp
-    @:noDebug static public function haxeInitializeAndRun(): cpp.ConstCharStar {
-        var result = untyped __cpp__('hx::Init()'); // requires hx/native.h
-        return result;
+    @:noDebug static public function initialize(): cpp.ConstCharStar {
+        if (Static.initialized) {
+            return null;
+        } else {
+            var result: cpp.ConstCharStar = untyped __cpp__('hx::Init()'); // requires hx/native.h, defined in hxcpp/src/StdLibs.cpp
+            if (result == null) {
+                Static.initialized = true;
+            }
+            return result;
+        }
     }
     #end
 
 }
 
 /**
-    We have to use a separate class to store data because `@:nativeGen` doesn't properly handle all references
+    We have to use a separate class to store data because `@:nativeGen` doesn't properly handle all references;
     If the `@:nativeGen` class is added to __boot__.cpp to initialize fields, it will be incorrectly referenced
 **/
-@:allow(app.AppInterface)
-@:allow(app.HaxeMainApp)
+@:allow(app.HaxeApp)
 class Static {
+
+    static var initialized = false;
     
     #if cpp
-    static var createMainApp: cpp.Callable<() -> AppInterface>;
+    static var createMainApp: cpp.Callable<() -> HaxeAppInterface>;
     #else
-    static var createMainApp: () -> AppInterface;
+    static var createMainApp: () -> HaxeAppInterface;
     #end
 
 
