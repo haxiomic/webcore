@@ -7,14 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BE0BCEC723E60ECD004AF3C6 /* HaxeAppC.h in Headers */ = {isa = PBXBuildFile; fileRef = BE0BCEC623E60ECD004AF3C6 /* HaxeAppC.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BE24799923E5C91800D9F118 /* HaxeAppFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = BE24799723E5C91800D9F118 /* HaxeAppFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BE60D9B623E5F90000BFFB3C /* HaxeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE60D9B423E5F90000BFFB3C /* HaxeApp.swift */; };
 		BE60D9B723E5F90000BFFB3C /* HaxeAppViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE60D9B523E5F90000BFFB3C /* HaxeAppViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		BE0BCEC623E60ECD004AF3C6 /* HaxeAppC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HaxeAppC.h; path = include/HaxeAppC.h; sourceTree = SOURCE_ROOT; };
 		BE24799423E5C91800D9F118 /* HaxeAppFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = HaxeAppFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		BE24799723E5C91800D9F118 /* HaxeAppFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HaxeAppFramework.h; sourceTree = "<group>"; };
+		BE24799723E5C91800D9F118 /* HaxeAppFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HaxeAppFramework.h; path = HaxeAppFramework/HaxeAppFramework.h; sourceTree = SOURCE_ROOT; };
 		BE60D9B423E5F90000BFFB3C /* HaxeApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HaxeApp.swift; sourceTree = "<group>"; };
 		BE60D9B523E5F90000BFFB3C /* HaxeAppViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HaxeAppViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -49,6 +51,7 @@
 		BE24799623E5C91800D9F118 /* HaxeAppFramework */ = {
 			isa = PBXGroup;
 			children = (
+				BE0BCEC623E60ECD004AF3C6 /* HaxeAppC.h */,
 				BE60D9B423E5F90000BFFB3C /* HaxeApp.swift */,
 				BE60D9B523E5F90000BFFB3C /* HaxeAppViewController.swift */,
 				BE24799723E5C91800D9F118 /* HaxeAppFramework.h */,
@@ -63,6 +66,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE0BCEC723E60ECD004AF3C6 /* HaxeAppC.h in Headers */,
 				BE24799923E5C91800D9F118 /* HaxeAppFramework.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
