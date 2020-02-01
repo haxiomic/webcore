@@ -7,14 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		BE24799923E5C91800D9F118 /* Framework.h in Headers */ = {isa = PBXBuildFile; fileRef = BE24799723E5C91800D9F118 /* Framework.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BE24799923E5C91800D9F118 /* HaxeAppFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = BE24799723E5C91800D9F118 /* HaxeAppFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BE60D9B623E5F90000BFFB3C /* HaxeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE60D9B423E5F90000BFFB3C /* HaxeApp.swift */; };
 		BE60D9B723E5F90000BFFB3C /* HaxeAppViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE60D9B523E5F90000BFFB3C /* HaxeAppViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		BE24799423E5C91800D9F118 /* Framework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Framework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		BE24799723E5C91800D9F118 /* Framework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Framework.h; sourceTree = "<group>"; };
+		BE24799423E5C91800D9F118 /* HaxeAppFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = HaxeAppFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BE24799723E5C91800D9F118 /* HaxeAppFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HaxeAppFramework.h; sourceTree = "<group>"; };
 		BE60D9B423E5F90000BFFB3C /* HaxeApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HaxeApp.swift; sourceTree = "<group>"; };
 		BE60D9B523E5F90000BFFB3C /* HaxeAppViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HaxeAppViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -41,7 +41,7 @@
 		BE24799523E5C91800D9F118 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				BE24799423E5C91800D9F118 /* Framework.framework */,
+				BE24799423E5C91800D9F118 /* HaxeAppFramework.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -51,7 +51,7 @@
 			children = (
 				BE60D9B423E5F90000BFFB3C /* HaxeApp.swift */,
 				BE60D9B523E5F90000BFFB3C /* HaxeAppViewController.swift */,
-				BE24799723E5C91800D9F118 /* Framework.h */,
+				BE24799723E5C91800D9F118 /* HaxeAppFramework.h */,
 			);
 			path = Framework;
 			sourceTree = "<group>";
@@ -63,16 +63,16 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BE24799923E5C91800D9F118 /* Framework.h in Headers */,
+				BE24799923E5C91800D9F118 /* HaxeAppFramework.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		BE24799323E5C91800D9F118 /* Framework */ = {
+		BE24799323E5C91800D9F118 /* HaxeAppFramework */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BE24799C23E5C91800D9F118 /* Build configuration list for PBXNativeTarget "Framework" */;
+			buildConfigurationList = BE24799C23E5C91800D9F118 /* Build configuration list for PBXNativeTarget "HaxeAppFramework" */;
 			buildPhases = (
 				BE24798F23E5C91800D9F118 /* Headers */,
 				BE24799023E5C91800D9F118 /* Sources */,
@@ -83,9 +83,9 @@
 			);
 			dependencies = (
 			);
-			name = Framework;
+			name = HaxeAppFramework;
 			productName = Framework;
-			productReference = BE24799423E5C91800D9F118 /* Framework.framework */;
+			productReference = BE24799423E5C91800D9F118 /* HaxeAppFramework.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
@@ -103,7 +103,7 @@
 					};
 				};
 			};
-			buildConfigurationList = BE24798E23E5C91800D9F118 /* Build configuration list for PBXProject "Framework" */;
+			buildConfigurationList = BE24798E23E5C91800D9F118 /* Build configuration list for PBXProject "HaxeAppFramework" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -115,7 +115,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				BE24799323E5C91800D9F118 /* Framework */,
+				BE24799323E5C91800D9F118 /* HaxeAppFramework */,
 			);
 		};
 /* End PBXProject section */
@@ -227,7 +227,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		BE24798E23E5C91800D9F118 /* Build configuration list for PBXProject "Framework" */ = {
+		BE24798E23E5C91800D9F118 /* Build configuration list for PBXProject "HaxeAppFramework" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BE24799B23E5C91800D9F118 /* Release */,
@@ -235,7 +235,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		BE24799C23E5C91800D9F118 /* Build configuration list for PBXNativeTarget "Framework" */ = {
+		BE24799C23E5C91800D9F118 /* Build configuration list for PBXNativeTarget "HaxeAppFramework" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BE24799E23E5C91800D9F118 /* Release */,
