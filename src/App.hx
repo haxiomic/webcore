@@ -16,7 +16,7 @@ import typedarray.Float32Array;
 #end
 class App implements app.HaxeAppInterface {
 
-	var gl: GLContext;
+	var gl: Null<GLContext>;
 	var program: GLProgram;
 	var triangleBuffer: GLBuffer;
 
@@ -57,6 +57,7 @@ class App implements app.HaxeAppInterface {
 
 	public function onGraphicsContextLost() {
 		trace('Graphics context lost');
+		this.gl = null;
 	}
 
 	public function onDrawFrame() {
@@ -74,10 +75,12 @@ class App implements app.HaxeAppInterface {
 	}
 
 	function releaseGraphicsResources() {
-		// WebGL objects are garbage collected in js but because the browser cannot properly estimate the memory pressure (small-handles in js, big on GPU), they might not be collected when we want
-		// so with WebGL it's always best to release manually
-		gl.deleteProgram(program);
-		gl.deleteBuffer(triangleBuffer);
+		if (this.gl != null) {
+			// WebGL objects are garbage collected in js but because the browser cannot properly estimate the memory pressure (small-handles in js, big on GPU), they might not be collected when we want
+			// so with WebGL it's always best to release manually
+			gl.deleteProgram(program);
+			gl.deleteBuffer(triangleBuffer);
+		}
 	}
 
 	/**
