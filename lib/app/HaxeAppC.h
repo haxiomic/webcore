@@ -5,8 +5,6 @@
 #ifndef HaxeAppC_h
 #define HaxeAppC_h
 
-typedef void HaxeAppHandle;
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -15,11 +13,11 @@ extern "C" {
     const char* HaxeApp_initialize();
 
     // instance methods
-    HaxeAppHandle* HaxeApp_create();
-    void           HaxeApp_release(HaxeAppHandle* appHandle);
-    void HaxeApp_onGraphicsContextReady(HaxeAppHandle* appHandle);
-    void HaxeApp_onGraphicsContextLost(HaxeAppHandle* appHandle);
-    void HaxeApp_onDrawFrame(HaxeAppHandle* appHandle);
+    void* HaxeApp_create();
+    void  HaxeApp_release(void* appHandle);
+    void  HaxeApp_onGraphicsContextReady(void* appHandle);
+    void  HaxeApp_onGraphicsContextLost(void* appHandle);
+    void  HaxeApp_onDrawFrame(void* appHandle);
 
 #ifdef __cplusplus
 }

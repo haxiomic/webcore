@@ -3,10 +3,16 @@ package app;
 @:native('HaxeApp')
 @:nativeGen // cpp
 @:expose // js
-#if !display
-@:build(app.Macro.addNativeCode('./HaxeAppC.h', './HaxeAppC.cpp'))
-#end
 @:keep
+#if !display
+@:build(app.Macro.hxcppAddNativeCode('./HaxeAppC.h', './HaxeAppC.cpp'))
+
+#if (iphoneos || iphonesim)
+@:build(app.Macro.copyToOutput('./ios/HaxeAppFramework'))
+@:build(app.Macro.copyToOutput('./ios/HaxeAppFramework.xcodeproj'))
+#end
+
+#end
 class HaxeApp {
 
     static public function create(): HaxeAppInterface {

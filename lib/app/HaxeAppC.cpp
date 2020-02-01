@@ -29,26 +29,30 @@ const char* HaxeApp_initialize() {
     return HaxeApp::initialize();
 }
 
-HaxeAppHandle* HaxeApp_create() {
+void* HaxeApp_create() {
     hx::Native<app::HaxeAppInterface*> app = HaxeApp::create();
     return new AppHandle(app);
 }
 
-void HaxeApp_release(AppHandle* appHandle) {
+void HaxeApp_release(void* untypedAppHandle) {
+    AppHandle* appHandle = (AppHandle*) untypedAppHandle;
     delete appHandle;
 }
 
-void HaxeApp_onGraphicsContextReady(AppHandle* appHandle) {
+void HaxeApp_onGraphicsContextReady(void* untypedAppHandle) {
+    AppHandle* appHandle = (AppHandle*) untypedAppHandle;
     HX_JUST_GC_STACKFRAME
     // create an gl context wrapper (the real context must already be created)
     gluon::webgl::native::GLContext gl = gluon::webgl::native::GLContext_obj::__alloc(HX_CTX);
     appHandle->haxeRef->onGraphicsContextReady(gl);
 }
 
-void HaxeApp_onGraphicsContextLost(AppHandle* appHandle) {
+void HaxeApp_onGraphicsContextLost(void* untypedAppHandle) {
+    AppHandle* appHandle = (AppHandle*) untypedAppHandle;
     appHandle->haxeRef->onGraphicsContextLost();
 }
 
-void HaxeApp_onDrawFrame(AppHandle* appHandle) {
+void HaxeApp_onDrawFrame(void* untypedAppHandle) {
+    AppHandle* appHandle = (AppHandle*) untypedAppHandle;
     appHandle->haxeRef->onDrawFrame();
 }

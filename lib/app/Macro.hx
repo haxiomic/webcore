@@ -78,10 +78,8 @@ class Macro {
     /**
         Adds :buildXml metadata that copies native interface code into the hxcpp output directory
     **/
-    static function addNativeCode(headerFilePath: String, implementationFilePath: String) {
-        var classPosInfo = Context.getPosInfos(Context.currentPos());
-        var classFilePath = Path.isAbsolute(classPosInfo.file) ? classPosInfo.file : Path.join([Sys.getCwd(), classPosInfo.file]);
-        var classDir = Path.directory(classFilePath);
+    static function hxcppAddNativeCode(headerFilePath: String, implementationFilePath: String) {
+        var classDir = getBuildClassDirectory();
 
         var buildXml = '
             <copy from="$classDir/$headerFilePath" to="include" />
@@ -99,29 +97,55 @@ class Macro {
         return Context.getBuildFields();
     }
 
-    static function platformLibrary() {
-        #if display return; #end
+    /**
+        Copies a file or directory to the current compile output
+    **/
+    static function copyToOutput(path: String) {
+        var pos = Context.currentPos();
+        var sourcePath = Path.join([getBuildClassDirectory(), path]);
 
-        var defines = Context.getDefines();
-
-        var ios = false;
-        for (d in ['iphoneos', 'iphonesim', 'appletvos', 'appletvsim'])
-            if (defines.exists(d)) {
-                ios = true;
-                break;
-            }
-        
-        var android  = defines.exists('android');
-
-        var outputPath = Compiler.getOutput();
-
-        trace('platformLibrary $outputPath', ios, android);
+        // wait until compilation is complete before copying the files
         Context.onAfterGenerate(() -> {
-            var staticLibs = FileSystem.readDirectory(outputPath).filter((name) ->
-                Path.extension(name).toLowerCase() == 'a'
-            );
-            trace('Context.onAfterGenerate', staticLibs);
+            if (FileSystem.exists(sourcePath)) {
+                copyToDirectoryOverwrite(sourcePath, Compiler.getOutput());
+            } else {
+                Context.fatalError('Path "$sourcePath" does not exist', pos);
+            }
         });
+
+        return Context.getBuildFields();
+    }
+
+    static function getBuildClassDirectory() {
+        var classPosInfo = Context.getPosInfos(Context.currentPos());
+        var classFilePath = Path.isAbsolute(classPosInfo.file) ? classPosInfo.file : Path.join([Sys.getCwd(), classPosInfo.file]);
+        return Path.directory(classFilePath);
+    }
+
+    /**
+        Copies files or directories (recursively) to a given target directory
+        Files in the target directory are overwritten
+        When overwriting directories, their contents are merged
+    **/
+    static function copyToDirectoryOverwrite(sourcePath: String, targetDirectoryPath: String) {
+        var filename = Path.withoutDirectory(sourcePath);
+        var targetFilePath = Path.join([targetDirectoryPath, filename]);
+
+        if (FileSystem.isDirectory(sourcePath)) {
+
+            // touch within targetDirectoryPath
+            if (!FileSystem.exists(targetFilePath)) {
+                FileSystem.createDirectory(targetFilePath);
+            }
+
+            // recursive file copy
+            for (filename in FileSystem.readDirectory(sourcePath)) {
+                copyToDirectoryOverwrite(Path.join([sourcePath, filename]), targetFilePath);
+            }
+        } else {
+            // copy single file
+            sys.io.File.copy(sourcePath, targetFilePath);
+        }
     }
 
 }
