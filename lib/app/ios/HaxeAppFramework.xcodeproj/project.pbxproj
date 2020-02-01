@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		BE0BCEC723E60ECD004AF3C6 /* HaxeAppC.h in Headers */ = {isa = PBXBuildFile; fileRef = BE0BCEC623E60ECD004AF3C6 /* HaxeAppC.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BE0BCED223E61118004AF3C6 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BE0BCED123E61118004AF3C6 /* libc++.tbd */; };
 		BE24799923E5C91800D9F118 /* HaxeAppFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = BE24799723E5C91800D9F118 /* HaxeAppFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BE60D9B623E5F90000BFFB3C /* HaxeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE60D9B423E5F90000BFFB3C /* HaxeApp.swift */; };
 		BE60D9B723E5F90000BFFB3C /* HaxeAppViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE60D9B523E5F90000BFFB3C /* HaxeAppViewController.swift */; };
@@ -15,6 +16,7 @@
 
 /* Begin PBXFileReference section */
 		BE0BCEC623E60ECD004AF3C6 /* HaxeAppC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HaxeAppC.h; path = include/HaxeAppC.h; sourceTree = SOURCE_ROOT; };
+		BE0BCED123E61118004AF3C6 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		BE24799423E5C91800D9F118 /* HaxeAppFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = HaxeAppFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE24799723E5C91800D9F118 /* HaxeAppFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HaxeAppFramework.h; path = HaxeAppFramework/HaxeAppFramework.h; sourceTree = SOURCE_ROOT; };
 		BE60D9B423E5F90000BFFB3C /* HaxeApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HaxeApp.swift; sourceTree = "<group>"; };
@@ -26,17 +28,27 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE0BCED223E61118004AF3C6 /* libc++.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BE0BCECB23E610E9004AF3C6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				BE0BCED123E61118004AF3C6 /* libc++.tbd */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		BE24798A23E5C91800D9F118 = {
 			isa = PBXGroup;
 			children = (
 				BE24799623E5C91800D9F118 /* HaxeAppFramework */,
 				BE24799523E5C91800D9F118 /* Products */,
+				BE0BCECB23E610E9004AF3C6 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -219,6 +231,10 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = haxeapp.Framework;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
