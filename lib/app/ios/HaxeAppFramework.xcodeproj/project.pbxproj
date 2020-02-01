@@ -33,7 +33,7 @@
 		BE24798A23E5C91800D9F118 = {
 			isa = PBXGroup;
 			children = (
-				BE24799623E5C91800D9F118 /* Framework */,
+				BE24799623E5C91800D9F118 /* HaxeAppFramework */,
 				BE24799523E5C91800D9F118 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -46,14 +46,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		BE24799623E5C91800D9F118 /* Framework */ = {
+		BE24799623E5C91800D9F118 /* HaxeAppFramework */ = {
 			isa = PBXGroup;
 			children = (
 				BE60D9B423E5F90000BFFB3C /* HaxeApp.swift */,
 				BE60D9B523E5F90000BFFB3C /* HaxeAppViewController.swift */,
 				BE24799723E5C91800D9F118 /* HaxeAppFramework.h */,
 			);
-			path = Framework;
+			path = HaxeAppFramework;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
