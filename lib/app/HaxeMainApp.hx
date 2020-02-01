@@ -4,7 +4,7 @@ package app;
 @:nativeGen // cpp
 @:expose // js
 #if !display
-@:build(app.Macro.addNativeCode('./native/CHaxeMainApp.h', './native/CHaxeMainApp.cpp'))
+@:build(app.Macro.addNativeCode('./HaxeMainAppC.h', './HaxeMainAppC.cpp'))
 #end
 @:keep
 class HaxeMainApp {

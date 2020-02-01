@@ -2,8 +2,8 @@
  * C language wrapper for hxcpp-generated AppInterface class
  */
 
-#ifndef CHaxeMainApp_h
-#define CHaxeMainApp_h
+#ifndef HaxeMainAppC_h
+#define HaxeMainAppC_h
 
 typedef void AppInterfaceHandle;
 

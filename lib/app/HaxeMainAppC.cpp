@@ -9,7 +9,7 @@
 // include the hxcpp generated AppInterface class
 #include <HaxeMainApp.h>
 
-#include "CHaxeMainApp.h"
+#include "HaxeMainAppC.h"
 
 #include <app/AppInterface.h>
 #include <gluon/webgl/native/GLContext.h>
