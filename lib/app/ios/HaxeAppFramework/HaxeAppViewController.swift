@@ -9,7 +9,7 @@ public class HaxeAppViewController: GLKViewController {
     public var context: EAGLContext?
     
     var haxeGraphicsContextReady = false
-    
+
     public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         HaxeApp.initialize()
         haxeAppInstance = HaxeApp()
@@ -17,7 +17,9 @@ public class HaxeAppViewController: GLKViewController {
     }
     
     required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        HaxeApp.initialize()
+        haxeAppInstance = HaxeApp()
+        super.init(coder: aDecoder)
     }
     
     deinit {
@@ -51,6 +53,9 @@ public class HaxeAppViewController: GLKViewController {
         // Set the current EAGLContext to our context. This ensures we are deleting buffers against it and potentially not a
         // different context.
         EAGLContext.setCurrent(context)
+
+        // tell haxe that we've lost the graphics context
+        haxeAppInstance.onGraphicsContextLost()
         
         // Set the current EAGLContext to nil.
         EAGLContext.setCurrent(nil)
