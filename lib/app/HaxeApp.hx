@@ -6,10 +6,8 @@ package app;
 @:keep
 #if !display
 @:build(app.Macro.hxcppAddNativeCode('./HaxeAppC.h', './HaxeAppC.cpp'))
-
 #if (iphoneos || iphonesim)
-@:build(app.Macro.copyToOutput('./ios/HaxeAppFramework'))
-@:build(app.Macro.copyToOutput('./ios/HaxeAppFramework.xcodeproj'))
+@:build(app.Macro.generateHaxeAppFramework())
 #end
 
 #end
