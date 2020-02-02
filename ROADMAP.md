@@ -1,30 +1,17 @@
-- C interface for App 
-- https://stackoverflow.com/questions/15496862/delay-a-method-call-in-objective-c/15496921
 
-- Can we generate a .framework for iOS?
-    https://theswiftdev.com/2018/01/25/deep-dive-into-swift-frameworks/
-- And generate an .aar for Android?
+- Confirm with hugh about usage of hx:SetTopOfStack
+
+- Can we generate an .aar for easy Android integration?
     https://medium.com/@yushulx/how-to-build-so-library-files-into-aar-bundle-in-android-studio-a44387c9a012
 
-    => The bundling code should be independent from the AppInterface (so you can make non-graphics bundles)
-    => Maybe a macro generates a bash/bat script in the hxcpp output directory that creates the frameworks when executed
-    => Users then do `-cmd _hxcpp-bin/generate-lib.sh`
-
-    => A compiler macro could be used to make this easy, so adding something like
-        `--macro Tool.generateIOSFramework('com.example.MyFrameworkName')`
-        This might also add `-D HAXE_OUTPUT_PART=MinimalGL` and
-            ```
-            --each
-            -D iphoneos
-            -D HXCPP_ARM64
-            --next
-            -D iphonesim
-            -D HXCPP_M64
-            ```
-        Ideally this generate the native platform glue code – C-API and Swift/Java/JNI
+- Lock with the audio source when using it in mixSources to prevent use-after-free of the decoder
+- Minimize lock contention by splitting mixSources into time quanta (as specified in the specification)
 
 - [ ] Switch to dynamic libraries so we can link with system libraries during haxe compile (and not platform compile)
     - [ ] Link with AVFoundation and AudioToolbox when building lib for iOS and OpenSLES for Android
+
+- Event loop https://stackoverflow.com/questions/15496862/delay-a-method-call-in-objective-c/15496921
+
 
 - Move gluon to HaxeNativeWeb.webgl
 - Move audio to HaxeNativeWeb.webaudio
