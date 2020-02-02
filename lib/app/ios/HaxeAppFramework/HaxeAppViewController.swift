@@ -1,7 +1,7 @@
 import GLKit
 
 /**
- * An OpenGL that hosts our MinimalGL example
+ * View controller that hosts an instance of HaxeApp. Haxe's GC will be initialized when the view controller is created
  */
 public class HaxeAppViewController: GLKViewController {
     

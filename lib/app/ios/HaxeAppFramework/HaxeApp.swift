@@ -1,3 +1,6 @@
+/**
+    Swift wrapper for HaxeAppC.h
+**/
 public class HaxeApp {
     
     static public func initialize() {

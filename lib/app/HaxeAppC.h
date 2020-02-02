@@ -1,5 +1,5 @@
 /**
- * C language wrapper for hxcpp-generated HaxeAppInterface class
+ * C language wrapper for HaxeApp
  */
 
 #ifndef HaxeAppC_h
