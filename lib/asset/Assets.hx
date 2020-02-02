@@ -9,7 +9,7 @@ package asset;
     Extend this class to use metadata
 
     **Supported metadata**
-    - `@embedFile(path: String, ?variableName: String)`    embeds a single file into the output
+    - `@:embedFile(path: String, ?variableName: String)`    embeds a single file into the output
 
     **Paths are relative to the class used**
     
@@ -46,7 +46,7 @@ class Macro {
         var metas = localClass.meta;
 
         // metadata to embed a single file
-        var embedMetas = metas.extract('embedFile');
+        var embedMetas = metas.extract(':embedFile').concat(metas.extract('embedFile'));
 
         var incbinLines = new Array<String>();
 
@@ -66,16 +66,24 @@ class Macro {
                     );
 
                     var resourceId = path;
+
+                    #if !display
                     var fileBytes = try sys.io.File.getBytes(absPath) catch (e: Any) {
                         Context.fatalError('Failed to embed file: $e', pos);
                     }
 
                     // embed bytes using the haxe resource system
                     Context.addResource(resourceId, fileBytes);
+                    #end
 
                     var newFields = (macro class X {
 
-                        static public final $variableName: haxe.io.Bytes = haxe.Resource.getBytes($v{resourceId});
+                        static public final $variableName: haxe.io.Bytes =
+                            #if !display
+                                haxe.Resource.getBytes($v{resourceId});
+                            #else
+                                new haxe.io.Bytes(0);
+                            #end
 
                     }).fields;
 
