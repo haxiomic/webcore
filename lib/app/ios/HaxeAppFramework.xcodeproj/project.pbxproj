@@ -12,11 +12,10 @@
 		BE24799923E5C91800D9F118 /* HaxeAppFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = BE24799723E5C91800D9F118 /* HaxeAppFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BE60D9B623E5F90000BFFB3C /* HaxeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE60D9B423E5F90000BFFB3C /* HaxeApp.swift */; };
 		BE60D9B723E5F90000BFFB3C /* HaxeAppViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE60D9B523E5F90000BFFB3C /* HaxeAppViewController.swift */; };
-		BEC88F7123E7557C005C1AD9 /* libHaxeAppUniversal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BEC88F7023E7557C005C1AD9 /* libHaxeAppUniversal.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		BE0BCEC623E60ECD004AF3C6 /* HaxeAppC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HaxeAppC.h; path = include/HaxeAppC.h; sourceTree = SOURCE_ROOT; };
+		BE0BCEC623E60ECD004AF3C6 /* HaxeAppC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HaxeAppC.h; path = ../HaxeAppC.h; sourceTree = SOURCE_ROOT; };
 		BE0BCED123E61118004AF3C6 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		BE24799423E5C91800D9F118 /* HaxeAppFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = HaxeAppFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE24799723E5C91800D9F118 /* HaxeAppFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HaxeAppFramework.h; path = HaxeAppFramework/HaxeAppFramework.h; sourceTree = SOURCE_ROOT; };
@@ -30,7 +29,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BEC88F7123E7557C005C1AD9 /* libHaxeAppUniversal.a in Frameworks */,
 				BE0BCED223E61118004AF3C6 /* libc++.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
