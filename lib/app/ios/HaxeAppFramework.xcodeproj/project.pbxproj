@@ -12,6 +12,7 @@
 		BE24799923E5C91800D9F118 /* HaxeAppFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = BE24799723E5C91800D9F118 /* HaxeAppFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BE60D9B623E5F90000BFFB3C /* HaxeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE60D9B423E5F90000BFFB3C /* HaxeApp.swift */; };
 		BE60D9B723E5F90000BFFB3C /* HaxeAppViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE60D9B523E5F90000BFFB3C /* HaxeAppViewController.swift */; };
+		BEC88F7123E7557C005C1AD9 /* libHaxeAppUniversal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BEC88F7023E7557C005C1AD9 /* libHaxeAppUniversal.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +22,7 @@
 		BE24799723E5C91800D9F118 /* HaxeAppFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HaxeAppFramework.h; path = HaxeAppFramework/HaxeAppFramework.h; sourceTree = SOURCE_ROOT; };
 		BE60D9B423E5F90000BFFB3C /* HaxeApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HaxeApp.swift; sourceTree = "<group>"; };
 		BE60D9B523E5F90000BFFB3C /* HaxeAppViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HaxeAppViewController.swift; sourceTree = "<group>"; };
+		BEC88F7023E7557C005C1AD9 /* libHaxeAppUniversal.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libHaxeAppUniversal.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -28,6 +30,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BEC88F7123E7557C005C1AD9 /* libHaxeAppUniversal.a in Frameworks */,
 				BE0BCED223E61118004AF3C6 /* libc++.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -38,6 +41,7 @@
 		BE0BCECB23E610E9004AF3C6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BEC88F7023E7557C005C1AD9 /* libHaxeAppUniversal.a */,
 				BE0BCED123E61118004AF3C6 /* libc++.tbd */,
 			);
 			name = Frameworks;
