@@ -21,7 +21,6 @@
 		BE24799723E5C91800D9F118 /* HaxeAppFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HaxeAppFramework.h; path = HaxeAppFramework/HaxeAppFramework.h; sourceTree = SOURCE_ROOT; };
 		BE60D9B423E5F90000BFFB3C /* HaxeApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HaxeApp.swift; sourceTree = "<group>"; };
 		BE60D9B523E5F90000BFFB3C /* HaxeAppViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HaxeAppViewController.swift; sourceTree = "<group>"; };
-		BEC88F7023E7557C005C1AD9 /* libHaxeAppUniversal.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libHaxeAppUniversal.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -39,7 +38,6 @@
 		BE0BCECB23E610E9004AF3C6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				BEC88F7023E7557C005C1AD9 /* libHaxeAppUniversal.a */,
 				BE0BCED123E61118004AF3C6 /* libc++.tbd */,
 			);
 			name = Frameworks;
