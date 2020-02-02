@@ -136,9 +136,19 @@ class Macro {
             if (Context.defined('iphone') || Context.defined('iphonesim')) {
                 var iphoneosFilenamePattern = ~/\b(iphoneos|iphonesim)\b/i;
 
+                var debugSuffix = Context.defined('DEBUGSUFFIX') ? Context.definedValue('DEBUGSUFFIX') : '-debug';
+                var debugFilenamePattern = new EReg('\\b$debugSuffix\\b', 'i');
+
                 inline function iosBinaries(extension: String) {
                     return outputDirectoryFiles.filter(
-                        filename -> iphoneosFilenamePattern.match(filename) && Path.extension(filename).toLowerCase() == extension
+                        filename -> {
+                            if (Path.extension(filename).toLowerCase() != extension) return false;
+                            var isDebugFile = debugFilenamePattern.match(filename);
+                            var isIPhoneOsFile = iphoneosFilenamePattern.match(filename);
+                            return
+                                isIPhoneOsFile &&
+                                #if debug isDebugFile #else !isDebugFile #end;
+                        }
                     ).map(
                         filename -> Path.join([outputDirectory, filename])
                     );
@@ -146,6 +156,7 @@ class Macro {
 
                 inline function lipo(inputFilePaths: Array<String>, outputFilePath: String) {
                     if (inputFilePaths.length == 0) return;
+                    trace('Combining ${inputFilePaths.map(Path.withoutDirectory).join(',')} into ${Path.withoutDirectory(outputFilePath)}');
                     Sys.command('lipo', inputFilePaths.concat(['-output', outputFilePath, '-create']));
                 }
 
