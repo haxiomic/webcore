@@ -3,25 +3,16 @@ App
 --class-path lib
 --class-path src
 
-# --library hxcpp:4.0.52
-# hxcpp needs fixes to support dll_link on iOS
---library hxcpp:git
-
+--library hxcpp:4.0.52
 
 --cpp _hxcpp-bin/ios
-
--D dll_link
 
 # Leaving SDK empty should map to the default
 # if you have errors about missing SDK then explicitly set the SDK version on your system (e.g. -D IPHONE_VER=12.2)
 -D IPHONE_VER=
 
---macro app.Macro.generateFramework('example')
-
 -dce full
 -D analyzer-optimize
-
--debug
 
 # Build libs for multiple architectures: iOS (arm64) and simulator (x86_64)
 --each
