@@ -98,41 +98,23 @@ class Macro {
     }
 
     /**
-        Copies a file or directory to the current compile output
-    **/
-    /*
-    static function copyToOutput(path: String) {
-        var pos = Context.currentPos();
-        var sourcePath = Path.join([getPosDirectory(pos), path]);
-
-        // wait until compilation is complete before copying the files
-        Context.onAfterGenerate(() -> {
-            if (FileSystem.exists(sourcePath)) {
-                copyToDirectoryOverwrite(sourcePath, getOutputDirectory());
-            } else {
-                Context.fatalError('Path "$sourcePath" does not exist', pos);
-            }
-        });
-
-        return Context.getBuildFields();
-    }
-    */
-
-    /**
         Generates a framework by copying the framework files into the hxcpp output directory and combining hxcpp binaries of different architectures into a single file to link against.
         **Currently only supports iOS frameworks**
     **/
     static function copyHaxeAppFramework() {
         var pos = Context.currentPos();
-        var outputDirectory = FileSystem.absolutePath(getOutputDirectory());
 
         Context.onAfterGenerate(() -> {
+            var outputDirectory = getOutputDirectory();
 
             // copy Xcode project files to generate framework
             // using resolvePath allows user overriding
-            var frameworkProjectPath = FileSystem.absolutePath(Context.resolvePath('app/ios'));
+            var frameworkProjectPath = Context.resolvePath('app/ios');
             for (filename in FileSystem.readDirectory(frameworkProjectPath)) {
-                copyToDirectoryOverwrite(Path.join([frameworkProjectPath, filename]), outputDirectory);
+                var outputPath = Path.join([outputDirectory, filename]);
+                // Xcode doesn't like subprojects being changed duirng a build so only copy if the file doesn't already exist
+                var overwrite = false;
+                copyToDirectory(Path.join([frameworkProjectPath, filename]), outputDirectory, overwrite);
             }
 
             // symlink device and simulator binaries and lipo together different architectures
@@ -153,107 +135,33 @@ class Macro {
             var debugSuffix = Context.defined('DEBUGSUFFIX') ? Context.definedValue('DEBUGSUFFIX') : '-debug';
             var debugFilenamePattern = new EReg('\\b$debugSuffix\\b', 'i');
 
-            var binaries = FileSystem.readDirectory(outputDirectory).filter(filename -> {
+            var binaryFilenames = FileSystem.readDirectory(outputDirectory).filter(filename -> {
                 if (Path.extension(filename).toLowerCase() != binaryExtension) return false;
                 var isDebugFile = debugFilenamePattern.match(filename);
                 return
                     currentBuild.filenamePattern.match(filename) &&
                     #if debug isDebugFile #else !isDebugFile #end;
-            }).map(filename -> Path.join([outputDirectory, filename]));
+            });
+
+            if (binaryFilenames.length == 0) {
+                Context.error('Could not find hxcpp output binary', pos);
+            }
 
             var targetFilePath = Path.join([outputDirectory, 'lib/${currentBuild.type}/libHaxeApp.a']);
 
             touchDirectoryPath(Path.directory(targetFilePath));
 
-            if (binaries.length == 1) {
+            if (binaryFilenames.length == 1) {
                 // symlink
-                var command = 'ln -sf "${binaries[0]}" "$targetFilePath"';
+                var command = 'ln -sf "../../${binaryFilenames[0]}" "$targetFilePath"';
                 Sys.println(command);
                 if (Sys.command(command) != 0) {
                     Context.error('Symbolic link failed', pos);
                 }
-            } else if (binaries.length > 1) {
+            } else if (binaryFilenames.length > 1) {
                 // lipo multiple binaries together
                 throw '@! todo: lipo multiple binaries together';
             }
-
-
-
-            // @! copy files method doesn't work becuse we still need a bridging header
-            // var frameworkSourcePath = Context.resolvePath('app/ios/HaxeAppFramework');
-
-            // copy framework method is best but requires lipo
-            // compile framework doesn't work well because it's hard to create a universal framework
-            
-            /*
-            var outputDirectoryFiles = FileSystem.readDirectory(outputDirectory);
-            
-            // for ios we merge all architectures to a single file with the lipo tool
-            // this makes it easy for the Xcode project to link to the hxcpp generated binaries
-            if (Context.defined('iphone') || Context.defined('iphonesim')) {
-                var iphoneosFilenamePattern = ~/\b(iphoneos|iphonesim)\b/i;
-
-                var debugSuffix = Context.defined('DEBUGSUFFIX') ? Context.definedValue('DEBUGSUFFIX') : '-debug';
-                var debugFilenamePattern = new EReg('\\b$debugSuffix\\b', 'i');
-
-                var iphoneosArchiveFilenames = outputDirectoryFiles.filter(
-                    filename -> {
-                        if (Path.extension(filename).toLowerCase() != 'a') return false;
-                        var isDebugFile = debugFilenamePattern.match(filename);
-                        var isIPhoneOsFile = iphoneosFilenamePattern.match(filename);
-                        return
-                            isIPhoneOsFile &&
-                            #if debug isDebugFile #else !isDebugFile #end;
-                    }
-                );
-
-                var iphoneosArchivePaths = iphoneosArchiveFilenames.map(f -> Path.join([outputDirectory, f]));
-
-                var derivedDataPath = Path.join([outputDirectory, 'framework-build']);
-                touchDirectoryPath(derivedDataPath);
-
-                var combinedArchivePath = Path.join([derivedDataPath, 'libCombinedArchive.a']);
-
-
-                var lipoCommand = 'lipo ${iphoneosArchivePaths.map(p -> '"$p"').join(' ')} -output "${combinedArchivePath}" -create';
-                Sys.println(lipoCommand);
-                var exitCode = Sys.command(lipoCommand);
-                if (exitCode != 0) {
-                    Context.error('Failed to create combined archive with lipo. Exit code $exitCode', pos);
-                }
-
-                //@! handle IPHONE_VER
-
-                // compile the Xcode project to generate a framework
-                // users can override the xcode project by redefine the path class-path app/ios
-                var xcodeProjectPath = FileSystem.absolutePath(Context.resolvePath('app/ios'));
-
-                executeWithCwd(xcodeProjectPath, () -> {
-                    var scheme = 'HaxeAppFramework';
-
-                    // to solve the framework archiecture issue
-                    // See https://stackoverflow.com/questions/51558933/error-unable-to-load-standard-library-for-target-arm64-apple-ios10-0-simulator
-                    // need to be careful not to have simulator framework code for app store submission
-                    // https://stackoverflow.com/questions/29634466/how-to-export-fat-cocoa-touch-framework-for-simulator-and-device
-
-                    // For build settings variables see https://developer.apple.com/library/archive/documentation/DeveloperTools/Reference/XcodeBuildSettingRef/1-Build_Setting_Reference/build_setting_ref.html
-                    var command = 'xcodebuild ' + [
-                        // 'LIBRARY_SEARCH_PATHS="$outputDirectory"',
-                        'CONFIGURATION_BUILD_DIR="$outputDirectory"',
-                        'OTHER_LDFLAGS="$combinedArchivePath"',
-                        '-derivedDataPath "$derivedDataPath"',
-                        '-scheme $scheme',
-                        'archive'
-                    ].join(' ');
-
-                    Sys.println(command);
-                    var exitCode = Sys.command(command);
-                    if (exitCode != 0) {
-                        Context.error('Failed to compile xcode framework project. Exit code $exitCode', pos);
-                    }
-                });
-            }
-            */
         });
 
         return Context.getBuildFields();
@@ -264,12 +172,11 @@ class Macro {
         Files in the target directory are overwritten
         When overwriting directories, their contents are merged
     **/
-    static function copyToDirectoryOverwrite(sourcePath: String, targetDirectoryPath: String) {
+    static function copyToDirectory(sourcePath: String, targetDirectoryPath: String, overwrite: Bool) {
         var filename = Path.withoutDirectory(sourcePath);
         var targetFilePath = Path.join([targetDirectoryPath, filename]);
 
         if (FileSystem.isDirectory(sourcePath)) {
-
             // touch within targetDirectoryPath
             if (!FileSystem.exists(targetFilePath)) {
                 FileSystem.createDirectory(targetFilePath);
@@ -277,10 +184,11 @@ class Macro {
 
             // recursive file copy
             for (filename in FileSystem.readDirectory(sourcePath)) {
-                copyToDirectoryOverwrite(Path.join([sourcePath, filename]), targetFilePath);
+                copyToDirectory(Path.join([sourcePath, filename]), targetFilePath, overwrite);
             }
         } else {
             // copy single file
+            if (!overwrite && FileSystem.exists(targetFilePath)) return;
             sys.io.File.copy(sourcePath, targetFilePath);
         }
     }
