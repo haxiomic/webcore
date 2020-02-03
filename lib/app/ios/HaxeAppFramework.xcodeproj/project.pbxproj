@@ -13,6 +13,8 @@
 		BE60D9B623E5F90000BFFB3C /* HaxeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE60D9B423E5F90000BFFB3C /* HaxeApp.swift */; };
 		BE60D9B723E5F90000BFFB3C /* HaxeAppViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE60D9B523E5F90000BFFB3C /* HaxeAppViewController.swift */; };
 		BE6FC30723E884C900E2FAF6 /* lib in Resources */ = {isa = PBXBuildFile; fileRef = BE6FC30623E884C900E2FAF6 /* lib */; };
+		BEE38F0A23E8917200EE0F87 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEE38F0923E8917200EE0F87 /* AVFoundation.framework */; };
+		BEE38F0C23E8917700EE0F87 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEE38F0B23E8917700EE0F87 /* AudioToolbox.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +26,8 @@
 		BE60D9B523E5F90000BFFB3C /* HaxeAppViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HaxeAppViewController.swift; sourceTree = "<group>"; };
 		BE6FC30623E884C900E2FAF6 /* lib */ = {isa = PBXFileReference; lastKnownFileType = folder; path = lib; sourceTree = "<group>"; };
 		BE6FC30823E884D800E2FAF6 /* libHaxeApp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libHaxeApp.a; path = lib/device/libHaxeApp.a; sourceTree = "<group>"; };
+		BEE38F0923E8917200EE0F87 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		BEE38F0B23E8917700EE0F87 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -31,6 +35,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BEE38F0C23E8917700EE0F87 /* AudioToolbox.framework in Frameworks */,
+				BEE38F0A23E8917200EE0F87 /* AVFoundation.framework in Frameworks */,
 				BE0BCED223E61118004AF3C6 /* libc++.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -41,6 +47,8 @@
 		BE0BCECB23E610E9004AF3C6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BEE38F0B23E8917700EE0F87 /* AudioToolbox.framework */,
+				BEE38F0923E8917200EE0F87 /* AVFoundation.framework */,
 				BE6FC30823E884D800E2FAF6 /* libHaxeApp.a */,
 				BE0BCED123E61118004AF3C6 /* libc++.tbd */,
 			);
