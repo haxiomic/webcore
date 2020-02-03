@@ -12,15 +12,19 @@
 		BE24799923E5C91800D9F118 /* HaxeAppFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = BE24799723E5C91800D9F118 /* HaxeAppFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BE60D9B623E5F90000BFFB3C /* HaxeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE60D9B423E5F90000BFFB3C /* HaxeApp.swift */; };
 		BE60D9B723E5F90000BFFB3C /* HaxeAppViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE60D9B523E5F90000BFFB3C /* HaxeAppViewController.swift */; };
+		BE6FC30723E884C900E2FAF6 /* lib in Resources */ = {isa = PBXBuildFile; fileRef = BE6FC30623E884C900E2FAF6 /* lib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		BE0BCEC623E60ECD004AF3C6 /* HaxeAppC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HaxeAppC.h; path = ../HaxeAppC.h; sourceTree = SOURCE_ROOT; };
+		BE0BCEC623E60ECD004AF3C6 /* HaxeAppC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HaxeAppC.h; path = include/HaxeAppC.h; sourceTree = SOURCE_ROOT; };
 		BE0BCED123E61118004AF3C6 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		BE24799423E5C91800D9F118 /* HaxeAppFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = HaxeAppFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE24799723E5C91800D9F118 /* HaxeAppFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HaxeAppFramework.h; path = HaxeAppFramework/HaxeAppFramework.h; sourceTree = SOURCE_ROOT; };
 		BE60D9B423E5F90000BFFB3C /* HaxeApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HaxeApp.swift; sourceTree = "<group>"; };
 		BE60D9B523E5F90000BFFB3C /* HaxeAppViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HaxeAppViewController.swift; sourceTree = "<group>"; };
+		BE6FC30423E8843F00E2FAF6 /* liboutput.iphonesim-64.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "liboutput.iphonesim-64.a"; sourceTree = "<group>"; };
+		BE6FC30623E884C900E2FAF6 /* lib */ = {isa = PBXFileReference; lastKnownFileType = folder; path = lib; sourceTree = "<group>"; };
+		BE6FC30823E884D800E2FAF6 /* libHaxeApp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libHaxeApp.a; path = lib/device/libHaxeApp.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -38,6 +42,8 @@
 		BE0BCECB23E610E9004AF3C6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BE6FC30423E8843F00E2FAF6 /* liboutput.iphonesim-64.a */,
+				BE6FC30823E884D800E2FAF6 /* libHaxeApp.a */,
 				BE0BCED123E61118004AF3C6 /* libc++.tbd */,
 			);
 			name = Frameworks;
@@ -47,6 +53,7 @@
 			isa = PBXGroup;
 			children = (
 				BE24799623E5C91800D9F118 /* HaxeAppFramework */,
+				BE6FC30623E884C900E2FAF6 /* lib */,
 				BE24799523E5C91800D9F118 /* Products */,
 				BE0BCECB23E610E9004AF3C6 /* Frameworks */,
 			);
@@ -141,6 +148,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE6FC30723E884C900E2FAF6 /* lib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -234,8 +242,16 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)",
 				);
+				"LIBRARY_SEARCH_PATHS[sdk=iphoneos*]" = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/lib/device",
+				);
+				"LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*]" = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/lib/simulator",
+				);
+				OTHER_LDFLAGS = "-lHaxeApp";
 				PRODUCT_BUNDLE_IDENTIFIER = haxeapp.Framework;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
