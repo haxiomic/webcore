@@ -1,0 +1,7 @@
+App
+
+--class-path lib
+--class-path src
+
+-dce full
+-D analyzer-optimize

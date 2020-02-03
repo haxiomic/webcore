@@ -1,19 +1,7 @@
-App
-
---class-path lib
---class-path src
+project.hxml
 
 --library hxcpp:4.0.52
 --cpp _hxcpp-bin/android
-
--D dll_link
-
---macro app.Macro.generateFramework('example')
-
--dce full
--D analyzer-optimize
-
--debug
 
 # Compile for multiple architectures
 -D android

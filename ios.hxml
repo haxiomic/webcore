@@ -1,18 +1,11 @@
-App
-
---class-path lib
---class-path src
+project.hxml
 
 --library hxcpp:4.0.52
-
 --cpp _hxcpp-bin/ios
 
 # Leaving SDK empty should map to the default
 # if you have errors about missing SDK then explicitly set the SDK version on your system (e.g. -D IPHONE_VER=12.2)
 -D IPHONE_VER=
-
--dce full
--D analyzer-optimize
 
 # Build libs for multiple architectures: iOS (arm64) and simulator (x86_64)
 --each
