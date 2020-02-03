@@ -160,7 +160,11 @@ class Macro {
                 }
             } else if (binaryFilenames.length > 1) {
                 // lipo multiple binaries together
-                throw '@! todo: lipo multiple binaries together';
+                var command = 'lipo ${binaryFilenames.map(f -> '"${Path.join([outputDirectory, f])}"').join(' ')} -output "$targetFilePath" -create';
+                Sys.println(command);
+                if (Sys.command(command) != 0) {
+                    Context.error('Combing multiple archs with lipo failed', pos);
+                }
             }
         });
 
