@@ -1,5 +1,13 @@
 /**
  * C language wrapper for hxcpp-generated HaxeApp class
+ * 
+ * `hx::NativeAttach haxeGcScope` marks a stack-scope for the hxcpp garbage collector (sets top and bottom of stack)
+ * 
+ * The gc top and bottom of stack should be set whenever haxe allocations can occur
+ * 
+ * See https://groups.google.com/forum/#!topic/haxelang/V-jzaEX7YD8
+ * and https://github.com/HaxeFoundation/hxcpp/blob/master/docs/ThreadsAndStacks.md
+ * For documentation
  */
 
 #include <stdio.h>
@@ -30,16 +38,22 @@ const char* HaxeApp_initialize() {
 }
 
 void* HaxeApp_create() {
+    hx::NativeAttach haxeGcScope;
+
     hx::Native<app::HaxeAppInterface*> app = HaxeApp::create();
     return new AppHandle(app);
 }
 
 void HaxeApp_release(void* untypedAppHandle) {
+    hx::NativeAttach haxeGcScope;
+
     AppHandle* appHandle = (AppHandle*) untypedAppHandle;
     delete appHandle;
 }
 
 void HaxeApp_onGraphicsContextReady(void* untypedAppHandle) {
+    hx::NativeAttach haxeGcScope;
+
     AppHandle* appHandle = (AppHandle*) untypedAppHandle;
     HX_JUST_GC_STACKFRAME
     // create an gl context wrapper (the real context must already be created)
@@ -48,11 +62,15 @@ void HaxeApp_onGraphicsContextReady(void* untypedAppHandle) {
 }
 
 void HaxeApp_onGraphicsContextLost(void* untypedAppHandle) {
+    hx::NativeAttach haxeGcScope;
+
     AppHandle* appHandle = (AppHandle*) untypedAppHandle;
     appHandle->haxeRef->onGraphicsContextLost();
 }
 
 void HaxeApp_onDrawFrame(void* untypedAppHandle) {
+    hx::NativeAttach haxeGcScope;
+
     AppHandle* appHandle = (AppHandle*) untypedAppHandle;
     appHandle->haxeRef->onDrawFrame();
 }
