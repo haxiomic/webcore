@@ -4,6 +4,11 @@ import gluon.webgl.GLShader;
 import gluon.webgl.GLContext;
 import typedarray.Float32Array;
 
+@:embedFile('../assets/multi-channel-test.mp3')
+class Assets extends asset.Assets {
+
+}
+
 #if debug
 // In debug mode we enable sanitizers to help validate correctness (at a performance cost)
 // @:buildXml('
@@ -22,8 +27,38 @@ class App implements app.HaxeAppInterface {
 
 	public function new() {
 		trace('App instance created');
+
 		#if cpp
 		cpp.vm.Gc.setFinalizer(this, cpp.Function.fromStaticFunction(finalizer));
+		#end
+
+		// test the haxe event loop
+		function helloLoop() {
+			haxe.Timer.delay(helloLoop, 1000);
+			trace('hello', haxe.Timer.stamp(), '${cpp.vm.Gc.memInfo(cpp.vm.Gc.MEM_INFO_CURRENT) / 1e6}MB');
+		}
+
+		helloLoop();
+		
+		// play a song
+		trace('about to create audio context');
+		var audioContext = new audio.AudioContext();
+		trace('audio context = $audioContext');
+
+		var node = audioContext.createBufferSource();
+		node.connect(audioContext.destination);
+
+		audioContext.decodeAudioData(Assets.multi_channel_test_mp3.getData(), (audioBuffer) -> {
+			trace('Trying to play audio', audioBuffer);
+			node.buffer = audioBuffer;
+			node.start();
+			node.onended = () -> {
+				trace('Song ended');
+			}
+		});
+
+		#if js
+		js.Browser.window.addEventListener('click', () -> audioContext.resume());
 		#end
 	}
 
