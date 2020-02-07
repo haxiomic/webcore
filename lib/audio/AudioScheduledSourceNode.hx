@@ -60,7 +60,7 @@ class AudioScheduledSourceNode extends AudioNode {
             handledReachedEnd();
         } else {
             // keep polling until end
-            haxe.Timer.delay(pollReachedEndFlag, 0);
+            haxe.Timer.delay(pollReachedEndFlag, 1);
         }
     }
 
