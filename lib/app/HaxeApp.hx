@@ -79,7 +79,7 @@ class Static {
 **/
 #if cpp
 @:notMainApp
-class HaxeAppInterfaceWrapper implements HaxeAppInterface {
+private class HaxeAppInterfaceWrapper implements HaxeAppInterface {
 
     final appInterface: HaxeAppInterface;
 
@@ -103,7 +103,7 @@ class HaxeAppInterfaceWrapper implements HaxeAppInterface {
 
 }
 
-class HaxeMainThread {
+private class HaxeMainThread {
 
     static public var running(default, null): Bool = false;
     static final haxeExecutionMutex = new sys.thread.Mutex();
