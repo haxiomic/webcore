@@ -13,7 +13,7 @@ import gluon.webgl.GLContext;
 #end
 interface HaxeAppInterface {
 
-    function onGraphicsContextReady(gl: GLContext): Void;
+    function onGraphicsContextReady(context: GLContext): Void;
     function onGraphicsContextLost(): Void;
     function onDrawFrame(): Void;
 
