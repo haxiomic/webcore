@@ -98,21 +98,76 @@ class Macro {
     }
 
     /**
+        Generates a script (`haxe-compile.sh|cmd`) that runs haxe command with the same arguments
+    **/
+    static function generateHaxeCompileScript() {
+        if (Sys.args().has('--no-output')) {
+            return Context.getBuildFields();
+        }
+
+        var outputDirectory = getOutputDirectory();
+
+        var sysSettings = switch Sys.systemName().toLowerCase() {
+            case 'windows': {
+                shell: 'windows',
+                scriptExtension: 'cmd',
+                pathSplitChar: ';',
+                quoteArg: (s) -> haxe.SysTools.quoteWinArg(s, false)
+            };
+            case 'macos', _: {
+                shell: 'unix',
+                scriptExtension: 'sh',
+                pathSplitChar: ':',
+                quoteArg: haxe.SysTools.quoteUnixArg
+            }
+        }
+
+        var scriptName = 'haxe-compile.${sysSettings.scriptExtension}';
+
+        var cwd = Sys.getCwd();
+
+        var script = [
+            'cd ${sysSettings.quoteArg(cwd)}',
+            sysSettings.shell == 'windows' ?
+                'set PATH=${sysSettings.quoteArg(Sys.getEnv('PATH'))}' :
+                'export PATH=${sysSettings.quoteArg(Sys.getEnv('PATH'))}',
+            'haxe ${Sys.args().map(s -> sysSettings.quoteArg(s)).join(' ')}',
+        ].join('\n');
+        
+        var scriptPath = Path.join([outputDirectory, scriptName]);
+
+        touchDirectoryPath(Path.directory(scriptPath));
+        sys.io.File.saveContent(scriptPath, script);
+
+        if (sysSettings.shell == 'unix') {
+            if (Sys.command('chmod', ['u+x', scriptPath]) != 0) {
+                Context.error('Failed to make "$scriptPath" executable', Context.currentPos());
+            }
+        }
+        
+        return Context.getBuildFields();
+    }
+
+    /**
         Generates a framework by copying the framework files into the hxcpp output directory and combining hxcpp binaries of different architectures into a single file to link against.
         **Currently only supports iOS frameworks**
     **/
     static function copyHaxeAppFramework() {
+        if (Sys.args().has('--no-output')) {
+            return Context.getBuildFields();
+        }
+
+        var outputDirectory = getOutputDirectory();
+
         var pos = Context.currentPos();
 
         Context.onAfterGenerate(() -> {
-            var outputDirectory = getOutputDirectory();
-
             // copy Xcode project files to generate framework
             // using resolvePath allows user overriding
             var frameworkProjectPath = Context.resolvePath('app/ios');
             for (filename in FileSystem.readDirectory(frameworkProjectPath)) {
                 var outputPath = Path.join([outputDirectory, filename]);
-                // Xcode doesn't like subprojects being changed duirng a build so only copy if the file doesn't already exist
+                // Xcode doesn't like sub-projects being changed during a build so only copy if the file doesn't already exist
                 var overwrite = false;
                 copyToDirectory(Path.join([frameworkProjectPath, filename]), outputDirectory, overwrite);
             }
@@ -154,15 +209,13 @@ class Macro {
             if (binaryFilenames.length == 1) {
                 // symlink
                 var command = 'ln -sf "../../${binaryFilenames[0]}" "$targetFilePath"';
-                Sys.println(command);
-                if (Sys.command(command) != 0) {
+                if (echoCommand(command) != 0) {
                     Context.error('Symbolic link failed', pos);
                 }
             } else if (binaryFilenames.length > 1) {
                 // lipo multiple binaries together
                 var command = 'lipo ${binaryFilenames.map(f -> '"${Path.join([outputDirectory, f])}"').join(' ')} -output "$targetFilePath" -create';
-                Sys.println(command);
-                if (Sys.command(command) != 0) {
+                if (echoCommand(command) != 0) {
                     Context.error('Combing multiple archs with lipo failed', pos);
                 }
             }
@@ -229,8 +282,8 @@ class Macro {
     }
 
     static function getOutputDirectory() {
-        var outputPath = Compiler.getOutput();
-        return FileSystem.isDirectory(outputPath) ? outputPath : Path.directory(outputPath);
+        var directoryTargets = [ 'as3', 'php', 'cpp', 'cs', 'java' ];
+        return directoryTargets.has(Context.definedValue('target.name')) ? Compiler.getOutput() : Path.directory(Compiler.getOutput());
     }
 
     static function executeWithCwd(cwd: String, callback: () -> Void) {
@@ -238,6 +291,12 @@ class Macro {
         Sys.setCwd(cwd);
         callback();
         Sys.setCwd(initialCwd);
+    }
+
+    static function echoCommand(cmd: String) {
+        // from haxe Sys.command() implementation
+        Sys.println(cmd);
+        return Sys.command(cmd);
     }
 
 }
