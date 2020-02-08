@@ -11,24 +11,17 @@
 		BE4331572325743100C9A45D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BE4331552325743100C9A45D /* Main.storyboard */; };
 		BE4331592325743200C9A45D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE4331582325743200C9A45D /* Assets.xcassets */; };
 		BE43315C2325743200C9A45D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BE43315A2325743200C9A45D /* LaunchScreen.storyboard */; };
-		BE43316B2325748D00C9A45D /* MinimalGLFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE43316A2325746E00C9A45D /* MinimalGLFramework.framework */; };
-		BE43316C2325748D00C9A45D /* MinimalGLFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BE43316A2325746E00C9A45D /* MinimalGLFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		BEBB8EC523EF6A2A00574F6A /* HaxeAppFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEBB8EC423EF6A2500574F6A /* HaxeAppFramework.framework */; };
+		BEBB8EC623EF6A2A00574F6A /* HaxeAppFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BEBB8EC423EF6A2500574F6A /* HaxeAppFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		BE4331692325746E00C9A45D /* PBXContainerItemProxy */ = {
+		BEBB8EC323EF6A2500574F6A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = BE4331652325746E00C9A45D /* MinimalGLFramework.xcodeproj */;
+			containerPortal = BEBB8EBF23EF6A2500574F6A /* HaxeAppFramework.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = BE35669623255E8F00F0CD08;
-			remoteInfo = MinimalGLFramework;
-		};
-		BE43316D2325748D00C9A45D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BE4331652325746E00C9A45D /* MinimalGLFramework.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = BE35669523255E8F00F0CD08;
-			remoteInfo = MinimalGLFramework;
+			remoteGlobalIDString = BE24799423E5C91800D9F118;
+			remoteInfo = HaxeAppFramework;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -39,7 +32,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				BE43316C2325748D00C9A45D /* MinimalGLFramework.framework in Embed Frameworks */,
+				BEBB8EC623EF6A2A00574F6A /* HaxeAppFramework.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -53,7 +46,7 @@
 		BE4331582325743200C9A45D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BE43315B2325743200C9A45D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		BE43315D2325743200C9A45D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		BE4331652325746E00C9A45D /* MinimalGLFramework.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = MinimalGLFramework.xcodeproj; path = ../MinimalGLFramework/MinimalGLFramework.xcodeproj; sourceTree = "<group>"; };
+		BEBB8EBF23EF6A2500574F6A /* HaxeAppFramework.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = HaxeAppFramework.xcodeproj; path = "../../../_hxcpp-bin/ios/HaxeAppFramework.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,7 +54,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BE43316B2325748D00C9A45D /* MinimalGLFramework.framework in Frameworks */,
+				BEBB8EC523EF6A2A00574F6A /* HaxeAppFramework.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -73,7 +66,7 @@
 			children = (
 				BE4331502325743100C9A45D /* MinimalGLApp */,
 				BE43314F2325743100C9A45D /* Products */,
-				BE4331652325746E00C9A45D /* MinimalGLFramework.xcodeproj */,
+				BEC88F7223E759C4005C1AD9 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -97,12 +90,20 @@
 			path = MinimalGLApp;
 			sourceTree = "<group>";
 		};
-		BE4331662325746E00C9A45D /* Products */ = {
+		BEBB8EC023EF6A2500574F6A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				BE43316A2325746E00C9A45D /* MinimalGLFramework.framework */,
+				BEBB8EC423EF6A2500574F6A /* HaxeAppFramework.framework */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		BEC88F7223E759C4005C1AD9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				BEBB8EBF23EF6A2500574F6A /* HaxeAppFramework.xcodeproj */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -120,7 +121,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				BE43316E2325748D00C9A45D /* PBXTargetDependency */,
 			);
 			name = MinimalGLApp;
 			productName = MinimalGLApp;
@@ -155,8 +155,8 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = BE4331662325746E00C9A45D /* Products */;
-					ProjectRef = BE4331652325746E00C9A45D /* MinimalGLFramework.xcodeproj */;
+					ProductGroup = BEBB8EC023EF6A2500574F6A /* Products */;
+					ProjectRef = BEBB8EBF23EF6A2500574F6A /* HaxeAppFramework.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -167,11 +167,11 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		BE43316A2325746E00C9A45D /* MinimalGLFramework.framework */ = {
+		BEBB8EC423EF6A2500574F6A /* HaxeAppFramework.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			path = MinimalGLFramework.framework;
-			remoteRef = BE4331692325746E00C9A45D /* PBXContainerItemProxy */;
+			path = HaxeAppFramework.framework;
+			remoteRef = BEBB8EC323EF6A2500574F6A /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -199,14 +199,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		BE43316E2325748D00C9A45D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = MinimalGLFramework;
-			targetProxy = BE43316D2325748D00C9A45D /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		BE4331552325743100C9A45D /* Main.storyboard */ = {
@@ -347,11 +339,11 @@
 		BE4331612325743200C9A45D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 8U5TB3BU5A;
 				INFOPLIST_FILE = MinimalGLApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -366,11 +358,11 @@
 		BE4331622325743200C9A45D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 8U5TB3BU5A;
 				INFOPLIST_FILE = MinimalGLApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
