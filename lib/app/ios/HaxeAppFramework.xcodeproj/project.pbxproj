@@ -15,6 +15,7 @@
 		BE6FC30723E884C900E2FAF6 /* lib in Resources */ = {isa = PBXBuildFile; fileRef = BE6FC30623E884C900E2FAF6 /* lib */; };
 		BEE38F0A23E8917200EE0F87 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEE38F0923E8917200EE0F87 /* AVFoundation.framework */; };
 		BEE38F0C23E8917700EE0F87 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEE38F0B23E8917700EE0F87 /* AudioToolbox.framework */; };
+		BEFF39DA23EF671900454EB5 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BEFF39D923EF671900454EB5 /* Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		BE6FC30823E884D800E2FAF6 /* libHaxeApp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libHaxeApp.a; path = lib/device/libHaxeApp.a; sourceTree = "<group>"; };
 		BEE38F0923E8917200EE0F87 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		BEE38F0B23E8917700EE0F87 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		BEFF39D923EF671900454EB5 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = HaxeAppFramework/Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +60,7 @@
 		BE24798A23E5C91800D9F118 = {
 			isa = PBXGroup;
 			children = (
+				BEFF39D923EF671900454EB5 /* Info.plist */,
 				BE24799623E5C91800D9F118 /* HaxeAppFramework */,
 				BE6FC30623E884C900E2FAF6 /* lib */,
 				BE24799523E5C91800D9F118 /* Products */,
@@ -103,6 +106,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = BE24799C23E5C91800D9F118 /* Build configuration list for PBXNativeTarget "HaxeAppFramework" */;
 			buildPhases = (
+				BEFF39BB23EF60FC00454EB5 /* ShellScript */,
 				BE24798F23E5C91800D9F118 /* Headers */,
 				BE24799023E5C91800D9F118 /* Sources */,
 				BE24799123E5C91800D9F118 /* Frameworks */,
@@ -154,11 +158,32 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BEFF39DA23EF671900454EB5 /* Info.plist in Resources */,
 				BE6FC30723E884C900E2FAF6 /* lib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		BEFF39BB23EF60FC00454EB5 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -x\n$SRCROOT/haxe-compile.sh\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		BE24799023E5C91800D9F118 /* Sources */ = {
