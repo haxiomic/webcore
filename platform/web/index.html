@@ -65,7 +65,7 @@
 
 			// add canvas gl context listeners to encourage powerPreference to be respected
 			canvas.addEventListener('webglcontextlost', () => {
-				appInstance.oonNativeGraphicsContextLost();
+				appInstance.onGraphicsContextLost();
 				cancelAnimationFrame(requestAnimationFrameHandle);
 			});
 			canvas.addEventListener('webglcontextrestored', () => {
