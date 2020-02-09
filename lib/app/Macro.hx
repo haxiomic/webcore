@@ -106,7 +106,6 @@ class Macro {
             return Context.getBuildFields();
         }
 
-        
         // remove arch specific compile defines
         var stripDefines = [
             'iphoneos',
@@ -131,7 +130,9 @@ class Macro {
             strippedHaxeArgs.push(haxeArgs[i]);
             i++;
         }
-        haxeArgs = strippedHaxeArgs;
+
+        // add -D HXCPP_VERBOSE
+        haxeArgs = ['-D', 'HXCPP_VERBOSE'].concat(strippedHaxeArgs);
 
         var outputDirectory = getOutputDirectory();
 
@@ -203,14 +204,14 @@ class Macro {
             }
 
             // symlink device and simulator binaries and lipo together different architectures
-            var binaryExtension = 'a';
+            var binaryExtensions = ['a'];
             var currentBuild =
                 if (Context.defined('iphoneos')) {
-                    filenamePattern: ~/\b(iphoneos)\b/i,
+                    filenamePattern: ~/\b(iphoneos|ios)\b/i,
                     type: 'device',
                 }
                 else if (Context.defined('iphonesim')) {
-                    filenamePattern: ~/\b(iphonesim)\b/i,
+                    filenamePattern: ~/\b(iphonesim|sim)\b/i,
                     type: 'simulator',
                 }
                 else {
@@ -221,7 +222,7 @@ class Macro {
             var debugFilenamePattern = new EReg('\\b$debugSuffix\\b', 'i');
 
             var binaryFilenames = FileSystem.readDirectory(outputDirectory).filter(filename -> {
-                if (Path.extension(filename).toLowerCase() != binaryExtension) return false;
+                if (!binaryExtensions.has(Path.extension(filename).toLowerCase())) return false;
                 var isDebugFile = debugFilenamePattern.match(filename);
                 return
                     currentBuild.filenamePattern.match(filename) &&
