@@ -98,12 +98,40 @@ class Macro {
     }
 
     /**
-        Generates a script (`haxe-compile.sh|cmd`) that runs haxe command with the same arguments
+        Generates a script (`haxe-compile.sh|cmd`) that runs haxe command with the same arguments as the build which called this macro
     **/
     static function generateHaxeCompileScript() {
-        if (Sys.args().has('--no-output')) {
+        var haxeArgs = Sys.args();
+        if (haxeArgs.has('--no-output')) {
             return Context.getBuildFields();
         }
+
+        
+        // remove arch specific compile defines
+        var stripDefines = [
+            'iphoneos',
+            'iphonesim',
+            'HXCPP_ARMV6',
+            'HXCPP_ARMV7',
+            'HXCPP_ARMV7S',
+            'HXCPP_ARM64',
+            'HXCPP_M64',
+        ];
+        var strippedHaxeArgs = [];
+        var i = 0;
+        while (i < haxeArgs.length - 1) {
+            if (StringTools.trim(haxeArgs[i]) == '-D') {
+                var define = StringTools.trim(haxeArgs[i + 1]);
+                if (stripDefines.has(define)) {
+                    i += 2;
+                    continue;
+                }
+            }
+
+            strippedHaxeArgs.push(haxeArgs[i]);
+            i++;
+        }
+        haxeArgs = strippedHaxeArgs;
 
         var outputDirectory = getOutputDirectory();
 
@@ -112,13 +140,15 @@ class Macro {
                 shell: 'windows',
                 scriptExtension: 'cmd',
                 pathSplitChar: ';',
-                quoteArg: (s) -> haxe.SysTools.quoteWinArg(s, false)
+                quoteArg: (s) -> haxe.SysTools.quoteWinArg(s, false),
+                shellArgsVar: '%*',
             };
             case 'macos', _: {
                 shell: 'unix',
                 scriptExtension: 'sh',
                 pathSplitChar: ':',
-                quoteArg: haxe.SysTools.quoteUnixArg
+                quoteArg: haxe.SysTools.quoteUnixArg,
+                shellArgsVar: '$@',
             }
         }
 
@@ -131,7 +161,7 @@ class Macro {
             sysSettings.shell == 'windows' ?
                 'set PATH=${sysSettings.quoteArg(Sys.getEnv('PATH'))}' :
                 'export PATH=${sysSettings.quoteArg(Sys.getEnv('PATH'))}',
-            'haxe ${Sys.args().map(s -> sysSettings.quoteArg(s)).join(' ')}',
+            'haxe ${haxeArgs.map(s -> sysSettings.quoteArg(s)).concat([sysSettings.shellArgsVar]).join(' ')}',
         ].join('\n');
         
         var scriptPath = Path.join([outputDirectory, scriptName]);

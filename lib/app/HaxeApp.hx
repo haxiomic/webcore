@@ -153,12 +153,15 @@ private class HaxeMainThread {
         // event loop
         while (true) {
             haxeExecutionMutex.acquire();
+
             if (!running) {
                 break;
             }
+
             var nextTick_s = haxe.EntryPoint.processEvents();
             
             haxeExecutionMutex.release();
+
             // we keep the event-loop alive even if there are no events (nextTick_s < 0)
             // this differs from the default haxe event loop because haxe code can be executed externally and so new events may be scheduled
             if (nextTick_s < 0) {

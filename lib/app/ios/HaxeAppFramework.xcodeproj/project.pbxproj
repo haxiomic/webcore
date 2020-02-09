@@ -179,7 +179,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -x\n$SRCROOT/haxe-compile.sh\n";
+			shellScript = "set -x\n\nEXTRA_HAXE_ARGS=\"\"\n\nif [ \"$ARCHS\" == \"armv6\" ]; then EXTRA_HAXE_ARGS+=\" -D HXCPP_ARMV6\";\nelif [ \"$ARCHS\" == \"armv7\" ]; then EXTRA_HAXE_ARGS+=\" -D HXCPP_ARMV7\";\nelif [ \"$ARCHS\" == \"armv7s\" ]; then EXTRA_HAXE_ARGS+=\" -D HXCPP_ARMV7S\";\nelif [ \"$ARCHS\" == \"arm64\" ]; then EXTRA_HAXE_ARGS+=\" -D HXCPP_ARM64\";\nelif [ \"$ARCHS\" == \"x86_64\" ]; then EXTRA_HAXE_ARGS+=\" -D HXCPP_M64\";\nelif [ \"$ARCHS\" == \"i386\" ]; then EXTRA_HAXE_ARGS+=\"\";\nelse echo \"Warning: arch not recognized '$ARCHS'; no matching hxcpp flag found\";\nfi\n\nif [ \"$PLATFORM_NAME\" == \"iphonesimulator\" ]; then EXTRA_HAXE_ARGS+=\" -D iphonesim\";\nelif [ \"$PLATFORM_NAME\" == \"iphoneos\" ]; then EXTRA_HAXE_ARGS+=\" -D iphoneos\";\nfi \n\n$SRCROOT/haxe-compile.sh $EXTRA_HAXE_ARGS\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
