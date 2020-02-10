@@ -33,8 +33,24 @@ class AudioDecoder {
         cpp.vm.Gc.setFinalizer(this, Function.fromStaticFunction(finalizer));
     }
 
+    /**
+        Retrieves the length of the decoder in PCM frames.
+
+        Do not call this on streams of an undefined length, such as internet radio.
+
+        If the length is unknown or an error occurs, 0 will be returned.
+
+        This will always return 0 for Vorbis decoders. This is due to a limitation with stb_vorbis in push mode which is what miniaudio
+        uses internally.
+
+        For MP3's, this will decode the entire file. Do not call this in time critical scenarios.
+    **/
     public inline function getLengthInPcmFrames(): UInt64 {
         return nativeAudioDecoder.getLengthInPcmFrames();
+    }
+
+    public inline function bytesPerFrame(): UInt32 {
+        return MiniAudio.get_bytes_per_frame(format, channels);
     }
 
     /**
@@ -42,20 +58,27 @@ class AudioDecoder {
         For example, 3 samples with two channels: [C1 C2 C1 C2 C1 C2]
 
         By default the sample data type will be float32
+
+        `frameCount` is not clamped to the source length, exceeding the source frame count is unspecified
     **/
-    public inline function getInterleavedPcmFrames(startFrameIndex: UInt64 = 0, ?frameCount: UInt64): haxe.io.Bytes {
+    public inline function getInterleavedPcmFrames(startFrameIndex: UInt64 = 0, ?frameCount: UInt64, ?destination: haxe.io.Bytes): haxe.io.Bytes {
         var initialFrameIndex = frameIndex;
-        var sourceLength = getLengthInPcmFrames();
-        var remainingFrames = sourceLength - startFrameIndex;
-        var framesToRead: UInt64 = if (frameCount == null) {
-            remainingFrames;
+
+        var framesToRead: UInt64 = if (frameCount != null) {
+            frameCount;
         } else {
-            frameCount < remainingFrames ? frameCount : remainingFrames;
+            var sourceLength = getLengthInPcmFrames();
+            var remainingFrames = sourceLength - startFrameIndex;
+            remainingFrames;
         }
 
-        var bytesPerFrame = MiniAudio.get_bytes_per_frame(format, channels);
-        var totalBytes: UInt64 = cast bytesPerFrame * framesToRead;
-        var bytes = haxe.io.Bytes.alloc(totalBytes);
+        var bytes = if (destination != null) {
+            destination;
+        } else {
+            var totalBytes: UInt64 = cast bytesPerFrame() * framesToRead;
+            haxe.io.Bytes.alloc(totalBytes);
+        }
+
         var bytesAddress: Star<cpp.Void> = cast cpp.NativeArray.address(bytes.getData(), 0).raw;
         
         seekToPcmFrame(startFrameIndex);
