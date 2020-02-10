@@ -192,17 +192,22 @@ class Macro {
 
         var pos = Context.currentPos();
 
-        Context.onAfterGenerate(() -> {
-            // copy Xcode project files to generate framework
-            // using resolvePath allows user overriding
-            var frameworkProjectPath = Context.resolvePath('app/ios');
-            for (filename in FileSystem.readDirectory(frameworkProjectPath)) {
-                var outputPath = Path.join([outputDirectory, filename]);
-                // Xcode doesn't like sub-projects being changed during a build so only copy if the file doesn't already exist
-                var overwrite = false;
-                copyToDirectory(Path.join([frameworkProjectPath, filename]), outputDirectory, overwrite);
-            }
 
+        // copy Xcode project files to generate framework
+        // using resolvePath allows user overriding
+        var frameworkProjectPath = Context.resolvePath('app/ios');
+
+        touchDirectoryPath(outputDirectory);
+
+        for (filename in FileSystem.readDirectory(frameworkProjectPath)) {
+            var outputPath = Path.join([outputDirectory, filename]);
+            // Xcode doesn't like sub-projects being changed during a build so only copy if the file doesn't already exist
+            var overwrite = false;
+            copyToDirectory(Path.join([frameworkProjectPath, filename]), outputDirectory, overwrite);
+        }
+
+        // when hxcpp completes, we need to link the output binaries to a hardcoded name so the Xcode project can find them
+        Context.onAfterGenerate(() -> {
             // symlink device and simulator binaries and lipo together different architectures
             var binaryExtensions = ['a'];
             var currentBuild =
