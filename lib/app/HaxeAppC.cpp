@@ -21,7 +21,7 @@
 #include "HaxeAppC.h"
 
 #include <app/HaxeAppInterface.h>
-#include <gluon/webgl/native/GLContext.h>
+#include <webgl/native/GLContext.h>
 
 struct AppHandle {
     hx::Ref<app::HaxeAppInterface*> haxeRef;
@@ -57,7 +57,7 @@ void HaxeApp_onGraphicsContextReady(void* untypedAppHandle) {
     AppHandle* appHandle = (AppHandle*) untypedAppHandle;
     HX_JUST_GC_STACKFRAME
     // create an gl context wrapper (the real context must already be created)
-    gluon::webgl::native::GLContext gl = gluon::webgl::native::GLContext_obj::__alloc(HX_CTX);
+    webgl::native::GLContext gl = webgl::native::GLContext_obj::__alloc(HX_CTX);
     appHandle->haxeRef->onGraphicsContextReady(gl);
 }
 

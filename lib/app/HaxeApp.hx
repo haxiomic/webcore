@@ -90,7 +90,7 @@ private class HaxeAppInterfaceWrapper implements HaxeAppInterface {
         this.appInterface = appInterface;
     }
 
-    public function onGraphicsContextReady(context: gluon.webgl.GLContext) {
+    public function onGraphicsContextReady(context: webgl.GLContext) {
         HaxeMainThread.runWithMainThreadMutex(() -> appInterface.onGraphicsContextReady(context));
     }
 
