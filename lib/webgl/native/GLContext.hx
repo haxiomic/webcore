@@ -829,13 +829,57 @@ class GLContext {
 		glStencilOpSeparate(face, fail, zfail, zpass);
 	}
 
-	public inline function texImage2D(target:TextureTarget, level:GLint, internalformat:GLint, width:GLsizei, height:GLsizei, border:GLint, format:PixelFormat, type:PixelDataType, pixels:GLArrayBufferView) {
+	public inline function texImage2D(target:TextureTarget, level:GLint, internalformat:GLint, width:GLsizei, height:GLsizei, border:GLint, format:PixelFormat, type:PixelDataType, pixels:Null<GLArrayBufferView>) {
 		var ptr: Star<UInt8> = pixels != null ? pixels.toCPointer() : null;
 		glTexImage2D(target, level, internalformat, width, height, border, format, type, cast ptr);
 	}
 
-	public inline function texImage2DPtr(target:TextureTarget, level:GLint, internalformat:GLint, width:GLsizei, height:GLsizei, border:GLint, format:PixelFormat, type:PixelDataType, pixels:RawConstPointer<cpp.Void>) {
-		glTexImage2D(target, level, internalformat, width, height, border, format, type, cast pixels);
+	public function texImage2DImageSource(target:TextureTarget, level:GLint, internalformat:GLint, format:PixelFormat, type:PixelDataType, source:TexImageSource) {
+		@:privateAccess {
+			// currently on C++ TexImageSource can only be an Image
+			var imageSource: image.Image = source;
+
+			var nChannels = switch format {
+				case RGB: 3;
+				case RGBA: 4;
+				case ALPHA: 1;
+				case LUMINANCE: 1;
+				case LUMINANCE_ALPHA: 2;
+				case DEPTH_COMPONENT: 1;
+				default: null;
+			}
+
+			if (nChannels == null) {
+				throw 'Unsupported PixelFormat ${format}';
+			}
+
+			var dataType = switch type {
+				case FLOAT: image.Image.PixelDataType.FLOAT;
+				case UNSIGNED_BYTE: image.Image.PixelDataType.UNSIGNED_BYTE;
+				default: null;
+			}
+
+			if (dataType == null) {
+				throw 'Unsupported PixelDataType ${type}';
+			}
+
+			var flipY = false;
+			var forceUnpremultiply = false;
+
+			var imageData = imageSource.getData(nChannels, dataType, flipY, forceUnpremultiply);
+
+			var ptr: Star<UInt8> = imageData != null ? imageData.toCPointer() : null;
+
+			var initialUnpackAlignment = getParameter(UNPACK_ALIGNMENT);
+
+			// set unpack alignment to 1 for the upload
+			pixelStorei(UNPACK_ALIGNMENT, 1);
+
+			glTexImage2D(target, level, internalformat, source.width, source.height, 0, format, type, cast ptr);
+
+			// restore initial unpack alignment
+			pixelStorei(UNPACK_ALIGNMENT, initialUnpackAlignment);
+		}
 	}
 
 	public inline function texParameterf<T:GLfloat>(target:TextureTarget, pname:TextureParameter<T>, param:T) {
@@ -849,6 +893,54 @@ class GLContext {
 	public inline function texSubImage2D(target:TextureTarget, level:GLint, xoffset:GLint, yoffset:GLint, width:GLsizei, height:GLsizei, format:PixelFormat, type:PixelDataType, pixels:GLArrayBufferView) {
 		var ptr: Star<UInt8> = pixels != null ? pixels.toCPointer() : null;
 		glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, cast ptr);
+	}
+
+	public function texSubImage2DImageSource(target:TextureTarget, level:GLint, xoffset:GLint, yoffset:GLint, format:PixelFormat, type:PixelDataType, source:TexImageSource) {
+		@:privateAccess {
+			// currently on C++ TexImageSource can only be an Image
+			var imageSource: image.Image = source;
+
+			var nChannels = switch format {
+				case RGB: 3;
+				case RGBA: 4;
+				case ALPHA: 1;
+				case LUMINANCE: 1;
+				case LUMINANCE_ALPHA: 2;
+				case DEPTH_COMPONENT: 1;
+				default: null;
+			}
+
+			if (nChannels == null) {
+				throw 'Unsupported PixelFormat ${format}';
+			}
+
+			var dataType = switch type {
+				case FLOAT: image.Image.PixelDataType.FLOAT;
+				case UNSIGNED_BYTE: image.Image.PixelDataType.UNSIGNED_BYTE;
+				default: null;
+			}
+
+			if (dataType == null) {
+				throw 'Unsupported PixelDataType ${type}';
+			}
+
+			var flipY = false;
+			var forceUnpremultiply = false;
+
+			var imageData = imageSource.getData(nChannels, dataType, flipY, forceUnpremultiply);
+
+			var ptr: Star<UInt8> = imageData != null ? imageData.toCPointer() : null;
+
+			var initialUnpackAlignment = getParameter(UNPACK_ALIGNMENT);
+
+			// set unpack alignment to 1 for the upload
+			pixelStorei(UNPACK_ALIGNMENT, 1);
+
+			glTexSubImage2D(target, level, xoffset, yoffset, source.width, source.height, format, type, cast ptr);
+
+			// restore initial unpack alignment
+			pixelStorei(UNPACK_ALIGNMENT, initialUnpackAlignment);
+		}
 	}
 
 	public inline function uniform1f(location:GLUniformLocation, x:GLfloat) {

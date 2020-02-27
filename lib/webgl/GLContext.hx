@@ -51,16 +51,18 @@ abstract TexImageSource(Dynamic)
 	from js.html.ImageData     to js.html.ImageData
 	from js.html.ImageElement  to js.html.ImageElement
 	from js.html.CanvasElement to js.html.CanvasElement
-	from js.html.VideoElement  to js.html.VideoElement {
-		public var width (get, set): Int;
-		public var height (get, set): Int;
-
-		inline function get_width() return this.width;
-		inline function set_width(v: Int) return this.width = v;
-		inline function get_height() return this.height;
-		inline function set_height(v: Int) return this.height = v;
-	}
+	from js.html.VideoElement  to js.html.VideoElement
+#else
+abstract TexImageSource(image.Image)
+	from image.Image to image.Image
 #end
+{
+	public var width (get, never): Int;
+	public var height (get, never): Int;
+
+	inline function get_width() return this.width;
+	inline function get_height() return this.height;
+}
 
 private typedef InternalGLContext = 
 	#if js
@@ -399,18 +401,15 @@ abstract GLContext(InternalGLContext) from InternalGLContext to InternalGLContex
 	public inline function stencilOpSeparate(face:CullFaceMode, fail:Operation, zfail:Operation, zpass:Operation)
 		this.stencilOpSeparate(face, fail, zfail, zpass);
 
-	public inline function texImage2D(target:TextureTarget, level:GLint, internalformat:GLint, width:GLsizei, height:GLsizei, border:GLint, format:PixelFormat, type:PixelDataType, pixels:GLArrayBufferView)
+	public inline function texImage2D(target:TextureTarget, level:GLint, internalformat:GLint, width:GLsizei, height:GLsizei, border:GLint, format:PixelFormat, type:PixelDataType, pixels:Null<GLArrayBufferView>)
 		this.texImage2D(target, level, internalformat, width, height, border, format, type, pixels);
 
-	#if cpp
-	public inline function texImage2DPtr(target:TextureTarget, level:GLint, internalformat:GLint, width:GLsizei, height:GLsizei, border:GLint, format:PixelFormat, type:PixelDataType, pixels:cpp.RawConstPointer<cpp.Void>)
-		this.texImage2DPtr(target, level, internalformat, width, height, border, format, type, pixels);
-	#end
-
-	#if js
-	public inline function texImage2DDOM(target:TextureTarget, level:GLint, internalformat:GLint, format:PixelFormat, type:PixelDataType, source:TexImageSource)
+	public inline function texImage2DImageSource(target:TextureTarget, level:GLint, internalformat:GLint, format:PixelFormat, type:PixelDataType, source:TexImageSource)
+		#if js
 		this.texImage2D(target, level, internalformat, format, type, source);
-	#end
+		#else
+		this.texImage2DImageSource(target, level, internalformat, format, type, source);
+		#end
 
 	public inline function texParameterf<T:GLfloat>(target:TextureTarget, pname:TextureParameter<T>, param:T)
 		this.texParameterf(target, pname, param);
@@ -421,10 +420,12 @@ abstract GLContext(InternalGLContext) from InternalGLContext to InternalGLContex
 	public inline function texSubImage2D(target:TextureTarget, level:GLint, xoffset:GLint, yoffset:GLint, width:GLsizei, height:GLsizei, format:PixelFormat, type:PixelDataType, pixels:GLArrayBufferView)
 		this.texSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
 
-	#if js
-	public inline function texSubImage2DDOM(target:TextureTarget, level:GLint, xoffset:GLint, yoffset:GLint, format:PixelFormat, type:PixelDataType, source:TexImageSource)
+	public inline function texSubImage2DImageSource(target:TextureTarget, level:GLint, xoffset:GLint, yoffset:GLint, format:PixelFormat, type:PixelDataType, source:TexImageSource)
+		#if js
 		this.texSubImage2D(target, level, xoffset, yoffset, format, type, source);
-	#end
+		#else
+		this.texSubImage2DImageSource(target, level, xoffset, yoffset, format, type, source);
+		#end
 
 	public inline function uniform1f(location:GLUniformLocation, x:GLfloat)
 		this.uniform1f(location, x);
