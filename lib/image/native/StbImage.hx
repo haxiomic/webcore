@@ -74,6 +74,17 @@ extern class StbImage {
     @:native('stbi_failure_reason')
     static function stbi_failure_reason(): ConstCharStar;
 
+
+    @:native('stbi_hdr_to_ldr_gamma')
+    static function stbi_hdr_to_ldr_gamma(gamma: Float): Void;
+    @:native('stbi_hdr_to_ldr_scale')
+    static function stbi_hdr_to_ldr_scale(scale: Float): Void;
+
+    @:native('stbi_ldr_to_hdr_gamma')
+    static function stbi_ldr_to_hdr_gamma(gamma: Float): Void;
+    @:native('stbi_ldr_to_hdr_scale')
+    static function stbi_ldr_to_hdr_scale(scale: Float): Void;
+
 }
 
 typedef ReadCallback = Callable<(user: Star<cpp.Void>, data: Star<Char>, size: Int32) -> Int32>;
