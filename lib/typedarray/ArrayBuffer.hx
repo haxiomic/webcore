@@ -2,7 +2,20 @@ package typedarray;
 
 #if js
 
-typedef ArrayBuffer = js.lib.ArrayBuffer;
+// in js, we abstract over ArrayBuffer so we can enable to/from haxe.io.Bytes
+@:forward
+abstract ArrayBuffer(js.lib.ArrayBuffer) to js.lib.ArrayBuffer from js.lib.ArrayBuffer {
+
+	@:to inline function toBytes(): haxe.io.Bytes {
+		return haxe.io.Bytes.ofData(this);
+	}
+
+	@:from static inline function fromBytes(bytes: haxe.io.Bytes): ArrayBuffer {
+		// in js BytesData is ArrayBuffer
+		return bytes.getData();
+	}
+
+}
 
 #else
 
@@ -60,6 +73,12 @@ abstract ArrayBuffer(haxe.io.Bytes) from haxe.io.Bytes to haxe.io.Bytes {
 	static public inline function ofData(bytesData: haxe.io.BytesData): ArrayBuffer {
 		return haxe.io.Bytes.ofData(bytesData);
 	}
+
+	#if cpp
+	static public inline function fromCPointer(cPointer: cpp.Star<cpp.UInt8>, byteLength: Int): ArrayBuffer {
+		return ofData(cpp.Pointer.fromStar(cPointer).toUnmanagedArray(byteLength));
+	}
+	#end
 
 }
 
