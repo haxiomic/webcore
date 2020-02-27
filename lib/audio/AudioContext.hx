@@ -8,6 +8,7 @@ typedef AudioContext = js.html.audio.AudioContext;
 
 import cpp.*;
 
+import typedarray.ArrayBuffer;
 import audio.native.AudioDecoder;
 import audio.native.NativeAudioNode.NativeAudioNodeList;
 import audio.native.MiniAudio;
@@ -122,12 +123,12 @@ class AudioContext {
         return new GainNode(this);
     }
 
-    public function decodeAudioData(audioFileBytes: haxe.io.BytesData, ?successCallback: AudioBuffer -> Void, ?errorCallback: String -> Void): Void {
-        var copiedBytes = audioFileBytes.copy(); // we must copy because these bytes are read from another thread
+    public function decodeAudioData(audioFileBytes: ArrayBuffer, ?successCallback: AudioBuffer -> Void, ?errorCallback: String -> Void): Void {
+        var copiedBytes = audioFileBytes.slice(0); // we must copy because these bytes are read from another thread
         sys.thread.Thread.create(() -> {
             try {
                 // decode file into raw pcm frame bytes
-                var tmpDecoder = new FileBytesDecoder(this, haxe.io.Bytes.ofData(copiedBytes), false);
+                var tmpDecoder = new FileBytesDecoder(this, copiedBytes, false);
                 var bytes = tmpDecoder.getInterleavedPcmFrames(0);
                 var audioBuffer = new AudioBuffer(bytes, tmpDecoder);
                 if (successCallback != null) {
