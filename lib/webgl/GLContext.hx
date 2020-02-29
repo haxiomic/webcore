@@ -47,6 +47,7 @@ typedef GLFloat64Array      = typedarray.Float64Array;
 
 #if js
 abstract TexImageSource(Dynamic)
+	from image.Image           to image.Image
 	from js.html.ImageBitmap   to js.html.ImageBitmap
 	from js.html.ImageData     to js.html.ImageData
 	from js.html.ImageElement  to js.html.ImageElement
@@ -401,10 +402,10 @@ abstract GLContext(InternalGLContext) from InternalGLContext to InternalGLContex
 	public inline function stencilOpSeparate(face:CullFaceMode, fail:Operation, zfail:Operation, zpass:Operation)
 		this.stencilOpSeparate(face, fail, zfail, zpass);
 
-	public inline function texImage2D(target:TextureTarget, level:GLint, internalformat:GLint, width:GLsizei, height:GLsizei, border:GLint, format:PixelFormat, type:PixelDataType, pixels:Null<GLArrayBufferView>)
+	public inline function texImage2D(target:TextureTarget, level:GLint, internalformat:PixelFormat, width:GLsizei, height:GLsizei, border:GLint, format:PixelFormat, type:PixelDataType, pixels:Null<GLArrayBufferView>)
 		this.texImage2D(target, level, internalformat, width, height, border, format, type, pixels);
 
-	public inline function texImage2DImageSource(target:TextureTarget, level:GLint, internalformat:GLint, format:PixelFormat, type:PixelDataType, source:TexImageSource)
+	public inline function texImage2DImageSource(target:TextureTarget, level:GLint, internalformat:PixelFormat, format:PixelFormat, type:PixelDataType, source:TexImageSource)
 		#if js
 		this.texImage2D(target, level, internalformat, format, type, source);
 		#else
@@ -929,19 +930,6 @@ abstract VertexAttributeOffsetParameter(GLenum) to GLenum from GLenum{
 }
 
 @:enum
-abstract PixelStoreParameter<T>(GLenum) to GLenum from GLenum{
-	var PACK_ALIGNMENT:PixelStoreParameter<GLint>                                         = InternalConstGLContext.PACK_ALIGNMENT;
-	var UNPACK_ALIGNMENT:PixelStoreParameter<GLint>                                       = InternalConstGLContext.UNPACK_ALIGNMENT;
-
-	//WebGL specific
-	#if js
-	var UNPACK_FLIP_Y_WEBGL:PixelStoreParameter<Bool>                                     = InternalConstGLContext.UNPACK_FLIP_Y_WEBGL;
-	var UNPACK_PREMULTIPLY_ALPHA_WEBGL:PixelStoreParameter<Bool>                          = InternalConstGLContext.UNPACK_PREMULTIPLY_ALPHA_WEBGL;
-	var UNPACK_COLORSPACE_CONVERSION_WEBGL:PixelStoreParameter<WebGLColorSpaceConversion> = InternalConstGLContext.UNPACK_COLORSPACE_CONVERSION_WEBGL;
-	#end
-}
-
-@:enum
 abstract Parameter<T>(GLenum) to GLenum from GLenum{
 	var ACTIVE_TEXTURE:Parameter<TextureUnit>                                   = InternalConstGLContext.ACTIVE_TEXTURE;
 	var ALIASED_LINE_WIDTH_RANGE:Parameter<GLFloat32Array>                      = InternalConstGLContext.ALIASED_LINE_WIDTH_RANGE; //(with 2 elements)
@@ -1025,7 +1013,7 @@ abstract Parameter<T>(GLenum) to GLenum from GLenum{
 	var TEXTURE_BINDING_CUBE_MAP:Parameter<GLTexture>                           = InternalConstGLContext.TEXTURE_BINDING_CUBE_MAP;
 	var UNPACK_ALIGNMENT:Parameter<GLint>                                       = InternalConstGLContext.UNPACK_ALIGNMENT;
 
-	//WebGL specific
+	// WebGL specific
 	#if js
 	var UNPACK_COLORSPACE_CONVERSION_WEBGL:Parameter<WebGLColorSpaceConversion> = InternalConstGLContext.UNPACK_COLORSPACE_CONVERSION_WEBGL;
 	var UNPACK_FLIP_Y_WEBGL:Parameter<Bool>                                     = InternalConstGLContext.UNPACK_FLIP_Y_WEBGL;
@@ -1037,7 +1025,23 @@ abstract Parameter<T>(GLenum) to GLenum from GLenum{
 	var VIEWPORT:Parameter<GLInt32Array>                                        = InternalConstGLContext.VIEWPORT; //(with 4 elements)
 }
 
-//WebGL specific
+/**
+	Subset of Parameter
+**/
+@:enum
+abstract PixelStoreParameter<T>(GLenum) to GLenum from GLenum to Parameter<T> {
+	var PACK_ALIGNMENT:PixelStoreParameter<GLint>                                         = InternalConstGLContext.PACK_ALIGNMENT;
+	var UNPACK_ALIGNMENT:PixelStoreParameter<GLint>                                       = InternalConstGLContext.UNPACK_ALIGNMENT;
+
+	// WebGL specific
+	#if js
+	var UNPACK_FLIP_Y_WEBGL:PixelStoreParameter<Bool>                                     = InternalConstGLContext.UNPACK_FLIP_Y_WEBGL;
+	var UNPACK_PREMULTIPLY_ALPHA_WEBGL:PixelStoreParameter<Bool>                          = InternalConstGLContext.UNPACK_PREMULTIPLY_ALPHA_WEBGL;
+	var UNPACK_COLORSPACE_CONVERSION_WEBGL:PixelStoreParameter<WebGLColorSpaceConversion> = InternalConstGLContext.UNPACK_COLORSPACE_CONVERSION_WEBGL;
+	#end
+}
+
+// WebGL specific
 #if js
 @:enum
 abstract WebGLColorSpaceConversion(GLenum) to GLenum from GLenum{

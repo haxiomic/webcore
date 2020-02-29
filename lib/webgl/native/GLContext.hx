@@ -829,12 +829,12 @@ class GLContext {
 		glStencilOpSeparate(face, fail, zfail, zpass);
 	}
 
-	public inline function texImage2D(target:TextureTarget, level:GLint, internalformat:GLint, width:GLsizei, height:GLsizei, border:GLint, format:PixelFormat, type:PixelDataType, pixels:Null<GLArrayBufferView>) {
+	public inline function texImage2D(target:TextureTarget, level:GLint, internalformat:PixelFormat, width:GLsizei, height:GLsizei, border:GLint, format:PixelFormat, type:PixelDataType, pixels:Null<GLArrayBufferView>) {
 		var ptr: Star<UInt8> = pixels != null ? pixels.toCPointer() : null;
 		glTexImage2D(target, level, internalformat, width, height, border, format, type, cast ptr);
 	}
 
-	public function texImage2DImageSource(target:TextureTarget, level:GLint, internalformat:GLint, format:PixelFormat, type:PixelDataType, source:TexImageSource) {
+	public function texImage2DImageSource(target:TextureTarget, level:GLint, internalformat:PixelFormat, format:PixelFormat, type:PixelDataType, source:TexImageSource) {
 		@:privateAccess {
 			// currently on C++ TexImageSource can only be an Image
 			var imageSource: image.Image = source;
@@ -870,15 +870,15 @@ class GLContext {
 
 			var ptr: Star<UInt8> = imageData != null ? imageData.toCPointer() : null;
 
-			var initialUnpackAlignment = getParameter(UNPACK_ALIGNMENT);
+			var initialUnpackAlignment: Int32 = cast getParameter(PixelStoreParameter.UNPACK_ALIGNMENT);
 
 			// set unpack alignment to 1 for the upload
-			pixelStorei(UNPACK_ALIGNMENT, 1);
+			pixelStorei(PixelStoreParameter.UNPACK_ALIGNMENT, 1);
 
 			glTexImage2D(target, level, internalformat, source.width, source.height, 0, format, type, cast ptr);
 
 			// restore initial unpack alignment
-			pixelStorei(UNPACK_ALIGNMENT, initialUnpackAlignment);
+			pixelStorei(PixelStoreParameter.UNPACK_ALIGNMENT, initialUnpackAlignment);
 		}
 	}
 
@@ -931,15 +931,15 @@ class GLContext {
 
 			var ptr: Star<UInt8> = imageData != null ? imageData.toCPointer() : null;
 
-			var initialUnpackAlignment = getParameter(UNPACK_ALIGNMENT);
+			var initialUnpackAlignment: Int32 = cast getParameter(PixelStoreParameter.UNPACK_ALIGNMENT);
 
 			// set unpack alignment to 1 for the upload
-			pixelStorei(UNPACK_ALIGNMENT, 1);
+			pixelStorei(PixelStoreParameter.UNPACK_ALIGNMENT, 1);
 
 			glTexSubImage2D(target, level, xoffset, yoffset, source.width, source.height, format, type, cast ptr);
 
 			// restore initial unpack alignment
-			pixelStorei(UNPACK_ALIGNMENT, initialUnpackAlignment);
+			pixelStorei(PixelStoreParameter.UNPACK_ALIGNMENT, initialUnpackAlignment);
 		}
 	}
 
