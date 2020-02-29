@@ -83,8 +83,15 @@ class Image {
     public function new(width: Int = 0, height: Int = 0) {
         this.width = width;
         this.height = height;
+
+        #if cpp
+        cpp.vm.Gc.setFinalizer(this, cpp.Function.fromStaticFunction(finalizer));
+        #end
     }
 
+    /**
+        Will also free stbi allocated pixel data in the cache
+    **/
     function clearInternalState() {
         naturalWidth = 0;
         naturalHeight = 0;
@@ -228,6 +235,13 @@ class Image {
                 }
             }
         });
+    }
+
+    static function finalizer(instance: Image) {
+        #if debug
+        trace('[debug] Image.finalizer()');
+        #end
+        instance.clearInternalState();
     }
 
 }
