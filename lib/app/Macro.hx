@@ -37,11 +37,11 @@ class Macro {
                 }
             }).fields);
             macro @:privateAccess {
-                app.HaxeApp.Static.createMainApp = cpp.Function.fromStaticFunction($i{localClass.module}.__construct__);
+                app.HaxeApp.Internal.createMainApp = cpp.Function.fromStaticFunction($i{localClass.module}.__construct__);
             };
         } else {
             macro @:privateAccess {
-                app.HaxeApp.Static.createMainApp = () -> new $localTypePath();
+                app.HaxeApp.Internal.createMainApp = () -> new $localTypePath();
             };
         }
 

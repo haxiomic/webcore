@@ -68,7 +68,7 @@ public class HaxeAppViewController: GLKViewController {
         // call onGraphicsContextReady() on first frame because at this point the view's drawable is fully initialized
         // we also rely on the screen framebuffer being bound during initialization of the GLContext
         if !haxeGraphicsContextReady {
-            haxeAppInstance.onGraphicsContextReady()
+            haxeAppInstance.onGraphicsContextReady(context!)
             haxeGraphicsContextReady = true
         }
         

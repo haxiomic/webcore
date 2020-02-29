@@ -2,14 +2,14 @@
     Swift wrapper for HaxeAppC.h
 **/
 public class HaxeApp {
-    
-    static public func initialize() {
-        HaxeApp_initialize()
-    }
 
     let ptr: UnsafeMutableRawPointer
 
     public init() {
+        if !Thread.isMainThread {
+            print("Haxe Error: called haxe method from a thread other than the main thread. This may cause instability because the event-loop runs on the main thread")
+        }
+
         ptr = HaxeApp_create()
     }
 
@@ -17,8 +17,9 @@ public class HaxeApp {
         HaxeApp_release(ptr)
     }
 
-    public func onGraphicsContextReady() {
-        HaxeApp_onGraphicsContextReady(ptr)
+    public func onGraphicsContextReady(_ context: EAGLContext) {
+        let contextRef: UnsafeMutableRawPointer = Unmanaged.passUnretained(context).toOpaque()
+        HaxeApp_onGraphicsContextReady(ptr, contextRef)
     }
 
     public func onGraphicsContextLost() {
@@ -27,6 +28,20 @@ public class HaxeApp {
 
     public func onDrawFrame() {
         HaxeApp_onDrawFrame(ptr)
+    }
+
+    static public func initialize() {
+        HaxeApp_initialize(
+            // tickOnMainThread()
+            {
+                DispatchQueue.main.async(execute: { HaxeApp_tick() })
+            },
+            // setGraphicsContext(ref)
+            { ref in
+                let context: EAGLContext = Unmanaged<EAGLContext>.fromOpaque(ref!).takeUnretainedValue()
+                EAGLContext.setCurrent(context)
+            }
+        )
     }
 
 }
