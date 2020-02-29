@@ -110,8 +110,8 @@ class App implements app.HaxeAppInterface {
 				trace('decodeImageData complete! ${image.naturalWidth}x${image.naturalHeight}');
 				gl.activeTexture(TEXTURE0);
 				gl.bindTexture(TEXTURE_2D, texture);
-				gl.texImage2D(TEXTURE_2D, 0, RGBA, 1, 1, 0, RGBA, UNSIGNED_BYTE, new typedarray.Uint8Array([255, 0, 0, 255]));
-				// gl.texImage2DImageSource(TEXTURE_2D, 0, RGBA, RGBA, UNSIGNED_BYTE, image);
+				// gl.texImage2D(TEXTURE_2D, 0, RGBA, 1, 1, 0, RGBA, UNSIGNED_BYTE, new typedarray.Uint8Array([255, 0, 0, 255]));
+				gl.texImage2DImageSource(TEXTURE_2D, 0, RGBA, RGBA, UNSIGNED_BYTE, image);
 
 				if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
 					gl.generateMipmap(TEXTURE_2D);
@@ -143,6 +143,8 @@ class App implements app.HaxeAppInterface {
 
 	public function onDrawFrame() {
 		var t_s = haxe.Timer.stamp();
+
+		// #if cpp cpp.vm.Gc.run(true); #end
 
 		// execute commands on the OpenGL context
 		gl.clearColor(Math.sin(t_s * 0.1), Math.cos(t_s * 0.5), Math.sin(t_s * 0.3), 1);
