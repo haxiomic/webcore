@@ -42,6 +42,7 @@ class App implements app.HaxeAppInterface {
 		function helloLoop() {
 			haxe.Timer.delay(helloLoop, 1000);
 			#if cpp
+			// cpp.vm.Gc.run(true);
 			trace('hello', haxe.Timer.stamp(), '${cpp.vm.Gc.memInfo(cpp.vm.Gc.MEM_INFO_CURRENT) / 1e6}MB');
 			#end
 		}
@@ -105,12 +106,14 @@ class App implements app.HaxeAppInterface {
 		gl.texImage2D(TEXTURE_2D, 0, RGBA, 1, 1, 0, RGBA, UNSIGNED_BYTE, new typedarray.Uint8Array([0, 0, 255, 255]));
 		gl.texImage2D(TEXTURE_2D, 0, RGBA, 1, 1, 0, RGBA, UNSIGNED_BYTE, new typedarray.Uint8Array([0, 255, 0, 255]));
 
+		var t0 = haxe.Timer.stamp();
 		image.Image.decodeImageData(Assets.red_panda_jpg,
 			(image) -> {
-				trace('decodeImageData complete! ${image.naturalWidth}x${image.naturalHeight}');
+				trace('decodeImageData complete! ${image.naturalWidth}x${image.naturalHeight}', haxe.Timer.stamp() - t0);
 				gl.activeTexture(TEXTURE0);
 				gl.bindTexture(TEXTURE_2D, texture);
 				// gl.texImage2D(TEXTURE_2D, 0, RGBA, 1, 1, 0, RGBA, UNSIGNED_BYTE, new typedarray.Uint8Array([255, 0, 0, 255]));
+				var t0 = haxe.Timer.stamp();
 				gl.texImage2DImageSource(TEXTURE_2D, 0, RGBA, RGBA, UNSIGNED_BYTE, image);
 
 				if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
@@ -122,7 +125,7 @@ class App implements app.HaxeAppInterface {
 					gl.texParameteri(TEXTURE_2D, TEXTURE_MIN_FILTER, LINEAR);
 				}
 
-				trace('Uploaded texture', texture);
+				trace('Uploaded texture', texture, haxe.Timer.stamp() - t0);
 			},
 			(error) -> {
 				trace('decodeImageData failed: "$error"');
@@ -143,8 +146,6 @@ class App implements app.HaxeAppInterface {
 
 	public function onDrawFrame() {
 		var t_s = haxe.Timer.stamp();
-
-		// #if cpp cpp.vm.Gc.run(true); #end
 
 		// execute commands on the OpenGL context
 		gl.clearColor(Math.sin(t_s * 0.1), Math.cos(t_s * 0.5), Math.sin(t_s * 0.3), 1);
