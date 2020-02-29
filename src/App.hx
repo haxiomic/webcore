@@ -103,13 +103,15 @@ class App implements app.HaxeAppInterface {
 		gl.bindTexture(TEXTURE_2D, texture);
 		// null texture
 		gl.texImage2D(TEXTURE_2D, 0, RGBA, 1, 1, 0, RGBA, UNSIGNED_BYTE, new typedarray.Uint8Array([0, 0, 255, 255]));
+		gl.texImage2D(TEXTURE_2D, 0, RGBA, 1, 1, 0, RGBA, UNSIGNED_BYTE, new typedarray.Uint8Array([0, 255, 0, 255]));
 
 		image.Image.decodeImageData(Assets.red_panda_jpg,
 			(image) -> {
 				trace('decodeImageData complete! ${image.naturalWidth}x${image.naturalHeight}');
 				gl.activeTexture(TEXTURE0);
 				gl.bindTexture(TEXTURE_2D, texture);
-				gl.texImage2DImageSource(TEXTURE_2D, 0, RGBA, RGBA, UNSIGNED_BYTE, image);
+				gl.texImage2D(TEXTURE_2D, 0, RGBA, 1, 1, 0, RGBA, UNSIGNED_BYTE, new typedarray.Uint8Array([255, 0, 0, 255]));
+				// gl.texImage2DImageSource(TEXTURE_2D, 0, RGBA, RGBA, UNSIGNED_BYTE, image);
 
 				if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
 					gl.generateMipmap(TEXTURE_2D);
@@ -237,7 +239,9 @@ class App implements app.HaxeAppInterface {
 	';
 
 	static function finalizer(instance: App) {
-		trace('[debug] App.finalizer()');
+		#if (debug && cpp)
+		cpp.Stdio.printf("%s\n", "[debug] App.finalizer()");
+		#end
 		if (instance.gl != null) {
 			instance.releaseGraphicsResources();
 		}

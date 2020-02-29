@@ -239,7 +239,7 @@ class Image {
 
     static function finalizer(instance: Image) {
         #if debug
-        trace('[debug] Image.finalizer()');
+        Stdio.printf("%s\n", "[debug] Image.finalizer()");
         #end
         instance.clearInternalState();
     }
