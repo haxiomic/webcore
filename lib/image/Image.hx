@@ -59,6 +59,7 @@ import image.native.StbImage;
 /**
     Native Implementation of HTMLImageElement
     Pixel data is always tightly packed; in OpenGL terms the packing alignment is 1
+    Uses stb_image.h
 **/
 class Image {
 
