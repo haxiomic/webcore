@@ -75,6 +75,9 @@ abstract ArrayBuffer(haxe.io.Bytes) from haxe.io.Bytes to haxe.io.Bytes {
 	}
 
 	#if cpp
+	/**
+		After calling this the return ArrayBuffer **does not** take responsibility for freeing the internal memory
+	**/
 	static public inline function fromCPointer(cPointer: cpp.Star<cpp.UInt8>, byteLength: Int): ArrayBuffer {
 		return ofData(cpp.Pointer.fromStar(cPointer).toUnmanagedArray(byteLength));
 	}
