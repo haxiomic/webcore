@@ -1,29 +1,35 @@
-import gluon.webgl.GLBuffer;
-import gluon.webgl.GLProgram;
-import gluon.webgl.GLShader;
-import gluon.webgl.GLContext;
+import webgl.GLUniformLocation;
+import webgl.GLTexture;
+import webgl.GLBuffer;
+import webgl.GLProgram;
+import webgl.GLShader;
+import webgl.GLContext;
 import typedarray.Float32Array;
 
-@:embedFile('../assets/multi-channel-test.mp3')
+@:embedFile('../assets/my-triangle.mp3')
+@:embedFile('../assets/red-panda.jpg')
+@:embedFile('../assets/pnggrad16rgb.png')
 class Assets extends asset.Assets {
 
 }
 
 #if debug
 // In debug mode we enable sanitizers to help validate correctness (at a performance cost)
-// @:buildXml('
 // <target id="haxe">
-// 	<flag value="-fsanitize=address" />
-// 	<flag value="-fsanitize=undefined" />
-// 	<flag value="-fno-omit-frame-pointer" />
+	// <compilerflag value="-fno-omit-frame-pointer" />
+	// <compilerflag value="-fsanitize=address" />
+	// <compilerflag value="-fsanitize=thread" />
+	// <compilerflag value="-fno-omit-frame-pointer" />
+	// <compilerflag value="-fsanitize=address" />
 // </target>
-// ')
 #end
 class App implements app.HaxeAppInterface {
 
 	var gl: Null<GLContext>;
 	var program: GLProgram;
 	var triangleBuffer: GLBuffer;
+	var texture: GLTexture;
+	var uTextureLoc: GLUniformLocation;
 
 	public function new() {
 		trace('App instance created');
@@ -35,11 +41,13 @@ class App implements app.HaxeAppInterface {
 		// test the haxe event loop
 		function helloLoop() {
 			haxe.Timer.delay(helloLoop, 1000);
+			#if cpp
 			trace('hello', haxe.Timer.stamp(), '${cpp.vm.Gc.memInfo(cpp.vm.Gc.MEM_INFO_CURRENT) / 1e6}MB');
+			#end
 		}
 
 		helloLoop();
-		
+
 		// play a song
 		trace('about to create audio context');
 		var audioContext = new audio.AudioContext();
@@ -48,7 +56,7 @@ class App implements app.HaxeAppInterface {
 		var node = audioContext.createBufferSource();
 		node.connect(audioContext.destination);
 
-		audioContext.decodeAudioData(Assets.multi_channel_test_mp3.getData(), (audioBuffer) -> {
+		audioContext.decodeAudioData(Assets.my_triangle_mp3.getData(), (audioBuffer) -> {
 			trace('Trying to play audio', audioBuffer);
 			node.buffer = audioBuffer;
 			node.start();
@@ -71,9 +79,11 @@ class App implements app.HaxeAppInterface {
 			var fragmentShader = compileShader(fragmentShaderSource, FRAGMENT_SHADER);
 			linkProgram(vertexShader, fragmentShader);
 		} catch (e: String) {
-			trace(e);
+			throw e;
 			null;
 		}
+		
+		uTextureLoc = gl.getUniformLocation(program, 'uTexture');
 
 		// create triangle buffer
 		var angle = Math.PI * 2 / 3;
@@ -86,6 +96,40 @@ class App implements app.HaxeAppInterface {
 		triangleBuffer = gl.createBuffer();
 		gl.bindBuffer(ARRAY_BUFFER, triangleBuffer);
 		gl.bufferData(ARRAY_BUFFER, trianglePositionArray, STATIC_DRAW);
+
+		// create texture
+		texture = gl.createTexture();
+		gl.activeTexture(TEXTURE0);
+		gl.bindTexture(TEXTURE_2D, texture);
+		// null texture
+		gl.texImage2D(TEXTURE_2D, 0, RGBA, 1, 1, 0, RGBA, UNSIGNED_BYTE, new typedarray.Uint8Array([0, 0, 255, 255]));
+
+		image.Image.decodeImageData(Assets.red_panda_jpg,
+			(image) -> {
+				trace('decodeImageData complete! ${image.naturalWidth}x${image.naturalHeight}');
+				gl.activeTexture(TEXTURE0);
+				gl.bindTexture(TEXTURE_2D, texture);
+				gl.texImage2DImageSource(TEXTURE_2D, 0, RGBA, RGBA, UNSIGNED_BYTE, image);
+
+				if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+					gl.generateMipmap(TEXTURE_2D);
+				} else {
+					// for non-power-of-2 images we need to set clamp wrapping and disable mip filtering
+					gl.texParameteri(TEXTURE_2D, TEXTURE_WRAP_S, CLAMP_TO_EDGE);
+					gl.texParameteri(TEXTURE_2D, TEXTURE_WRAP_T, CLAMP_TO_EDGE);
+					gl.texParameteri(TEXTURE_2D, TEXTURE_MIN_FILTER, LINEAR);
+				}
+
+				trace('Uploaded texture', texture);
+			},
+			(error) -> {
+				trace('decodeImageData failed: "$error"');
+			},
+			{
+				nChannels: 4,
+				dataType: UNSIGNED_BYTE,
+			}
+		);
 
 		gl.disable(CULL_FACE);
 	}
@@ -102,10 +146,15 @@ class App implements app.HaxeAppInterface {
 		gl.clearColor(Math.sin(t_s * 0.1), Math.cos(t_s * 0.5), Math.sin(t_s * 0.3), 1);
 		gl.clear(COLOR_BUFFER_BIT);
 
+		gl.useProgram(program);
+
 		gl.bindBuffer(ARRAY_BUFFER, triangleBuffer);
 		gl.enableVertexAttribArray(0);
 		gl.vertexAttribPointer(0, 2, FLOAT, false, 0, 0);
-		gl.useProgram(program);
+
+		// texture is at unit 0
+		gl.uniform1i(uTextureLoc, 0);
+
 		gl.drawArrays(TRIANGLES, 0, 3);
 	}
 
@@ -132,7 +181,7 @@ class App implements app.HaxeAppInterface {
 				case VERTEX_SHADER: 'vertex';
 				case FRAGMENT_SHADER: 'fragment';
 			}
-			throw '[${typeName} compile]: ${gl.getShaderInfoLog(shader)}';
+			throw '[${typeName} compile error]: ${gl.getShaderInfoLog(shader)}';
 		}
 
 		return shader;
@@ -150,10 +199,14 @@ class App implements app.HaxeAppInterface {
 		gl.linkProgram(program);
 
 		if (!gl.getProgramParameter(program, LINK_STATUS)) {
-			throw '[program link]: ${gl.getProgramInfoLog(program)}';
+			throw '[program link error]: ${gl.getProgramInfoLog(program)}';
 		}
 
 		return program;
+	}
+
+	function isPowerOf2(x: Int) {
+		return x == 1 || (x & (x-1)) == 0;
 	}
 
 	static var vertexShaderSource = '
@@ -175,8 +228,11 @@ class App implements app.HaxeAppInterface {
 
 		varying vec2 vPosition;
 
+		uniform sampler2D uTexture;
+
 		void main() {
-			gl_FragColor = vec4(abs(vPosition), 0.5, 1.);
+			vec4 sample = texture2D(uTexture, vPosition);
+			gl_FragColor = vec4(sample.rgb, 1.);
 		}
 	';
 
