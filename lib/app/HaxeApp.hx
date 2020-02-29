@@ -53,14 +53,23 @@ class HaxeApp {
         }
     }
 
+    /**
+        Execute queued and due events. Should only be called from the main haxe thread
+    **/
     static public function tick() {
         Internal.tick();
     }
 
+    /**
+        Stops the haxe event loop thread. Scheduled events and calls to `runInMainThread` will no longer be executed
+    **/
     static public function stopEventLoopThread() {
         Internal.stopEventLoopThread();
     }
 
+    /**
+        This is required because the graphics context might be used within events which can be executed at anytime and therefore we need to ensure the correct graphics context is activated
+    **/
     static public function setGlobalGraphicsContext(ref: cpp.Star<cpp.Void>) {
         Internal.graphicsContext = ref;
     }
@@ -157,6 +166,9 @@ class Internal {
         }
     }
 
+    /**
+        Should only be called from the main haxe thread
+    **/
     static function tick() {
         if (graphicsContext != null) {
             nativeSelectGraphicsContext(graphicsContext);
