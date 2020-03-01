@@ -52,8 +52,8 @@ public class HaxeApp {
         HaxeApp_stopEventLoopThread();
     }
 
-    static public func gcMajorCollection() {
-        HaxeApp_gcMajorCollection();
+    static public func runGc(major: Bool) {
+        HaxeApp_runGc(major);
     }
 
 

@@ -5,6 +5,8 @@
 #ifndef HaxeAppC_h
 #define HaxeAppC_h
 
+#include <stdbool.h>
+
 typedef void (* SelectGraphicsContext) (void* ref);
 typedef void (* MainThreadTick) ();
 
@@ -17,7 +19,7 @@ extern "C" {
     void        HaxeApp_tick();
     void        HaxeApp_startEventLoopThread();
     void        HaxeApp_stopEventLoopThread();
-    void        HaxeApp_gcMajorCollection();
+    void        HaxeApp_runGc(bool major);
 
     // instance methods
     void* HaxeApp_create();

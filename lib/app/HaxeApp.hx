@@ -77,8 +77,8 @@ class HaxeApp {
     /**
         Run the garbage collector to perform a major collection
     **/
-    static public function gcMajorCollection() {
-        cpp.vm.Gc.run(true);
+    static public function runGc(major: Bool) {
+        cpp.vm.Gc.run(major);
     }
 
     /**

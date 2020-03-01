@@ -55,9 +55,9 @@ void HaxeApp_stopEventLoopThread() {
     HaxeApp::stopEventLoopThread();
 }
 
-void HaxeApp_gcMajorCollection() {
+void HaxeApp_runGc(bool major) {
     hx::NativeAttach haxeGcScope;
-    HaxeApp::gcMajorCollection();
+    HaxeApp::runGc(major);
 }
 
 void* HaxeApp_create() {
