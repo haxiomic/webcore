@@ -64,6 +64,7 @@ class GLContext {
 
 	public inline function getExtension<T>(name: Extension<T>): Null<T> {
 		var isSupported = getSupportedExtensions().indexOf(name) != -1;
+		// @! should generate extension objects
 		return isSupported ? cast {} : null;
 	}
 
