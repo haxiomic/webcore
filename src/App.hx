@@ -104,7 +104,6 @@ class App implements app.HaxeAppInterface {
 		gl.bindTexture(TEXTURE_2D, texture);
 		// null texture
 		gl.texImage2D(TEXTURE_2D, 0, RGBA, 1, 1, 0, RGBA, UNSIGNED_BYTE, new typedarray.Uint8Array([0, 0, 255, 255]));
-		gl.texImage2D(TEXTURE_2D, 0, RGBA, 1, 1, 0, RGBA, UNSIGNED_BYTE, new typedarray.Uint8Array([0, 255, 0, 255]));
 
 		var t0 = haxe.Timer.stamp();
 		image.Image.decodeImageData(Assets.red_panda_jpg,
@@ -112,7 +111,7 @@ class App implements app.HaxeAppInterface {
 				trace('decodeImageData complete! ${image.naturalWidth}x${image.naturalHeight}', haxe.Timer.stamp() - t0);
 				gl.activeTexture(TEXTURE0);
 				gl.bindTexture(TEXTURE_2D, texture);
-				// gl.texImage2D(TEXTURE_2D, 0, RGBA, 1, 1, 0, RGBA, UNSIGNED_BYTE, new typedarray.Uint8Array([255, 0, 0, 255]));
+
 				var t0 = haxe.Timer.stamp();
 				gl.texImage2DImageSource(TEXTURE_2D, 0, RGBA, RGBA, UNSIGNED_BYTE, image);
 
@@ -237,7 +236,7 @@ class App implements app.HaxeAppInterface {
 
 		void main() {
 			vec4 sample = texture2D(uTexture, vPosition);
-			gl_FragColor = vec4(sample.rgb, 1.);
+			gl_FragColor = sample;
 		}
 	';
 
