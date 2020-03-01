@@ -61,10 +61,24 @@ class HaxeApp {
     }
 
     /**
+        Starts the event loop thread (should only be called after `stopEventLoopThread`). Automatically called by `initialize`
+    **/
+    static public function startEventLoopThread() {
+        Internal.startEventLoopThread();
+    }
+
+    /**
         Stops the haxe event loop thread. Scheduled events and calls to `runInMainThread` will no longer be executed
     **/
     static public function stopEventLoopThread() {
         Internal.stopEventLoopThread();
+    }
+
+    /**
+        Run the garbage collector to perform a major collection
+    **/
+    static public function gcMajorCollection() {
+        cpp.vm.Gc.run(true);
     }
 
     /**

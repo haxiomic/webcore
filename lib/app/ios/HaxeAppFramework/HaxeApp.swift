@@ -44,4 +44,17 @@ public class HaxeApp {
         )
     }
 
+    static public func startEventLoopThread() {
+        HaxeApp_startEventLoopThread();
+    }
+
+    static public func stopEventLoopThread() {
+        HaxeApp_stopEventLoopThread();
+    }
+
+    static public func gcMajorCollection() {
+        HaxeApp_gcMajorCollection();
+    }
+
+
 }

@@ -15,6 +15,9 @@ extern "C" {
     // static methods
     const char* HaxeApp_initialize(MainThreadTick tickOnMainThread, SelectGraphicsContext selectGraphicsContext);
     void        HaxeApp_tick();
+    void        HaxeApp_startEventLoopThread();
+    void        HaxeApp_stopEventLoopThread();
+    void        HaxeApp_gcMajorCollection();
 
     // instance methods
     void* HaxeApp_create();

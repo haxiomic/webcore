@@ -45,6 +45,21 @@ void HaxeApp_tick() {
     HaxeApp::tick();
 }
 
+void HaxeApp_startEventLoopThread() {
+    hx::NativeAttach haxeGcScope;
+    HaxeApp::startEventLoopThread();
+}
+
+void HaxeApp_stopEventLoopThread() {
+    hx::NativeAttach haxeGcScope;
+    HaxeApp::stopEventLoopThread();
+}
+
+void HaxeApp_gcMajorCollection() {
+    hx::NativeAttach haxeGcScope;
+    HaxeApp::gcMajorCollection();
+}
+
 void* HaxeApp_create() {
     hx::NativeAttach haxeGcScope;
 
