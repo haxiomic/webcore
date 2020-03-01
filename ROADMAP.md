@@ -20,27 +20,27 @@ That is
     https://medium.com/@yushulx/how-to-build-so-library-files-into-aar-bundle-in-android-studio-a44387c9a012
 
 - [ ] Fix iOS web
-- [ ] AudioSprite play/pause support
 
-- [ ] Asset system
-    - [ ] Platform native code
 - [ ] App main + platform native code
     - [ ] View resized
     - [ ] App life cycle
     - [ ] Keyboard events
+- [ ] Asset system
+    - [ ] Platform native code
 - [ ] Settings files per system
     - [ ] local storage?
     - [ ] iOS settings
     - [ ] Android settings
     - [ ] Desktop to file? Or Windows/mac settings?
-- [ ] Less boilerplate per platform -> code generation
-- [ ] Switch to dynamic libraries so we can link with system libraries during haxe compile (and not platform compile)
+- [ ] Switch to dynamic libraries so we can link with system libraries during haxe compile (and not platform compile). Or add metadata to add flags to platform projects
     - [ ] Link with AVFoundation and AudioToolbox when building lib for iOS and OpenSLES for Android
 
 - Review calling finalizers if throw when contructing
 
 
 -----
+
+# Auditing
 
 - Why is tsan reporting two different mutexes for the same lock?
     - ma_mutex_lock(&source->lock) 
@@ -59,10 +59,10 @@ That is
 
 -----
 
+# Future
+
 - Promises
     - Return promise for Image.decodeImageData and AudioContext.decodeAudioData
-
------
 
 - WebGL
     - Implement extensions
