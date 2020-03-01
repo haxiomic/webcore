@@ -84,7 +84,7 @@ class HaxeApp {
     /**
         Checks if new events were scheduled between calls to this method
         This is a work-around because MainLoop doesn't trigger wakeup when adding events
-        In the future we should probably redefine MainLoop
+        In the future we should probably redefine MainLoop rather than use this method
     **/
     static public function eventLoopNeedsWake() @:privateAccess {
         var needsWake = haxe.MainLoop.pending != Internal._eventsScheduledBeforeLatestEvent;

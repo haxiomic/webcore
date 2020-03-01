@@ -5,6 +5,8 @@
  * 
  * The gc top and bottom of stack should be set whenever haxe allocations can occur
  * 
+ * After executing haxe code we need to check if new events have been scheduled (and to wake the event loop if so). In the future we should redefine MainLoop to wake the loop automatically
+ * 
  * See https://groups.google.com/forum/#!topic/haxelang/V-jzaEX7YD8
  * and https://github.com/HaxeFoundation/hxcpp/blob/master/docs/ThreadsAndStacks.md
  * For documentation
