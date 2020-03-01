@@ -60,10 +60,11 @@ class AudioNode {
     }
 
     function setDecoder(decoder: AudioDecoder) {
-        this.decoder = decoder;
+        // set the native decoder first so we have to wait on the AudioNode lock
         if (nativeNode != null) {
             this.nativeNode.setDecoder(decoder.nativeAudioDecoder);
         }
+        this.decoder = decoder;
     }
 
     function addSourceNode(node: AudioNode) {
