@@ -1,13 +1,5 @@
-- Stop event loop thread from swift
-
-- Should we use `openGLES2` not 3?
-    - Yes probably, but what about extensions like float textures?
 - [ ] Image via stb_image
-    - test image
-        - when we reformat from 3 to 4 channels, alpha is set to 0. Is this at a mismatch with the web?
     - .src
-- Maybe rename HaxeApp -> HaxeAppView or similar
-- !!! sometimes audio does not stop after app close (and app kill)
 
 - Lock with the audio source when using it in mixSources to prevent use-after-free of the decoder
     - Since it's not locked, the decoder can be changed, and then cleared by the GC (while a reference is held )
@@ -72,6 +64,12 @@ That is
 
 -----
 
+- WebGL
+    - Implement extensions
+    - Enable support for flipY and premultiply alpha
+
 - Haxe's MainLoop doesn't appear thread safe X_X
     - Also we should sort _while inserting_ 
     - We should probably redefine so it wakes the event loop when a new event is added
+
+- Maybe rename HaxeApp -> HaxeAppView or similar
