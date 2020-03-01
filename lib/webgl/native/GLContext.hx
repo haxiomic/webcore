@@ -52,7 +52,7 @@ class GLContext {
 	#end
 
 	public inline function getContextAttributes(): Null<GLContextAttributes> {
-		// @! could use `eglQueryContext`
+		// @! could use `eglQueryContext` by passing an egl context reference during creation
 		return null;
 	}
 
@@ -846,10 +846,10 @@ class GLContext {
 				case LUMINANCE: 1;
 				case LUMINANCE_ALPHA: 2;
 				case DEPTH_COMPONENT: 1;
-				default: null;
+				default: -1;
 			}
 
-			if (nChannels == null) {
+			if (nChannels == -1) {
 				throw 'Unsupported PixelFormat ${format}';
 			}
 
@@ -907,10 +907,10 @@ class GLContext {
 				case LUMINANCE: 1;
 				case LUMINANCE_ALPHA: 2;
 				case DEPTH_COMPONENT: 1;
-				default: null;
+				default: -1;
 			}
 
-			if (nChannels == null) {
+			if (nChannels == -1) {
 				throw 'Unsupported PixelFormat ${format}';
 			}
 
