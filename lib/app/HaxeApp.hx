@@ -119,6 +119,7 @@ typedef MainThreadTick = cpp.Callable<() -> Void>;
     If the `@:nativeGen` class is added to __boot__.cpp to initialize fields, it will be incorrectly referenced
 **/
 @:allow(app.HaxeApp)
+@:unreflective
 class Internal {
 
     static var initialized = false;
