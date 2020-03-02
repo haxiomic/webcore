@@ -8,19 +8,26 @@ typedef GainNode = js.html.audio.GainNode;
 
 import cpp.*;
 
-class GainNode extends AudioNode.PcmTransformNode<Float> {
+class GainNode extends AudioNode.PcmTransformNode<AudioParam> {
+
+    /**
+        Is an a-rate `AudioParam` representing the amount of gain to apply. You have to set `AudioParam.value` or use the methods of `AudioParam` to change the effect of gain.
+    **/
+    public var gain(default,null): AudioParam;
 
     public function new(context: AudioContext,  ?options: {
         var ?gain: Float;
     }) {
-        var gainValue = options != null && options.gain != null ? options.gain : 1.0;
-        super(context, Function.fromStaticFunction(applyGain), gainValue);
+        gain = @:privateAccess new AudioParam(context);
+        gain.value = options != null && options.gain != null ? options.gain : 1.0;
+
+        super(context, Function.fromStaticFunction(applyGain), gain);
         numberOfInputs = 1;
         numberOfOutputs = 1;
     }
 
-    @:noDebug static function applyGain(gainStar: Star<Float>, nChannels: UInt32, frameCount: UInt32, schedulingCurrentFrameBlock: Int64, interleavedPcmSamples: RawPointer<Float32>) {
-        var gain: Float = Native.star(gainStar);
+    @:noDebug static function applyGain(gainParamStar: Star<AudioParam>, nChannels: UInt32, frameCount: UInt32, schedulingCurrentFrameBlock: Int64, interleavedPcmSamples: RawPointer<Float32>) {
+        var gain: Float = gainParamStar.value;
         if (gain == 1.0) return;
         if (gain == 0.0) {
             untyped __cpp__('memset({0}, 0, {1})', interleavedPcmSamples, frameCount * nChannels);
