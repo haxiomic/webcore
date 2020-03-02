@@ -391,7 +391,7 @@ class GLContext {
 
 	public inline function getAttachedShaders(program:GLProgram):Array<GLShader> {
 		var attachedShaderCount = getProgramParameter(program, ATTACHED_SHADERS);
-		var shaderRefs = new Uint8Array(attachedShaderCount);
+		var shaderRefs = new Uint32Array(attachedShaderCount);
 		glGetAttachedShaders(program.handle, attachedShaderCount, null, shaderRefs.toCPointer());
 		return [
 			for (ref in shaderRefs)
@@ -705,19 +705,19 @@ class GLContext {
 	public function getVertexAttrib<T>(index:GLuint, pname:VertexAttributeParameter<T>): Null<T> {
 		switch (pname) {
 			case VertexAttributeParameter.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING:
-				var ref: GLuint = 0;
+				var ref: GLint = 0;
 				glGetVertexAttribiv(index, pname, Native.addressOf(ref));
 				return ref != 0 ? new GLBuffer(this, ref) : null;
 			case VertexAttributeParameter.VERTEX_ATTRIB_ARRAY_ENABLED, VertexAttributeParameter.VERTEX_ATTRIB_ARRAY_NORMALIZED:
-				var result: GLuint = 0;
+				var result: GLint = 0;
 				glGetVertexAttribiv(index, pname, Native.addressOf(result));
 				return result != 0;
 			case VertexAttributeParameter.VERTEX_ATTRIB_ARRAY_SIZE, VertexAttributeParameter.VERTEX_ATTRIB_ARRAY_STRIDE:
-				var result: GLuint = 0;
+				var result: GLint = 0;
 				glGetVertexAttribiv(index, pname, Native.addressOf(result));
 				return result;
 			case VertexAttributeParameter.VERTEX_ATTRIB_ARRAY_TYPE:
-				var result: GLuint = 0;
+				var result: GLint = 0;
 				glGetVertexAttribiv(index, pname, Native.addressOf(result));
 				return result;
 			case VertexAttributeParameter.CURRENT_VERTEX_ATTRIB:
