@@ -330,7 +330,6 @@ class Macro {
     }
 
     static function echoCommand(cmd: String) {
-        // from haxe Sys.command() implementation
         Sys.println(cmd);
         return Sys.command(cmd);
     }
