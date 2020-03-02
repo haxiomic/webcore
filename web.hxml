@@ -1,3 +1,3 @@
-project.hxml
+main.hxml
 
 -js platform/web/app.js

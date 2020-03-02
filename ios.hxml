@@ -1,4 +1,4 @@
-project.hxml
+main.hxml
 
 --library hxcpp:4.0.52
 --cpp _hxcpp-bin/ios
@@ -7,10 +7,12 @@ project.hxml
 # if you have errors about missing SDK then explicitly set the SDK version on your system (e.g. -D IPHONE_VER=12.2)
 -D IPHONE_VER=
 
+-debug
+
 # Build libs for multiple architectures: iOS (arm64) and simulator (x86_64)
---each
--D iphoneos
--D HXCPP_ARM64
---next
+# --each
+# -D iphoneos
+# -D HXCPP_ARM64
+# --next
 -D iphonesim
 -D HXCPP_M64
