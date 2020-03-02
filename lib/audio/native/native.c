@@ -136,7 +136,6 @@ void AudioNodeList_destroy(AudioNodeList* instance) {
 }
 
 void AudioNodeList_add(AudioNodeList* audioNodeList, AudioNode* source) {
-
     // create an empty list node
     AudioNodeListNode* newListNode;
     newListNode = (AudioNodeListNode*)ma_malloc(sizeof(*newListNode));
