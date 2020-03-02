@@ -7,6 +7,7 @@ That is
     node = null;
     // node should get collected if used or not
 }
+    -> Need to iterate through node tree activating nodes
 
 - Implement AudioParam and GainNode value
 
@@ -72,7 +73,3 @@ That is
     - We should probably redefine so it wakes the event loop when a new event is added
 
 - Maybe rename HaxeApp -> HaxeAppView or similar
-
-- WebAudio
-    - Minimize lock contention by splitting mixSources into time quanta (as specified in the specification)
-        => Had issues when trying this; might be a problem in miniaudio

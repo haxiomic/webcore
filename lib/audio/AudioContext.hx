@@ -166,17 +166,37 @@ class AudioContext {
     static function audioThread_deviceDataCallbackMixSources(maDevice: Star<Device>, output: Star<cpp.Void>, input: ConstStar<cpp.Void>, frameCount: UInt32) {
         var userData: DeviceUserData = (cast maDevice.pUserData: Star<DeviceUserData>);
 
+        // double cast to workaround compiler issue, see HaxeFoundation/haxe/pull/9194
+        var outputF32: RawPointer<Float32> = cast (cast output: Star<Float32>);
+
         userData.schedulingCurrentFrameBlock.mutex.lock();
         var schedulingCurrentFrameBlock: Int64 = userData.schedulingCurrentFrameBlock.getUnsafe();
         userData.schedulingCurrentFrameBlock.mutex.unlock();
 
-        mixSources(userData.nativeNodeList, maDevice.playback.channels, frameCount, schedulingCurrentFrameBlock, cast output);
+        // the audio graph is processed in blocks of 128 frames called a 'render-quantum'
+        // https://webaudio.github.io/web-audio-api/#render-quantum
 
-        schedulingCurrentFrameBlock += (cast frameCount: Int64);
+        final quantaLength = 128;
+        var framesRemaining = frameCount;
 
-        userData.schedulingCurrentFrameBlock.mutex.lock();
-        userData.schedulingCurrentFrameBlock.setUnsafe(schedulingCurrentFrameBlock);
-        userData.schedulingCurrentFrameBlock.mutex.unlock();
+        while (framesRemaining > 0) {
+            var framesToRead = framesRemaining > quantaLength ? quantaLength : framesRemaining;
+
+            // offset output buffer by current samples read
+            var framesRead = frameCount - framesRemaining;
+            var samplesRead = framesRead * maDevice.playback.channels;
+            var quantaOutput = Native.addressOf(outputF32[samplesRead]);
+
+            mixSources(userData.nativeNodeList, maDevice.playback.channels, framesToRead, schedulingCurrentFrameBlock, quantaOutput);
+
+            framesRemaining -= framesToRead;
+            schedulingCurrentFrameBlock += (cast framesToRead: Int64);
+
+            // update shared current block variable atomically
+            userData.schedulingCurrentFrameBlock.mutex.lock();
+            userData.schedulingCurrentFrameBlock.setUnsafe(schedulingCurrentFrameBlock);
+            userData.schedulingCurrentFrameBlock.mutex.unlock();
+        }
     }
 
     @:noDebug
