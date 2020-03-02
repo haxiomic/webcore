@@ -20,7 +20,7 @@ import audio.native.LockedValue;
 @:allow(audio.native.AudioDecoder)
 class AudioContext {
 
-    public final destination: AudioNode;
+    public final destination: AudioDestinationNode;
     public var currentTime (get, null): Float;
     public var sampleRate (get, null): Float;
     public var state (get, null): AudioContextState;
@@ -57,7 +57,7 @@ class AudioContext {
             throw 'Failed to initialize miniaudio device: $initResult';
         }
 
-        destination = new AudioNode(this);
+        destination = new AudioDestinationNode(this);
 
         userData = new DeviceUserData(this, Pointer.fromStar(destination.nativeNodeList));
 

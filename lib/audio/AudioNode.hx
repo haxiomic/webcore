@@ -15,20 +15,24 @@ import audio.native.NativeAudioNode;
 class AudioNode {
 
     public final context: AudioContext;
-    public var numberOfInputs(get, null): Int;
-    public var numberOfOutputs(get, null): Int;
+    public var numberOfInputs (default, null): Int;
+    public var numberOfOutputs (default, null): Int;
 
     var decoder: Null<AudioDecoder>;
     final nativeNode: Star<NativeAudioNode>;
 
     final nativeNodeList: Star<NativeAudioNodeList>;
-    final connectedSources = new List<AudioNode>();
+
     final connectedDestinations = new List<AudioNode>();
+    final activeSources = new List<AudioNode>();
 
     function new(context: AudioContext, ?decoder: AudioDecoder) {
         this.context = context;
         this.nativeNode = NativeAudioNode.create(context.maDevice.pContext);
         this.nativeNodeList = NativeAudioNodeList.create(context.maDevice.pContext);
+
+        numberOfOutputs = 0;
+        numberOfInputs = 0;
 
         if (decoder != null) {
             setDecoder(decoder);
@@ -38,24 +42,61 @@ class AudioNode {
     }
 
     public function connect(destination: AudioNode) {
+        // the node isn't considered a live source of the destination until it's activated
         if (!Lambda.has(connectedDestinations, destination)) {
             connectedDestinations.add(destination);
         }
-        destination.addSourceNode(this);
         return destination;
     }
 
     public function disconnect(?destination: AudioNode) {
         if (destination == null) {
             // disconnect from all connected destinations
-            for (n in connectedDestinations) {
-                n.removeSourceNode(this);
+            for (node in connectedDestinations) {
+                node.removeActiveSourceNode(this);
             }
             connectedDestinations.clear();
         } else {
             // disconnect from single destination
             connectedDestinations.remove(destination);
-            destination.removeSourceNode(this);
+            destination.removeActiveSourceNode(this);
+        }
+    }
+
+    function addActiveSourceNode(node: AudioNode) {
+        if (!Lambda.has(activeSources, node)) {
+            if (node.nativeNode != null) {
+                this.nativeNodeList.add(node.nativeNode);
+            }
+            activeSources.add(node);
+        }
+    }
+
+    function removeActiveSourceNode(node: AudioNode) {
+        if (node.nativeNode != null) {
+            this.nativeNodeList.remove(node.nativeNode);
+        }
+        activeSources.remove(node);
+    }
+
+    /**
+        A node is considered active when it can supply input
+    **/
+    function activate() {
+        nativeNode.setActive(true);
+        for (destination in connectedDestinations) {
+            destination.addActiveSourceNode(this);
+            destination.activate();
+        }
+    }
+    
+    function tryDeactivate() {
+        if (activeSources.length == 0) {
+            nativeNode.setActive(false);
+            for (destination in connectedDestinations) {
+                destination.removeActiveSourceNode(this);
+                destination.tryDeactivate();
+            }
         }
     }
 
@@ -65,30 +106,6 @@ class AudioNode {
             this.nativeNode.setDecoder(decoder.nativeAudioDecoder);
         }
         this.decoder = decoder;
-    }
-
-    function addSourceNode(node: AudioNode) {
-        if (!Lambda.has(connectedSources, node)) {
-            connectedSources.add(node);
-            if (node.nativeNode != null) {
-                this.nativeNodeList.add(node.nativeNode);
-            }
-        }
-    }
-
-    function removeSourceNode(node: AudioNode) {
-        connectedSources.remove(node);
-        if (node.nativeNode != null) {
-            this.nativeNodeList.remove(node.nativeNode);
-        }
-    }
-
-    inline function get_numberOfInputs(): Int {
-        return this.connectedSources.length;
-    }
-
-    inline function get_numberOfOutputs(): Int {
-        return this.connectedDestinations.length;
     }
 
     static function finalizer(instance: AudioNode) {

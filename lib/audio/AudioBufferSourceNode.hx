@@ -11,6 +11,12 @@ import audio.native.AudioDecoder;
 @:allow(audio.AudioContext)
 class AudioBufferSourceNode extends AudioScheduledSourceNode {
 
+    function new(context: AudioContext, ?decoder: AudioDecoder) {
+        super(context, decoder);
+        numberOfInputs = 0;
+        numberOfOutputs = 1;
+    }
+
     public var loop (get, set): Bool;
 
     public var buffer (get, set): AudioBuffer;

@@ -15,6 +15,8 @@ class GainNode extends AudioNode.PcmTransformNode<Float> {
     }) {
         var gainValue = options != null && options.gain != null ? options.gain : 1.0;
         super(context, Function.fromStaticFunction(applyGain), gainValue);
+        numberOfInputs = 1;
+        numberOfOutputs = 1;
     }
 
     @:noDebug static function applyGain(gainStar: Star<Float>, nChannels: UInt32, frameCount: UInt32, schedulingCurrentFrameBlock: Int64, interleavedPcmSamples: RawPointer<Float32>) {
