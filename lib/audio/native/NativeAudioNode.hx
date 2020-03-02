@@ -3,7 +3,7 @@ package audio.native;
 import cpp.*;
 import audio.native.AudioDecoder;
 
-typedef ReadFramesCallback = Callable<(source: Star<NativeAudioNode>, nChannels: UInt32, frameCount: UInt64, schedulingCurrentFrameBlock: Int64, interleavedSamples: Star<Float32>) -> UInt64>;
+typedef ReadFramesCallback = Callable<(sourceUserData: Star<cpp.Void>, nChannels: UInt32, frameCount: UInt64, schedulingCurrentFrameBlock: Int64, interleavedSamples: Star<Float32>) -> UInt64>;
 
 @:include('./native.h')
 @:sourceFile(#if winrt './native.c' #else './native.m' #end)
@@ -12,7 +12,7 @@ typedef ReadFramesCallback = Callable<(source: Star<NativeAudioNode>, nChannels:
 @:access(audio.AudioContext)
 extern class NativeAudioNode {
 
-    var lock: audio.native.MiniAudio.Mutex;
+    var lock: Star<audio.native.MiniAudio.Mutex>;
     private var readFramesCallback: ReadFramesCallback;
     private var decoder: Star<NativeAudioDecoder>;
     private var active: Bool;

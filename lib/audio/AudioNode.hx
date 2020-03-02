@@ -131,8 +131,8 @@ private class PcmTransform {
         This is called from the unmanaged audio thread. It's critical that no haxe-allocation or haxe vm interaction occurs here
         @! maybe move this and PcmTransformData to C
     **/
-    @:noDebug static public function readFramesCallback<T>(source: Star<NativeAudioNode>, nChannels: UInt32, frameCount: UInt64, schedulingCurrentFrameBlock: Int64, interleavedSamples: Star<Float32>): UInt64 {
-        var readFramesData: Star<PcmTransformData<T>> = cast source.getUserData();
+    @:noDebug static public function readFramesCallback<T>(sourceUserData: Star<cpp.Void>, nChannels: UInt32, frameCount: UInt64, schedulingCurrentFrameBlock: Int64, interleavedSamples: Star<Float32>): UInt64 {
+        var readFramesData: Star<PcmTransformData<T>> = cast sourceUserData;
         var framesRead = AudioContext.mixSources(readFramesData.nativeNodeList, nChannels, frameCount, schedulingCurrentFrameBlock, interleavedSamples);
         // apply user transform to frames read
         readFramesData.transformFunction(readFramesData.transformDataStar, nChannels, framesRead, schedulingCurrentFrameBlock, cast interleavedSamples);

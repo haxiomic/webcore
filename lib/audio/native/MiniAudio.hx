@@ -610,6 +610,9 @@ extern class Decoder {
     static function alloc(): Star<Decoder>; 
 }
 
+/**
+    Mutex should always be used as Star<Mutex> to avoid issues where the mutex is inadvertently copied
+**/
 @:include('./native.h')
 @:sourceFile(#if winrt './native.c' #else './native.m' #end)
 @:native('ma_mutex') @:unreflective

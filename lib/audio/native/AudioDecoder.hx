@@ -198,7 +198,7 @@ class PcmBufferDecoder extends AudioDecoder {
 extern class NativeAudioDecoder {
 
     var maDecoder: Star<MiniAudio.Decoder>;
-    var lock: MiniAudio.Mutex;
+    var lock: Star<MiniAudio.Mutex>;
     private var frameIndex: UInt64;
 
     inline function readPcmFrames(pFramesOut: Star<cpp.Void>, frameCount: UInt64): UInt64 {

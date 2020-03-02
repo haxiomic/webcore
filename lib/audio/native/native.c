@@ -21,12 +21,11 @@ AudioDecoder* AudioDecoder_create(ma_context* context) {
     instance = (AudioDecoder*)ma_malloc(sizeof(*instance));
     ma_zero_object(instance);
 
+    // create lock
+    instance->lock = (ma_mutex*)ma_malloc(sizeof(*instance->lock));
+
     // initialize audioNodeList fields
-    ma_result r = ma_mutex_init(context, &instance->lock);
-    if (r != MA_SUCCESS) {
-        ma_mutex_uninit(&instance->lock);
-        return NULL;
-    }
+    ma_mutex_init(context, instance->lock);
 
     instance->maDecoder = (ma_decoder*)ma_malloc(sizeof(*instance->maDecoder));
     instance->frameIndex = 0;
@@ -37,7 +36,8 @@ AudioDecoder* AudioDecoder_create(ma_context* context) {
 }
 
 void AudioDecoder_destroy(AudioDecoder* instance) {
-    ma_mutex_uninit(&instance->lock);
+    ma_mutex_uninit(instance->lock);
+    ma_free(instance->lock);
 
     ma_decoder_uninit(instance->maDecoder);
     ma_free(instance->maDecoder);
@@ -47,27 +47,27 @@ void AudioDecoder_destroy(AudioDecoder* instance) {
 
 ma_uint64 AudioDecoder_readPcmFrames(AudioDecoder* decoder, ma_uint64 frameCount, void* pFramesOut) {
     ma_uint64 framesRead = 0;
-    ma_mutex_lock(&decoder->lock);
+    ma_mutex_lock(decoder->lock);
     framesRead = ma_decoder_read_pcm_frames(decoder->maDecoder, pFramesOut, frameCount);
     decoder->frameIndex += framesRead;
-    ma_mutex_unlock(&decoder->lock);
+    ma_mutex_unlock(decoder->lock);
     return framesRead;
 }
 
 ma_uint64 AudioDecoder_getLengthInPcmFrames(AudioDecoder* decoder) {
     ma_uint64 length = 0;
-    ma_mutex_lock(&decoder->lock);
+    ma_mutex_lock(decoder->lock);
     length = ma_decoder_get_length_in_pcm_frames(decoder->maDecoder);
-    ma_mutex_unlock(&decoder->lock);
+    ma_mutex_unlock(decoder->lock);
     return length;
 }
 
 ma_result AudioDecoder_seekToPcmFrame(AudioDecoder* decoder, ma_uint64 frameIndex) {
     ma_result result = MA_ERROR;
-    ma_mutex_lock(&decoder->lock);
+    ma_mutex_lock(decoder->lock);
     result = ma_decoder_seek_to_pcm_frame(decoder->maDecoder, frameIndex);
     decoder->frameIndex = frameIndex;
-    ma_mutex_unlock(&decoder->lock);
+    ma_mutex_unlock(decoder->lock);
     return result;
 }
 
@@ -81,11 +81,9 @@ AudioNode* AudioNode_create(ma_context* context) {
     instance = (AudioNode*)ma_malloc(sizeof(*instance));
     ma_zero_object(instance);
 
-    ma_result r = ma_mutex_init(context, &instance->lock);
-    if (r != MA_SUCCESS) {
-        ma_mutex_uninit(&instance->lock);
-        return NULL;
-    }
+    // create lock
+    instance->lock = (ma_mutex*)ma_malloc(sizeof(*instance->lock));
+    ma_mutex_init(context, instance->lock);
 
     instance->readFramesCallback = NULL;
     instance->decoder = NULL;
@@ -101,7 +99,8 @@ AudioNode* AudioNode_create(ma_context* context) {
 }
 
 void AudioNode_destroy(AudioNode* instance) {
-    ma_mutex_uninit(&instance->lock);
+    ma_mutex_uninit(instance->lock);
+    ma_free(instance->lock);
     ma_free(instance);
 }
 
@@ -115,18 +114,16 @@ AudioNodeList* AudioNodeList_create(ma_context* context) {
     instance = (AudioNodeList*)ma_malloc(sizeof(*instance));
     ma_zero_object(instance);
 
-    // initialize audioNodeList fields
-    ma_result r = ma_mutex_init(context, &instance->lock);
-    if (r != MA_SUCCESS) {
-        ma_mutex_uninit(&instance->lock);
-        return NULL;
-    }
+    // create lock
+    instance->lock = (ma_mutex*)ma_malloc(sizeof(*instance->lock));
+    ma_mutex_init(context, instance->lock);
     
     return instance;
 }
 
 void AudioNodeList_destroy(AudioNodeList* instance) {
-    ma_mutex_uninit(&instance->lock);
+    ma_mutex_uninit(instance->lock);
+    ma_free(instance->lock);
 
     // free source list nodes
     AudioNodeListNode* currentSourceListNode = instance->sourceNext;
@@ -146,7 +143,7 @@ void AudioNodeList_add(AudioNodeList* audioNodeList, AudioNode* source) {
     ma_zero_object(newListNode);
     newListNode->item = source;
 
-    ma_mutex_lock(&audioNodeList->lock);
+    ma_mutex_lock(audioNodeList->lock);
     {
         // find last next-item pointer
         AudioNodeListNode** currentSourceListNodePtr = &(audioNodeList->sourceNext);
@@ -155,13 +152,13 @@ void AudioNodeList_add(AudioNodeList* audioNodeList, AudioNode* source) {
         }
         (*currentSourceListNodePtr) = newListNode;
     }
-    ma_mutex_unlock(&audioNodeList->lock);
+    ma_mutex_unlock(audioNodeList->lock);
 }
 
 ma_bool32 AudioNodeList_remove(AudioNodeList* audioNodeList, AudioNode* source) {
     ma_bool32 removed = MA_FALSE;
 
-    ma_mutex_lock(&audioNodeList->lock);
+    ma_mutex_lock(audioNodeList->lock);
     {
         // iterate list searching for source and remove when found
         AudioNodeListNode** parentSourceListNodePtr = &(audioNodeList->sourceNext);
@@ -180,7 +177,7 @@ ma_bool32 AudioNodeList_remove(AudioNodeList* audioNodeList, AudioNode* source) 
             currentSourceListNode = currentSourceListNode->next;
         }
     }
-    ma_mutex_unlock(&audioNodeList->lock);
+    ma_mutex_unlock(audioNodeList->lock);
 
     return removed;
 }
@@ -188,7 +185,7 @@ ma_bool32 AudioNodeList_remove(AudioNodeList* audioNodeList, AudioNode* source) 
 int AudioNodeList_sourceCount(AudioNodeList* audioNodeList) {
     int count = 0;
 
-    ma_mutex_lock(&audioNodeList->lock);
+    ma_mutex_lock(audioNodeList->lock);
     {
         AudioNodeListNode* currentSourceListNode = audioNodeList->sourceNext;
         while (currentSourceListNode != NULL) {
@@ -196,7 +193,7 @@ int AudioNodeList_sourceCount(AudioNodeList* audioNodeList) {
             currentSourceListNode = currentSourceListNode->next;
         }
     }
-    ma_mutex_unlock(&audioNodeList->lock);
+    ma_mutex_unlock(audioNodeList->lock);
 
     return count;
 }
@@ -221,7 +218,7 @@ ma_uint32 Audio_mixSources(AudioNodeList* sourceList, ma_uint32 channelCount, ma
     ma_uint32 bufferMaxFrames = ma_countof(decoderOutputBuffer) / channelCount;
     ma_uint32 writtenDataWidth = 0;
 
-    ma_mutex_lock(&sourceList->lock);
+    ma_mutex_lock(sourceList->lock);
     {
         AudioNodeListNode* currentSourceListNode = sourceList->sourceNext;
         while (currentSourceListNode != NULL) {
@@ -231,7 +228,7 @@ ma_uint32 Audio_mixSources(AudioNodeList* sourceList, ma_uint32 channelCount, ma
             ma_assert(source != NULL);
 
             // we lock with the source object for the entire duration of the mix because if the source fields it's possible that references like the decoder are freed by the GC
-            ma_mutex_lock(&source->lock); {
+            ma_mutex_lock(source->lock); {
 
                 ma_int64 _lastReadFrameBlock;
                 _lastReadFrameBlock = source->_lastReadFrameBlock;
@@ -239,12 +236,12 @@ ma_uint32 Audio_mixSources(AudioNodeList* sourceList, ma_uint32 channelCount, ma
                 source->_lastReadFrameBlock = schedulingCurrentFrameBlock;
 
                 if (source->active != MA_TRUE) {
-                    goto NEXT_SOURCE; // unlock from current source first
+                    goto NEXT_SOURCE;
                 }
 
                 // if we've already read from this node for this frame block, then don't read again (this prevent cycles in the node tree)
                 if (_lastReadFrameBlock == schedulingCurrentFrameBlock) {
-                    goto NEXT_SOURCE; // unlock from current source first
+                    goto NEXT_SOURCE;
                 }
 
                 ma_int64 localStartFrame = 0;
@@ -256,7 +253,7 @@ ma_uint32 Audio_mixSources(AudioNodeList* sourceList, ma_uint32 channelCount, ma
 
                     // return if start is scheduled outside this block
                     if (localStartFrame >= frameCount) {
-                        goto NEXT_SOURCE; // unlock from current source first
+                        goto NEXT_SOURCE;
                     }
                 }
 
@@ -275,24 +272,24 @@ ma_uint32 Audio_mixSources(AudioNodeList* sourceList, ma_uint32 channelCount, ma
 
                 // scheduled out of this block, don't read
                 if (totalFramesToRead <= 0) {
-                    goto NEXT_SOURCE; // unlock from current source first
+                    goto NEXT_SOURCE; 
                 }
 
                 // if we have neither a read frames callback or a decoder then we can't read anything
-                if (source->readFramesCallback == NULL && source->decoder == NULL) goto NEXT_SOURCE; // unlock from current source first
+                if (source->readFramesCallback == NULL && source->decoder == NULL) goto NEXT_SOURCE;
 
                 // if we do have a decoder, validate that it has the right output format and channel count
                 if (source->decoder != NULL) {
                     // decoder should be setup to read into float buffers, if not then something has gone wrong
                     if (source->decoder->maDecoder->outputFormat != ma_format_f32) {
                         // error, output format must be F32
-                        goto NEXT_SOURCE; // unlock from current source first
+                        goto NEXT_SOURCE;
                     }
 
                     // we expect the decoder to have the same number of channels as the output
                     if (source->decoder->maDecoder->outputChannels != channelCount) {
                         // error, channel count mismatch
-                        goto NEXT_SOURCE; // unlock from current source first
+                        goto NEXT_SOURCE;
                     }
                 }
 
@@ -307,7 +304,8 @@ ma_uint32 Audio_mixSources(AudioNodeList* sourceList, ma_uint32 channelCount, ma
                     
                     ma_uint32 framesRead;
                     if (source->readFramesCallback != NULL) {
-                        framesRead = source->readFramesCallback(source, channelCount, chunkFrameCount, schedulingCurrentFrameBlock, decoderOutputBuffer);
+                        // be aware: the callback should not lock with the source (because it's already locked)
+                        framesRead = source->readFramesCallback(source->userData, channelCount, chunkFrameCount, schedulingCurrentFrameBlock, decoderOutputBuffer);
                     } else if (source->decoder != NULL) {
                         framesRead = (ma_uint32) AudioDecoder_readPcmFrames(source->decoder, chunkFrameCount, decoderOutputBuffer);
                     } else {
@@ -365,10 +363,10 @@ ma_uint32 Audio_mixSources(AudioNodeList* sourceList, ma_uint32 channelCount, ma
 
             }
             NEXT_SOURCE: // unlock from current source before next loop 
-            ma_mutex_unlock(&source->lock);
+            ma_mutex_unlock(source->lock);
         }
     }
-    ma_mutex_unlock(&sourceList->lock);
+    ma_mutex_unlock(sourceList->lock);
 
     return writtenDataWidth;
 }

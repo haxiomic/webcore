@@ -35,7 +35,7 @@ extern "C" {
  */
 
 typedef struct {
-    ma_mutex    lock;
+    ma_mutex*   lock;
     ma_decoder* maDecoder;
     ma_uint64   frameIndex;
 } AudioDecoder;
@@ -57,11 +57,11 @@ ma_result     AudioDecoder_seekToPcmFrame(AudioDecoder* decoder, ma_uint64 frame
 
 typedef struct AudioNode AudioNode;
 
-typedef ma_uint64 (* AudioNode_ReadFramesCallback) (AudioNode* AudioNode, ma_uint32 nChannels, ma_uint64 frameCount, ma_int64 schedulingCurrentFrameBlock, float* buffer);
+typedef ma_uint64 (* AudioNode_ReadFramesCallback) (void* audioNodeUserData, ma_uint32 nChannels, ma_uint64 frameCount, ma_int64 schedulingCurrentFrameBlock, float* buffer);
 
 struct AudioNode {
     AudioNode_ReadFramesCallback readFramesCallback; // allowed to be  NULL, when not null, this takes priority over reading from the decoder
-    ma_mutex                     lock;
+    ma_mutex*                    lock;
     AudioDecoder*                decoder; // allowed to be  NULL
     ma_int64                     scheduledStartFrame; // -1 for none
     ma_int64                     scheduledStopFrame;  // -1 for none
@@ -92,7 +92,7 @@ typedef struct AudioNodeListNode {
  */
 
 typedef struct {
-    ma_mutex           lock; // acquire when accessing sourceNext list
+    ma_mutex*          lock; // acquire when accessing sourceNext list
     AudioNodeListNode* sourceNext;
 } AudioNodeList;
 
