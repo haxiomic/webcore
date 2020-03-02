@@ -48,8 +48,6 @@ class Macro {
         // metadata to embed a single file
         var embedMetas = metas.extract(':embedFile').concat(metas.extract('embedFile'));
 
-        var incbinLines = new Array<String>();
-
         for (embedMeta in embedMetas) {
             switch embedMeta.params[0] {
                 case {expr: EConst(CString(path)), pos: pos}:
