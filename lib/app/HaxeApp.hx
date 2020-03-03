@@ -184,7 +184,7 @@ class Internal {
     /**
         Should only be called from the main haxe thread
     **/
-    static function tick() {
+    static inline function tick() {
         if (graphicsContext != null) {
             nativeSelectGraphicsContext(graphicsContext);
         }
