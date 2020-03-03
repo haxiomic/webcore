@@ -226,20 +226,18 @@ ma_uint32 Audio_mixSources(AudioNodeList* sourceList, ma_uint32 channelCount, ma
 
             ma_assert(source != NULL);
 
+            // _lastReadFrameBlock is used to mark the node with the current frame block being processed so we can avoid cycles
+            // we check it _before_ locking the mutex to avoid a possible double-lock (which would happen in the case of cycles)
+            // this variable should only ever be accessed from the audio thread
+            if (source->_lastReadFrameBlock == schedulingCurrentFrameBlock) {
+                continue;
+            }
+            source->_lastReadFrameBlock = schedulingCurrentFrameBlock;
+
             // we lock with the source object for the entire duration of the mix because if the source fields it's possible that references like the decoder are freed by the GC
             ma_mutex_lock(source->lock); {
 
-                ma_int64 _lastReadFrameBlock;
-                _lastReadFrameBlock = source->_lastReadFrameBlock;
-                // mark for this frame block
-                source->_lastReadFrameBlock = schedulingCurrentFrameBlock;
-
                 if (source->active != MA_TRUE) {
-                    goto NEXT_SOURCE;
-                }
-
-                // if we've already read from this node for this frame block, then don't read again (this prevent cycles in the node tree)
-                if (_lastReadFrameBlock == schedulingCurrentFrameBlock) {
                     goto NEXT_SOURCE;
                 }
 

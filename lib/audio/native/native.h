@@ -69,7 +69,10 @@ struct AudioNode {
     ma_bool32                    active;
     ma_bool32                    onReachEndFlag;
     void*                        userData;
-    ma_int64                     _lastReadFrameBlock; // used for node-tree cycle detection; when a node is read, it's marked with the schedulingCurrentFrameBlock at the time of reading
+
+    // used for node-tree cycle detection; when a node is read, it's marked with the schedulingCurrentFrameBlock at the time of reading
+    // should only be accessed from within the audio thread
+    ma_int64                     _lastReadFrameBlock;
 };
 
 AudioNode* AudioNode_create(ma_context* context);
