@@ -76,7 +76,7 @@ class Macro {
 
                     var newFields = (macro class X {
 
-                        static public final $variableName: haxe.io.Bytes =
+                        static public final $variableName: typedarray.ArrayBuffer =
                             #if !display
                                 haxe.Resource.getBytes($v{resourceId});
                             #else
