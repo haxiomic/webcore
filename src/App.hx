@@ -28,6 +28,8 @@ class Assets extends asset.Assets {
 class App implements app.HaxeAppInterface {
 
 	var gl: Null<GLContext>;
+	var drawingBufferWidth: Int = 0;
+	var drawingBufferHeight: Int = 0;
 	var program: GLProgram;
 	var triangleBuffer: GLBuffer;
 	var texture: GLTexture;
@@ -63,7 +65,6 @@ class App implements app.HaxeAppInterface {
 		function volumeLoop() {
 			haxe.Timer.delay(volumeLoop, 4);
 			volumeNode.gain.value = Math.sin(haxe.Timer.stamp()) + 1.0; // 0 to 2
-			trace('gain: ${volumeNode.gain.value}');
 		}
 		volumeLoop();
 
@@ -154,11 +155,19 @@ class App implements app.HaxeAppInterface {
 
 	public function onGraphicsContextLost() {
 		trace('Graphics context lost');
-		this.gl = null;
+		gl = null;
+	}
+
+	public function onGraphicsContextResize(drawingBufferWidth: Int, drawingBufferHeight: Int, displayPixelRatio: Float) {
+		trace('onGraphicsContextResize', drawingBufferWidth, drawingBufferHeight, displayPixelRatio);
+		this.drawingBufferWidth = drawingBufferWidth;
+		this.drawingBufferHeight = drawingBufferHeight;
 	}
 
 	public function onDrawFrame() {
 		var t_s = haxe.Timer.stamp();
+
+		gl.viewport(0, 0, drawingBufferWidth, drawingBufferHeight);
 
 		// execute commands on the OpenGL context
 		gl.clearColor(Math.sin(t_s * 0.1), Math.cos(t_s * 0.5), Math.sin(t_s * 0.3), 1);
@@ -177,11 +186,12 @@ class App implements app.HaxeAppInterface {
 	}
 
 	function releaseGraphicsResources() {
-		if (this.gl != null) {
+		if (gl != null) {
 			// WebGL objects are garbage collected in js but because the browser cannot properly estimate the memory pressure (small-handles in js, big on GPU), they might not be collected when we want
 			// so with WebGL it's always best to release manually
 			gl.deleteProgram(program);
 			gl.deleteBuffer(triangleBuffer);
+			gl.deleteTexture(texture);
 		}
 	}
 

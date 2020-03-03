@@ -19,6 +19,9 @@
 		<script>
 			let pixelRatio = window.devicePixelRatio != null ? window.devicePixelRatio : 1;
 
+			// initialize our haxe app
+			let appInstance = HaxeApp.create();
+
 			// create a canvas to provide the OpenGL context
 			let canvas = document.createElement('canvas');
 			document.body.appendChild(canvas);
@@ -28,21 +31,6 @@
 			// disable default touch actions, this helps disable view dragging on touch devices
 			canvas.style.touchAction = 'none';
 			canvas.setAttribute('touch-action', 'none');
-			
-			// resize canvas with window
-			function canvasFillWindow() {
-				// - html px units do not match the screen's native resolution
-				// - the ratio between html px units and the screen's pixels is stored in devicePixelRatio
-				// - the canvas width / height attribute set the size of the drawing buffer
-				// - to create a canvas that draws at the screen's native resolution we set 
-				canvas.width = Math.round(window.innerWidth * pixelRatio);
-				canvas.height = Math.round(window.innerHeight * pixelRatio);
-				canvas.style.width = "100%";
-				canvas.style.height = "100%";
-			}
-
-			canvasFillWindow();
-			window.addEventListener('resize', canvasFillWindow);
 
 			// get the webgl context
 			let webglContextAttributes = {
@@ -59,13 +47,30 @@
 			let gl = canvas.getContext('webgl', webglContextAttributes);
 			let requestAnimationFrameHandle = -1;
 			
-			// initialize our haxe app
-			let appInstance = HaxeApp.create();
 			appInstance.onGraphicsContextReady(gl);
+
+			// resize canvas with window
+			function canvasFillWindow() {
+				// - html px units do not match the screen's native resolution
+				// - the ratio between html px units and the screen's pixels is stored in devicePixelRatio
+				// - the canvas width / height attribute set the size of the drawing buffer
+				// - to create a canvas that draws at the screen's native resolution we set 
+				canvas.width = Math.round(window.innerWidth * pixelRatio);
+				canvas.height = Math.round(window.innerHeight * pixelRatio);
+				canvas.style.width = "100%";
+				canvas.style.height = "100%";
+
+				if (!gl.isContextLost()) {
+					appInstance.onGraphicsContextResize(canvas.width, canvas.height, pixelRatio);
+				}
+			}
+
+			canvasFillWindow();
+			window.addEventListener('resize', canvasFillWindow);
 
 			// add canvas gl context listeners to encourage powerPreference to be respected
 			canvas.addEventListener('webglcontextlost', () => {
-				appInstance.onGraphicsContextLost();
+				appInstance.onNativeGraphicsContextLost();
 				cancelAnimationFrame(requestAnimationFrameHandle);
 			});
 			canvas.addEventListener('webglcontextrestored', () => {
