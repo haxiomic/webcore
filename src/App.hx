@@ -7,6 +7,8 @@ import webgl.GLContext;
 import typedarray.Float32Array;
 
 @:embedFile('../assets/my-triangle.mp3')
+// @:embedFile('../assets/multi-channel-test.mp3')
+@:embedFile('../assets/testcase.mp3')
 @:embedFile('../assets/red-panda.jpg')
 @:embedFile('../assets/pnggrad16rgb.png')
 class Assets extends asset.Assets {
@@ -42,7 +44,7 @@ class App implements app.HaxeAppInterface {
 		function helloLoop() {
 			haxe.Timer.delay(helloLoop, 1000);
 			#if cpp
-			// cpp.vm.Gc.run(true);
+			cpp.vm.Gc.run(true);
 			trace('hello', haxe.Timer.stamp(), '${cpp.vm.Gc.memInfo(cpp.vm.Gc.MEM_INFO_CURRENT) / 1e6}MB');
 			#end
 		}
@@ -54,11 +56,23 @@ class App implements app.HaxeAppInterface {
 		var audioContext = new audio.AudioContext();
 		trace('audio context = $audioContext');
 
-		var node = audioContext.createBufferSource();
-		node.connect(audioContext.destination);
+		var volumeNode = audioContext.createGain();
+		volumeNode.connect(audioContext.destination);
+		volumeNode.gain.value = 1.0;
 
-		audioContext.decodeAudioData(Assets.my_triangle_mp3.getData(), (audioBuffer) -> {
-			trace('Trying to play audio', audioBuffer);
+		function volumeLoop() {
+			haxe.Timer.delay(volumeLoop, 4);
+			volumeNode.gain.value = Math.sin(haxe.Timer.stamp()) + 1.0; // 0 to 2
+			trace('gain: ${volumeNode.gain.value}');
+		}
+		volumeLoop();
+
+		var node = audioContext.createBufferSource();
+		node.connect(volumeNode);
+
+		var t0 = haxe.Timer.stamp();
+		audioContext.decodeAudioData(Assets.my_triangle_mp3, (audioBuffer) -> {
+			trace('Trying to play audio', audioBuffer, haxe.Timer.stamp() - t0);
 			node.buffer = audioBuffer;
 			node.start();
 			node.onended = () -> {
@@ -218,7 +232,7 @@ class App implements app.HaxeAppInterface {
 
 		varying vec2 vPosition;
 		void main() {
-			vPosition = position;
+			vPosition = position * vec2(1.0, -1.) * 0.5 + 0.5;
 
 			gl_Position = vec4(position * 0.5, 0., 1.);
 		}
@@ -244,9 +258,6 @@ class App implements app.HaxeAppInterface {
 		#if (debug && cpp)
 		cpp.Stdio.printf("%s\n", "[debug] App.finalizer()");
 		#end
-		if (instance.gl != null) {
-			instance.releaseGraphicsResources();
-		}
 	}
 
 }
