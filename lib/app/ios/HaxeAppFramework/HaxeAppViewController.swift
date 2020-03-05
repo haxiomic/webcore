@@ -9,6 +9,8 @@ public class HaxeAppViewController: GLKViewController {
     public var context: EAGLContext?
     
     var haxeGraphicsContextReady = false
+    var haxeGraphicsContextWidth = -1
+    var haxeGraphicsContextHeight = -1
 
     public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         HaxeApp.initialize()
@@ -46,8 +48,7 @@ public class HaxeAppViewController: GLKViewController {
         
         self.preferredFramesPerSecond = 60;
     }
-    
-    
+        
     /// Perform cleanup, and delete buffers and memory.
     private func releaseGraphicsContext() {
         // Set the current EAGLContext to our context. This ensures we are deleting buffers against it and potentially not a
@@ -72,7 +73,13 @@ public class HaxeAppViewController: GLKViewController {
             haxeGraphicsContextReady = true
         }
         
-        // let frameTime_s = CACurrentMediaTime()
+        // check if we need to tell haxe that the graphics context has changed size
+        if view.drawableWidth != haxeGraphicsContextWidth || view.drawableHeight != haxeGraphicsContextHeight {
+            let displayPixelRatio = Double(view.drawableWidth) / Double(view.frame.width)
+            haxeAppInstance.onGraphicsContextResize(Int32(view.drawableWidth), Int32(view.drawableHeight), displayPixelRatio);
+            haxeGraphicsContextWidth = view.drawableWidth
+            haxeGraphicsContextHeight = view.drawableHeight
+        }
         
         haxeAppInstance.onDrawFrame()
     }

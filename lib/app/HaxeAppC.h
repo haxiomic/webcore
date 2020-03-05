@@ -7,8 +7,9 @@
 
 #include <stdbool.h>
 
-typedef void (* SelectGraphicsContext) (void* ref);
+// callbacks
 typedef void (* MainThreadTick) ();
+typedef void (* SelectGraphicsContext) (void* ref);
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,6 +27,7 @@ extern "C" {
     void  HaxeApp_release(void* appHandle);
     void  HaxeApp_onGraphicsContextReady(void* appHandle, void* contextRef);
     void  HaxeApp_onGraphicsContextLost(void* appHandle);
+    void  HaxeApp_onGraphicsContextResize(void* appHandle, int drawingBufferWidth, int drawingBufferHeight, double displayPixelRatio);
     void  HaxeApp_onDrawFrame(void* appHandle);
 
 #ifdef __cplusplus

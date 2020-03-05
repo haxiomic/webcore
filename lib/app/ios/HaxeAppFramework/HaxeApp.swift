@@ -26,6 +26,10 @@ public class HaxeApp {
         HaxeApp_onGraphicsContextLost(ptr)
     }
 
+    public func onGraphicsContextResize(_ drawingBufferWidth: Int32, _ drawingBufferHeight: Int32, _ displayPixelRatio: Double) {
+        HaxeApp_onGraphicsContextResize(ptr, drawingBufferWidth, drawingBufferHeight, displayPixelRatio)
+    }
+
     public func onDrawFrame() {
         HaxeApp_onDrawFrame(ptr)
     }

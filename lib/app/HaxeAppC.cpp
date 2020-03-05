@@ -102,6 +102,15 @@ void HaxeApp_onGraphicsContextLost(void* untypedAppHandle) {
     if (HaxeApp::eventLoopNeedsWake()) HaxeApp::wakeEventLoop();
 }
 
+void HaxeApp_onGraphicsContextResize(void* untypedAppHandle, int drawingBufferWidth, int drawingBufferHeight, double displayPixelRatio) {
+    hx::NativeAttach haxeGcScope;
+
+    AppHandle* appHandle = (AppHandle*) untypedAppHandle;
+    appHandle->haxeRef->onGraphicsContextResize(drawingBufferWidth, drawingBufferHeight, displayPixelRatio);
+
+    if (HaxeApp::eventLoopNeedsWake()) HaxeApp::wakeEventLoop();
+}
+
 void HaxeApp_onDrawFrame(void* untypedAppHandle) {
     hx::NativeAttach haxeGcScope;
 
