@@ -6,7 +6,6 @@ final class GLProgram extends GLObject {
     @:noCompletion
     override public function finalize() {
         context.deleteProgram(this);
-        handle = 0;
     }
 
 }

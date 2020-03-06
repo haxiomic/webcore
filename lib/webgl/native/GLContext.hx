@@ -42,6 +42,10 @@ class GLContext {
 	}
 	#else
 
+	/**
+		`nativeContextReference` is a pointer to the underlying OpenGL context
+		`nativeSetContext` is a callback that receives the `nativeContextReference` and makes it the active OpenGL context
+	**/
 	public inline function new(nativeContextReference: Pointer<cpp.Void>, nativeSetContext: SetContext) {
 		this.nativeContextReference = nativeContextReference.ptr;
 		this.nativeSetContext = nativeSetContext;

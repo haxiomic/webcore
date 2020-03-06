@@ -6,7 +6,6 @@ final class GLBuffer extends GLObject {
     @:noCompletion
     override public function finalize() {
         context.deleteBuffer(this);
-        handle = 0;
     }
 
 }
