@@ -78,7 +78,7 @@ class GLContext {
 	public inline function getSupportedExtensions():Array<String> {
 		setContext();
 		var extensions = getString(EXTENSIONS);
-		return extensions.split(' ').map(name -> name.substr(3));
+		return extensions.split(' ').map(name -> name.substr(3)); // remove GL_ prefix
 	}
 
 	public inline function getExtension<T>(name: Extension<T>): Null<T> {
@@ -89,7 +89,6 @@ class GLContext {
 	}
 
 	public inline function isContextLost():Bool {
-		setContext();
 		return false;
 	}
 
