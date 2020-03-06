@@ -1,7 +1,7 @@
 import GLKit
 
 /**
- * View controller that hosts an instance of HaxeApp. Haxe's GC will be initialized when the view controller is created
+ * View controller that hosts an instance of HaxeApp
  */
 public class HaxeAppViewController: GLKViewController {
     
