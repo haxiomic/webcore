@@ -9,23 +9,25 @@
 
 // callbacks
 typedef void (* MainThreadTick) ();
-typedef void (* SelectGraphicsContext) (void* ref);
+typedef void (* SetGraphicsContext) (void* ref);
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
     // static methods
-    const char* HaxeApp_initialize(MainThreadTick tickOnMainThread, SelectGraphicsContext selectGraphicsContext);
+    const char* HaxeApp_haxeInitialize(MainThreadTick tickOnMainThread);
     void        HaxeApp_tick();
     void        HaxeApp_startEventLoopThread();
     void        HaxeApp_stopEventLoopThread();
     void        HaxeApp_runGc(bool major);
+    bool        HaxeApp_isHaxeInitialized();
+    bool        HaxeApp_isEventLoopThreadRunning();
 
     // instance methods
     void* HaxeApp_create();
     void  HaxeApp_release(void* appHandle);
-    void  HaxeApp_onGraphicsContextReady(void* appHandle, void* contextRef);
+    void  HaxeApp_onGraphicsContextReady(void* appHandle, void* contextRef, SetGraphicsContext setGraphicsContext);
     void  HaxeApp_onGraphicsContextLost(void* appHandle);
     void  HaxeApp_onGraphicsContextResize(void* appHandle, int drawingBufferWidth, int drawingBufferHeight, double displayPixelRatio);
     void  HaxeApp_onDrawFrame(void* appHandle);

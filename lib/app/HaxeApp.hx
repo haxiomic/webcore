@@ -38,7 +38,7 @@ class HaxeApp {
         - https://groups.google.com/forum/#!topic/haxelang/V-jzaEX7YD8
     **/
     #if cpp
-    @:noDebug static public function initialize(tickOnMainThread: MainThreadTick, selectGraphicsContext: SelectGraphicsContext): cpp.ConstCharStar {
+    @:noDebug static public function haxeInitialize(tickOnMainThread: MainThreadTick): cpp.ConstCharStar {
         if (Internal.initialized) {
             return null;
         } else {
@@ -46,11 +46,18 @@ class HaxeApp {
             if (result == null) {
                 Internal.initialized = true;
                 Internal.nativeTickOnMainThread = tickOnMainThread;
-                Internal.nativeSelectGraphicsContext = selectGraphicsContext;
                 Internal.startEventLoopThread();
             }
             return result;
         }
+    }
+
+    @:noDebug static public function isHaxeInitialized() {
+        return Internal.initialized;
+    }
+
+    @:noDebug static public function isEventLoopThreadRunning() {
+        return Internal.eventLoopRunning;
     }
 
     /**
@@ -82,13 +89,6 @@ class HaxeApp {
     }
 
     /**
-        This is required because the graphics context might be used within events which can be executed at anytime and therefore we need to ensure the correct graphics context is activated
-    **/
-    static public function setGlobalGraphicsContext(ref: cpp.Star<cpp.Void>) {
-        Internal.graphicsContext = ref;
-    }
-
-    /**
         Call this when external code executes haxe code that might schedule events
     **/
     static public function wakeEventLoop() {
@@ -110,7 +110,6 @@ class HaxeApp {
 }
 
 #if cpp
-typedef SelectGraphicsContext = cpp.Callable<(ref: cpp.Star<cpp.Void>) -> Void>;
 typedef MainThreadTick = cpp.Callable<() -> Void>;
 #end
 
@@ -122,7 +121,6 @@ typedef MainThreadTick = cpp.Callable<() -> Void>;
 @:unreflective
 class Internal {
 
-    static var initialized = false;
     
     #if cpp
     static var createMainApp: cpp.Callable<() -> HaxeAppInterface>;
@@ -132,14 +130,15 @@ class Internal {
 
 
     #if cpp
-    static var graphicsContext: cpp.Star<cpp.Void> = null;
-    static var eventLoopRunning = false;
-    static var eventLoopExitLock = new sys.thread.Lock();
     // native platform callbacks
     static var nativeTickOnMainThread: MainThreadTick;
-    static var nativeSelectGraphicsContext: SelectGraphicsContext;
+
+    static var initialized = false;
+    static var eventLoopRunning = false;
+    static var eventLoopExitLock = new sys.thread.Lock();
     static var tickLock = new sys.thread.Lock();
-    static var _nextTick_s: Float = -1.0;
+
+    static var _nextTick_s: Float = -1.0; // accessed by haxe main thread and event-loop thread; synchronize before read/write
 
     static var _eventsScheduledBeforeLatestEvent: Null<haxe.MainLoop.MainEvent> = null;
 
@@ -185,9 +184,6 @@ class Internal {
         Should only be called from the main haxe thread
     **/
     static inline function tick() {
-        if (graphicsContext != null) {
-            nativeSelectGraphicsContext(graphicsContext);
-        }
         _nextTick_s = @:privateAccess haxe.EntryPoint.processEvents();
         tickLock.release();
     }

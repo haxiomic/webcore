@@ -35,8 +35,18 @@ struct AppHandle {
     }
 };
 
-const char* HaxeApp_initialize(MainThreadTick tickOnMainThread, SelectGraphicsContext selectGraphicsContext) {
-    return HaxeApp::initialize(tickOnMainThread, selectGraphicsContext);
+const char* HaxeApp_haxeInitialize(MainThreadTick tickOnMainThread) {
+    return HaxeApp::haxeInitialize(tickOnMainThread);
+}
+
+bool HaxeApp_isHaxeInitialized() {
+    hx::NativeAttach haxeGcScope;
+    return HaxeApp::isHaxeInitialized();
+}
+
+bool HaxeApp_isEventLoopThreadRunning() {
+    hx::NativeAttach haxeGcScope;
+    return HaxeApp::isEventLoopThreadRunning();
 }
 
 void HaxeApp_tick() {
@@ -77,15 +87,13 @@ void HaxeApp_release(void* untypedAppHandle) {
     delete appHandle;
 }
 
-void HaxeApp_onGraphicsContextReady(void* untypedAppHandle, void* contextRef) {
+void HaxeApp_onGraphicsContextReady(void* untypedAppHandle, void* contextRef, SetGraphicsContext setGraphicsContext) {
     hx::NativeAttach haxeGcScope;
-
-    HaxeApp::setGlobalGraphicsContext(contextRef);
 
     AppHandle* appHandle = (AppHandle*) untypedAppHandle;
     HX_JUST_GC_STACKFRAME
     // create an gl context wrapper (the real context must already be created)
-    webgl::native::GLContext gl = webgl::native::GLContext_obj::__alloc(HX_CTX);
+    webgl::native::GLContext gl = webgl::native::GLContext_obj::__alloc(HX_CTX, contextRef, setGraphicsContext);
     appHandle->haxeRef->onGraphicsContextReady(gl);
 
     if (HaxeApp::eventLoopNeedsWake()) HaxeApp::wakeEventLoop();
@@ -93,8 +101,6 @@ void HaxeApp_onGraphicsContextReady(void* untypedAppHandle, void* contextRef) {
 
 void HaxeApp_onGraphicsContextLost(void* untypedAppHandle) {
     hx::NativeAttach haxeGcScope;
-
-    HaxeApp::setGlobalGraphicsContext(NULL);
 
     AppHandle* appHandle = (AppHandle*) untypedAppHandle;
     appHandle->haxeRef->onGraphicsContextLost();

@@ -9,10 +9,14 @@ import typedarray.Uint8Array;
 import typedarray.BufferSource;
 import webgl.native.ES2Context.*;
 
+typedef SetContext = cpp.Callable<(ref: cpp.Star<cpp.Void>) -> Void>;
+
 @:nullSafety
 class GLContext {
 
 	final defaultFramebuffer: GLFramebuffer;
+	final nativeSetContext: SetContext;
+	final nativeContextReference: Star<cpp.Void>;
 
 	#if windows
 	
@@ -38,11 +42,15 @@ class GLContext {
 	}
 	#else
 
-	public inline function new() {
+	public inline function new(nativeContextReference: Pointer<cpp.Void>, nativeSetContext: SetContext) {
+		this.nativeContextReference = nativeContextReference.ptr;
+		this.nativeSetContext = nativeSetContext;
+
 		#if windows
 		initGlew();
 		#end
 
+		// get initially bound framebuffer and use it for our default framebuffer `bindFramebuffer(FRAMEBUFFER, null)`
 		var temp = new Int32Array(1);
 		glGetIntegerv(FRAMEBUFFER_BINDING, temp.toCPointer());
 		var initialFramebufferRef = temp[0];
@@ -50,178 +58,221 @@ class GLContext {
 	}
 
 	#end
+	
+	inline function setContext() {
+		#if !single_graphics_context
+		nativeSetContext(this.nativeContextReference);
+		#end
+	}
 
 	public inline function getContextAttributes(): Null<GLContextAttributes> {
+		setContext();
 		// @! could use `eglQueryContext` by passing an egl context reference during creation
 		return null;
 	}
-
 	
 	public inline function getSupportedExtensions():Array<String> {
+		setContext();
 		var extensions = getString(EXTENSIONS);
 		return extensions.split(' ').map(name -> name.substr(3));
 	}
 
 	public inline function getExtension<T>(name: Extension<T>): Null<T> {
+		setContext();
 		var isSupported = getSupportedExtensions().indexOf(name) != -1;
 		// @! should generate extension objects
 		return isSupported ? cast {} : null;
 	}
 
 	public inline function isContextLost():Bool {
+		setContext();
 		return false;
 	}
 
 	public inline function activeTexture(unit:TextureUnit) {
+		setContext();
 		glActiveTexture(unit);
 	}
 
 	public inline function attachShader(program:GLProgram, shader:GLShader) {
+		setContext();
 		glAttachShader(program.handle, shader.handle);
 	}
 
 	public inline function bindAttribLocation(program:GLProgram, index:GLuint, name:String) {
+		setContext();
 		var nameCharStar = ConstCharStar.fromString(name);
 		glBindAttribLocation(program.handle, index, nameCharStar);
 	}
 
 	public inline function bindBuffer(target:BufferTarget, ?buffer:GLBuffer) {
+		setContext();
 		var ref = buffer != null ? buffer.handle : 0;
 		glBindBuffer(target, ref);
 	}
 
 	public inline function bindFramebuffer(target:FramebufferTarget, ?framebuffer:GLFramebuffer) {
+		setContext();
 		var ref = framebuffer != null ? framebuffer.handle : defaultFramebuffer.handle;
 		glBindFramebuffer(target, ref);
 	}
 
 	public inline function bindRenderbuffer(target:RenderbufferTarget, ?renderbuffer:GLRenderbuffer) {
+		setContext();
 		var ref = renderbuffer != null ? renderbuffer.handle : 0;
 		glBindRenderbuffer(target, ref);
 	}
 
 	public inline function bindTexture(target:TextureTarget, ?texture:GLTexture) {
+		setContext();
 		var ref = texture != null ? texture.handle : 0;
 		glBindTexture(target, ref);
 	}
 
 	public inline function blendColor(red:GLclampf, green:GLclampf, blue:GLclampf, alpha:GLclampf) {
+		setContext();
 		glBlendColor(red, green, blue, alpha);
 	}
 
 	public inline function blendEquation(mode:BlendEquation) {
+		setContext();
 		glBlendEquation(mode);
 	}
 
 	public inline function blendEquationSeparate(modeRGB:BlendEquation, modeAlpha:BlendEquation) {
+		setContext();
 		glBlendEquationSeparate(modeRGB, modeAlpha);
 	}
 
 	public inline function blendFunc(sfactor:BlendFactor, dfactor:BlendFactor) {
+		setContext();
 		glBlendFunc(sfactor, dfactor);
 	}
 
 	public inline function blendFuncSeparate(srcRGB:BlendFactor, dstRGB:BlendFactor, srcAlpha:BlendFactor, dstAlpha:BlendFactor) {
+		setContext();
 		glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
 	}
 
 	public inline function bufferData(target:BufferTarget, data:BufferSource, usage:BufferUsage) {
+		setContext();
 		glBufferData(target, data.byteLength, cast data.toCPointer(), usage);
 	}
 
 	public inline function bufferDataOfSize(target:BufferTarget, size:Int, usage:BufferUsage) {
+		setContext();
 		glBufferData(target, size, null, usage);
 	}
 
 	public inline function bufferSubData(target:BufferTarget, offset:GLintptr, data:BufferSource) {
+		setContext();
 		glBufferSubData(target, offset, data.byteLength, cast data.toCPointer());
 	}
 
 	public inline function checkFramebufferStatus(target:FramebufferTarget):FramebufferStatus {
+		setContext();
 		return glCheckFramebufferStatus(target);
 	}
 
 	public inline function clear(mask:ClearBufferMask) {
+		setContext();
 		glClear(mask);
 	}
 
 	public inline function clearColor(red:GLclampf, green:GLclampf, blue:GLclampf, alpha:GLclampf) {
+		setContext();
 		glClearColor(red, green, blue, alpha);
 	}
 
 	public inline function clearDepth(depth:GLclampf) {
+		setContext();
 		glClearDepthf(depth);
 	}
 
 	public inline function clearStencil(s:GLint) {
+		setContext();
 		glClearStencil(s);
 	}
 
 	public inline function colorMask(red:Bool, green:Bool, blue:Bool, alpha:Bool) {
+		setContext();
 		glColorMask(red, green, blue, alpha);
 	}
 
 	public inline function compileShader(shader:GLShader) {
+		setContext();
 		glCompileShader(shader.handle);
 	}
 
 	public inline function compressedTexImage2D(target:TextureTarget, level:GLint, internalformat:PixelFormat, width:GLsizei, height:GLsizei, border:GLint, data:GLArrayBufferView) {
+		setContext();
 		var ptr: Star<UInt8> = data != null ? data.toCPointer() : null;
 		glCompressedTexImage2D(target, level, internalformat, width, height, border, data.byteLength, cast ptr);
 	}
 
 	public inline function compressedTexSubImage2D(target:TextureTarget, level:GLint, xoffset:GLint, yoffset:GLint, width:GLsizei, height:GLsizei, format:PixelFormat, data:GLArrayBufferView) {
+		setContext();
 		var ptr: Star<UInt8> = data != null ? data.toCPointer() : null;
 		glCompressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, data.byteLength, cast ptr);
 	}
 
 	public inline function copyTexImage2D(target:TextureTarget, level:GLint, internalformat:PixelFormat, x:GLint, y:GLint, width:GLsizei, height:GLsizei, border:GLint) {
+		setContext();
 		glCopyTexImage2D(target, level, internalformat, x, y, width, height, border);
 	}
 
 	public inline function copyTexSubImage2D(target:TextureTarget, level:GLint, xoffset:GLint, yoffset:GLint, x:GLint, y:GLint, width:GLsizei, height:GLsizei) {
+		setContext();
 		glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
 	}
 
 	public inline function createBuffer():Null<GLBuffer> {
+		setContext();
 		var ref: GLuint = 0;
 		glGenBuffers(1, Native.addressOf(ref));
 		return ref != 0 ? new GLBuffer(this, ref) : null;
 	}
 
 	public inline function createFramebuffer():Null<GLFramebuffer> {
+		setContext();
 		var ref: GLuint = 0;
 		glGenFramebuffers(1, Native.addressOf(ref));
 		return ref != 0 ? new GLFramebuffer(this, ref) : null;
 	}
 
 	public inline function createProgram():Null<GLProgram> {
+		setContext();
 		var ref = glCreateProgram();
 		return ref != 0 ? new GLProgram(this, ref) : null;
 	}
 
 	public inline function createRenderbuffer():Null<GLRenderbuffer> {
+		setContext();
 		var ref: GLuint = 0;
 		glGenRenderbuffers(1, Native.addressOf(ref));
 		return ref != 0 ? new GLRenderbuffer(this, ref) : null;
 	}
 
 	public inline function createShader(type:ShaderType):Null<GLShader> {
+		setContext();
 		var ref = glCreateShader(type);
 		return ref != 0 ? new GLShader(this, ref) : null;
 	}
 
 	public inline function createTexture():Null<GLTexture> {
+		setContext();
 		var ref: GLuint = 0;
 		glGenTextures(1, Native.addressOf(ref));
 		return ref != 0 ? new GLTexture(this, ref) : null;
 	}
 
 	public inline function cullFace(mode:CullFaceMode) {
+		setContext();
 		glCullFace(mode);
 	}
 
 	public inline function deleteBuffer(?buffer:GLBuffer) {
+		setContext();
 		if (buffer != null) {
 			if (buffer.handle != 0) glDeleteBuffers(1, Native.addressOf(buffer.handle));
 			buffer.handle = 0;
@@ -229,6 +280,7 @@ class GLContext {
 	}
 
 	public inline function deleteFramebuffer(?framebuffer:GLFramebuffer) {
+		setContext();
 		if (framebuffer != null) {
 			if (framebuffer.handle != 0) glDeleteFramebuffers(1, Native.addressOf(framebuffer.handle));
 			framebuffer.handle = 0;
@@ -236,6 +288,7 @@ class GLContext {
 	}
 
 	public inline function deleteProgram(?program:GLProgram) {
+		setContext();
 		if (program != null) {
 			if (program.handle != 0) glDeleteProgram(program.handle);
 			program.handle = 0;
@@ -243,6 +296,7 @@ class GLContext {
 	}
 
 	public inline function deleteRenderbuffer(?renderbuffer:GLRenderbuffer) {
+		setContext();
 		if (renderbuffer != null) {
 			if (renderbuffer.handle != 0) glDeleteRenderbuffers(1, Native.addressOf(renderbuffer.handle));
 			renderbuffer.handle = 0;
@@ -250,6 +304,7 @@ class GLContext {
 	}
 
 	public inline function deleteShader(?shader:GLShader) {
+		setContext();
 		if (shader != null) {
 			if (shader.handle != 0) glDeleteShader(shader.handle);
 			shader.handle = 0;
@@ -257,6 +312,7 @@ class GLContext {
 	}
 
 	public inline function deleteTexture(?texture:GLTexture) {
+		setContext();
 		if (texture != null) {
 			if (texture.handle != 0) glDeleteTextures(1, Native.addressOf(texture.handle));
 			texture.handle = 0;
@@ -264,73 +320,90 @@ class GLContext {
 	}
 
 	public inline function depthFunc(func:ComparisonFunction) {
+		setContext();
 		glDepthFunc(func);
 	}
 
 	public inline function depthMask(flag:Bool) {
+		setContext();
 		glDepthMask(flag);
 	}
 
 	public inline function depthRange(zNear:GLclampf, zFar:GLclampf) {
+		setContext();
 		glDepthRangef(zNear, zFar);
 	}
 
 	public inline function detachShader(program:GLProgram, shader:GLShader) {
+		setContext();
 		glDetachShader(program.handle, shader.handle);
 	}
 
 	public inline function disable(cap:Capability) {
+		setContext();
 		glDisable(cap);
 	}
 
 	public inline function disableVertexAttribArray(index:GLuint) {
+		setContext();
 		glDisableVertexAttribArray(index);
 	}
 
 	public inline function drawArrays(mode:DrawMode, first:GLint, count:GLsizei) {
+		setContext();
 		glDrawArrays(mode, first, count);
 	}
 
 	public inline function drawElements(mode:DrawMode, count:GLsizei, type:DataType, offset:GLintptr) {
+		setContext();
 		var offsetAsPointer: ConstStar<cpp.Void> = untyped __cpp__('reinterpret_cast<void*>({0})', offset);
 		glDrawElements(mode, count, type, offsetAsPointer);
 	}
 
 	public inline function enable(cap:Capability) {
+		setContext();
 		glEnable(cap);
 	}
 
 	public inline function enableVertexAttribArray(index:GLuint) {
+		setContext();
 		glEnableVertexAttribArray(index);
 	}
 
 	public inline function finish() {
+		setContext();
 		glFinish();
 	}
 
 	public inline function flush() {
+		setContext();
 		glFlush();
 	}
 
 	public inline function framebufferRenderbuffer(target:FramebufferTarget, attachment:FramebufferAttachement, renderbuffertarget:RenderbufferTarget, ?renderbuffer:GLRenderbuffer) {
+		setContext();
 		var ref = renderbuffer != null ? renderbuffer.handle : 0;
 		glFramebufferRenderbuffer(target, attachment, renderbuffertarget, ref);
 	}
 
 	public inline function framebufferTexture2D(target:FramebufferTarget, attachment:FramebufferAttachement, textarget:TextureTarget, texture:GLTexture, level:GLint) {
+		setContext();
 		var ref = texture != null ? texture.handle : 0;
 		glFramebufferTexture2D(target, attachment, textarget, ref, level);
 	}
 
 	public inline function frontFace(mode:FrontFaceDirection) {
+		setContext();
 		glFrontFace(mode);
 	}
 
 	public inline function generateMipmap(target:TextureTarget) {
+		setContext();
 		glGenerateMipmap(target);
 	}
 
 	public function getActiveAttrib(program:GLProgram, index:GLuint):GLActiveInfo {
+		setContext();
 		final maxNameLength = getProgramParameter(program, ACTIVE_ATTRIBUTE_MAX_LENGTH);
 
 		var nameLength: GLsizei = 0;
@@ -361,6 +434,7 @@ class GLContext {
 	}
 
 	public function getActiveUniform(program:GLProgram, index:GLuint):GLActiveInfo {
+		setContext();
 		final maxNameLength = getProgramParameter(program, ACTIVE_UNIFORM_MAX_LENGTH);
 
 		var nameLength: GLsizei = 0;
@@ -390,6 +464,7 @@ class GLContext {
 	}
 
 	public inline function getAttachedShaders(program:GLProgram):Array<GLShader> {
+		setContext();
 		var attachedShaderCount = getProgramParameter(program, ATTACHED_SHADERS);
 		var shaderRefs = new Uint32Array(attachedShaderCount);
 		glGetAttachedShaders(program.handle, attachedShaderCount, null, shaderRefs.toCPointer());
@@ -400,17 +475,20 @@ class GLContext {
 	}
 
 	public inline function getAttribLocation(program:GLProgram, name:String):GLint {
+		setContext();
 		var nameCharStar = ConstCharStar.fromString(name);
 		return glGetAttribLocation(program.handle, nameCharStar);
 	}
 
 	public inline function getBufferParameter<T>(target:BufferTarget, pname:BufferParameter<T>):T {
+		setContext();
 		var result: GLint = 0;
 		glGetBufferParameteriv(target, pname, Native.addressOf(result));
 		return cast result;
 	}
 
 	public function getParameter<T>(pname:Parameter<T>): Null<T> {
+		setContext();
 		switch (pname) {
 			case Parameter.RENDERER, Parameter.SHADING_LANGUAGE_VERSION, Parameter.VENDOR, Parameter.VERSION:
 				return getString(pname);
@@ -517,10 +595,12 @@ class GLContext {
 
 
 	public inline function getError():ErrorCode {
+		setContext();
 		return glGetError();
 	}
 
 	public function getFramebufferAttachmentParameter<T>(target:FramebufferTarget, attachment:FramebufferAttachement, pname:FramebufferAttachmentParameter<T>): Null<T> {
+		setContext();
 		var ref: GLint = 0;
 		glGetFramebufferAttachmentParameteriv(target, attachment, pname, Native.addressOf(ref));
 		switch pname {
@@ -540,12 +620,14 @@ class GLContext {
 	}
 
 	public inline function getProgramParameter<T>(program:GLProgram, pname:ProgramParameter<T>):T {
+		setContext();
 		var ref: GLint = 0;
 		glGetProgramiv(program.handle, pname, Native.addressOf(ref));
 		return cast ref;
 	}
 
 	public function getProgramInfoLog(program:GLProgram):String {
+		setContext();
 		var maxInfoLogLength: GLint = getProgramParameter(program, INFO_LOG_LENGTH);
 		var returnedStringLength: GLsizei = 0;
 
@@ -560,12 +642,14 @@ class GLContext {
 	}
 
 	public inline function getRenderbufferParameter<T>(target:RenderbufferTarget, pname:RenderbufferParameter<T>):T {
+		setContext();
 		var result: GLint = 0;
 		glGetRenderbufferParameteriv(target, pname, Native.addressOf(result));
 		return cast result;
 	}
 
 	public function getShaderParameter<T>(shader:GLShader, pname:ShaderParameter<T>):T {
+		setContext();
 		var result: GLint = 0;
 		switch pname {
 			case ShaderParameter.COMPILE_STATUS, ShaderParameter.DELETE_STATUS:
@@ -578,6 +662,7 @@ class GLContext {
 	}
 
 	public inline function getShaderPrecisionFormat(shadertype:ShaderType, precisiontype:PrecisionType):GLShaderPrecisionFormat {
+		setContext();
 		var minMaxRange = new Int32Array(2);
 		var precision: GLint = 0;
 		glGetShaderPrecisionFormat(shadertype, precisiontype, minMaxRange.toCPointer(), Native.addressOf(precision));
@@ -589,6 +674,7 @@ class GLContext {
 	}
 
 	public function getShaderInfoLog(shader:GLShader):String {
+		setContext();
 		var maxInfoLogLength: GLint = getShaderParameter(shader, INFO_LOG_LENGTH);
 		var returnedStringLength: GLsizei = 0;
 
@@ -603,6 +689,7 @@ class GLContext {
 	}
 
 	public function getShaderSource(shader:GLShader):String {
+		setContext();
 		var maxSourceLength: GLint = getShaderParameter(shader, SHADER_SOURCE_LENGTH);
 		var returnedStringLength: GLsizei = 0;
 		
@@ -617,6 +704,7 @@ class GLContext {
 	}
 
 	public function getTexParameter<T>(target:TextureTarget, pname:TextureParameter<T>):T {
+		setContext();
 		switch pname {
 			// float parameters
 			case TextureParameter.TEXTURE_MAX_ANISOTROPY_EXT:
@@ -631,6 +719,7 @@ class GLContext {
 	}
 
 	public function getUniform(program:GLProgram, location:GLUniformLocation):Dynamic {
+		setContext();
 		var info = getActiveUniform(program, location);
 
 		inline function getUniformFloat32Array(n: Int) {
@@ -698,11 +787,13 @@ class GLContext {
 	}
 
 	public inline function getUniformLocation(program:GLProgram, name:String):GLUniformLocation {
+		setContext();
 		var nameCharStar = ConstCharStar.fromString(name);
 		return glGetUniformLocation(program.handle, nameCharStar);
 	}
 
 	public function getVertexAttrib<T>(index:GLuint, pname:VertexAttributeParameter<T>): Null<T> {
+		setContext();
 		switch (pname) {
 			case VertexAttributeParameter.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING:
 				var ref: GLint = 0;
@@ -729,113 +820,139 @@ class GLContext {
 	}
 
 	public inline function getVertexAttribOffset(index:GLuint, pname:VertexAttributeOffsetParameter):GLsizeiptr {
+		setContext();
 		var pointer: GLsizeiptr = 0;
 		glGetVertexAttribPointerv(index, pname, cast Native.addressOf(pointer));
 		return pointer;
 	}
 
 	public inline function hint(target:HintTarget, mode:HintMode) {
+		setContext();
 		glHint(target, mode);
 	}
 
 	public inline function isEnabled(cap:Capability):Bool {
+		setContext();
 		return glIsEnabled(cap);
 	}
 	
 	public inline function isBuffer(?buffer:GLBuffer):Bool {
+		setContext();
 		return buffer != null ? glIsBuffer(buffer.handle) : false;
 	}
 
 	public inline function isFramebuffer(?framebuffer:GLFramebuffer):Bool {
+		setContext();
 		return framebuffer != null ? glIsFramebuffer(framebuffer.handle) : false;
 	}
 
 	public inline function isProgram(?program:GLProgram):Bool {
+		setContext();
 		return program != null ? glIsProgram(program.handle) : false;
 	}
 
 	public inline function isRenderbuffer(?renderbuffer:GLRenderbuffer):Bool {
+		setContext();
 		return renderbuffer != null ? glIsRenderbuffer(renderbuffer.handle) : false;
 	}
 
 	public inline function isShader(?shader:GLShader):Bool {
+		setContext();
 		return shader != null ? glIsShader(shader.handle) : false;
 	}
 
 	public inline function isTexture(?texture:GLTexture):Bool {
+		setContext();
 		return texture != null ? glIsTexture(texture.handle) : false;
 	}
 
 	public inline function lineWidth(width:GLfloat) {
+		setContext();
 		glLineWidth(width);
 	}
 
 	public inline function linkProgram(program:GLProgram) {
+		setContext();
 		glLinkProgram(program.handle);
 	}
 
 	public inline function pixelStorei<T>(pname:PixelStoreParameter<T>, param:T) {
+		setContext();
 		glPixelStorei(pname, cast param);
 	}
 
 	public inline function polygonOffset(factor:GLfloat, units:GLfloat) {
+		setContext();
 		glPolygonOffset(factor, units);
 	}
 
 	public inline function readPixels(x:GLint, y:GLint, width:GLsizei, height:GLsizei, format:PixelFormat, type:PixelDataType, pixels:GLArrayBufferView) {
+		setContext();
 		var ptr: Star<UInt8> = pixels != null ? pixels.toCPointer() : null;
 		glReadPixels(x, y, width, height, format, type, cast ptr);
 	}
 
 	public inline function renderbufferStorage(target:RenderbufferTarget, internalformat:RenderbufferFormat, width:GLsizei, height:GLsizei) {
+		setContext();
 		glRenderbufferStorage(target, internalformat, width, height);
 	}
 
 	public inline function sampleCoverage(value:GLclampf, invert:Bool) {
+		setContext();
 		glSampleCoverage(value, invert);
 	}
 
 	public inline function scissor(x:GLint, y:GLint, width:GLsizei, height:GLsizei) {
+		setContext();
 		glScissor(x, y, width, height);
 	}
 
 	@:analyzer(no_optimize)
 	public function shaderSource(shader:GLShader, source:String) {
+		setContext();
 		var sourceCharStar = ConstCharStar.fromString(source);
 		// here we assume hxcpp strings are null terminated!
 		glShaderSource(shader.handle, 1, Native.addressOf(sourceCharStar), 0);
 	}
 
 	public inline function stencilFunc(func:ComparisonFunction, ref:GLint, mask:GLuint) {
+		setContext();
 		glStencilFunc(func, ref, mask);
 	}
 
 	public inline function stencilFuncSeparate(face:CullFaceMode, func:ComparisonFunction, ref:GLint, mask:GLuint) {
+		setContext();
 		glStencilFuncSeparate(face, func, ref, mask);
 	}
 
 	public inline function stencilMask(mask:GLuint) {
+		setContext();
 		glStencilMask(mask);
 	}
 
 	public inline function stencilMaskSeparate(face:CullFaceMode, mask:GLuint) {
+		setContext();
 		glStencilMaskSeparate(face, mask);
 	}
 
 	public inline function stencilOp(fail:Operation, zfail:Operation, zpass:Operation) {
+		setContext();
 		glStencilOp(fail, zfail, zpass);
 	}
 
 	public inline function stencilOpSeparate(face:CullFaceMode, fail:Operation, zfail:Operation, zpass:Operation) {
+		setContext();
 		glStencilOpSeparate(face, fail, zfail, zpass);
 	}
 
 	public inline function texImage2D(target:TextureTarget, level:GLint, internalformat:PixelFormat, width:GLsizei, height:GLsizei, border:GLint, format:PixelFormat, type:PixelDataType, pixels:Null<GLArrayBufferView>) {
+		setContext();
 		var ptr: Star<UInt8> = pixels != null ? pixels.toCPointer() : null;
 		glTexImage2D(target, level, internalformat, width, height, border, format, type, cast ptr);
 	}
 
 	public function texImage2DImageSource(target:TextureTarget, level:GLint, internalformat:PixelFormat, format:PixelFormat, type:PixelDataType, source:TexImageSource) {
+		setContext();
 		@:privateAccess {
 			// currently on C++ TexImageSource can only be an Image
 			var imageSource: image.Image = source;
@@ -884,19 +1001,23 @@ class GLContext {
 	}
 
 	public inline function texParameterf<T:GLfloat>(target:TextureTarget, pname:TextureParameter<T>, param:T) {
+		setContext();
 		glTexParameterf(target, pname, param);
 	}
 
 	public inline function texParameteri<T:GLint>(target:TextureTarget, pname:TextureParameter<T>, param:T) {
+		setContext();
 		glTexParameteri(target, pname, param);
 	}
 
 	public inline function texSubImage2D(target:TextureTarget, level:GLint, xoffset:GLint, yoffset:GLint, width:GLsizei, height:GLsizei, format:PixelFormat, type:PixelDataType, pixels:GLArrayBufferView) {
+		setContext();
 		var ptr: Star<UInt8> = pixels != null ? pixels.toCPointer() : null;
 		glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, cast ptr);
 	}
 
 	public function texSubImage2DImageSource(target:TextureTarget, level:GLint, xoffset:GLint, yoffset:GLint, format:PixelFormat, type:PixelDataType, source:TexImageSource) {
+		setContext();
 		@:privateAccess {
 			// currently on C++ TexImageSource can only be an Image
 			var imageSource: image.Image = source;
@@ -945,128 +1066,159 @@ class GLContext {
 	}
 
 	public inline function uniform1f(location:GLUniformLocation, x:GLfloat) {
+		setContext();
 		glUniform1f(location, x);
 	}
 
 	public inline function uniform1fv(location:GLUniformLocation, v:GLFloat32Array) {
+		setContext();
 		glUniform1fv(location, v.length, v.toCPointer());
 	}
 
 	public inline function uniform1i(location:GLUniformLocation, x:GLint) {
+		setContext();
 		glUniform1i(location, x);
 	}
 
 	public inline function uniform1iv(location:GLUniformLocation, v:GLInt32Array) {
+		setContext();
 		glUniform1iv(location, v.length, v.toCPointer());
 	}
 
 	public inline function uniform2f(location:GLUniformLocation, x:GLfloat, y:GLfloat) {
+		setContext();
 		glUniform2f(location, x, y);
 	}
 
 	public inline function uniform2fv(location:GLUniformLocation, v:GLFloat32Array) {
+		setContext();
 		glUniform2fv(location, NativeMath.idiv(v.length, 2), v.toCPointer());
 	}
 
 	public inline function uniform2i(location:GLUniformLocation, x:GLint, y:GLint) {
+		setContext();
 		glUniform2i(location, x, y);
 	}
 
 	public inline function uniform2iv(location:GLUniformLocation, v:GLInt32Array) {
+		setContext();
 		glUniform2iv(location, NativeMath.idiv(v.length, 2), v.toCPointer());
 	}
 
 	public inline function uniform3f(location:GLUniformLocation, x:GLfloat, y:GLfloat, z:GLfloat) {
+		setContext();
 		glUniform3f(location, x, y, z);
 	}
 
 	public inline function uniform3fv(location:GLUniformLocation, v:GLFloat32Array) {
+		setContext();
 		glUniform3fv(location, NativeMath.idiv(v.length, 3), v.toCPointer());
 	}
 
 	public inline function uniform3i(location:GLUniformLocation, x:GLint, y:GLint, z:GLint) {
+		setContext();
 		glUniform3i(location, x, y, z);
 	}
 
 	public inline function uniform3iv(location:GLUniformLocation, v:GLInt32Array) {
+		setContext();
 		glUniform3iv(location, NativeMath.idiv(v.length, 3), v.toCPointer());
 	}
 
 	public inline function uniform4f(location:GLUniformLocation, x:GLfloat, y:GLfloat, z:GLfloat, w:GLfloat) {
+		setContext();
 		glUniform4f(location, x, y, z, w);
 	}
 
 	public inline function uniform4fv(location:GLUniformLocation, v:GLFloat32Array) {
+		setContext();
 		glUniform4fv(location, NativeMath.idiv(v.length, 4), v.toCPointer());
 	}
 
 	public inline function uniform4i(location:GLUniformLocation, x:GLint, y:GLint, z:GLint, w:GLint) {
+		setContext();
 		glUniform4i(location, x, y, z, w);
 	}
 
 	public inline function uniform4iv(location:GLUniformLocation, v:GLInt32Array) {
+		setContext();
 		glUniform4iv(location, NativeMath.idiv(v.length, 4), v.toCPointer());
 	}
 
 	public inline function uniformMatrix2fv(location:GLUniformLocation, transpose:Bool, value:GLFloat32Array) {
+		setContext();
 		glUniformMatrix2fv(location, NativeMath.idiv(value.length, 4), transpose, value.toCPointer());
 	}
 
 	public inline function uniformMatrix3fv(location:GLUniformLocation, transpose:Bool, value:GLFloat32Array) {
+		setContext();
 		glUniformMatrix3fv(location, NativeMath.idiv(value.length, 9), transpose, value.toCPointer());
 	}
 
 	public inline function uniformMatrix4fv(location:GLUniformLocation, transpose:Bool, value:GLFloat32Array) {
+		setContext();
 		glUniformMatrix4fv(location, NativeMath.idiv(value.length, 16), transpose, value.toCPointer());
 	}
 
 	public inline function useProgram(?program:GLProgram) {
+		setContext();
 		var ref = program != null ? program.handle : 0;
 		glUseProgram(ref);
 	}
 
 	public inline function validateProgram(program:GLProgram) {
+		setContext();
 		glValidateProgram(program.handle);
 	}
 
 	public inline function vertexAttrib1f(index:GLuint, x:GLfloat) {
+		setContext();
 		glVertexAttrib1f(index, x);
 	}
 
 	public inline function vertexAttrib1fv(index:GLuint, values:GLFloat32Array) {
+		setContext();
 		glVertexAttrib1fv(index, values.toCPointer());
 	}
 
 	public inline function vertexAttrib2f(index:GLuint, x:GLfloat, y:GLfloat) {
+		setContext();
 		glVertexAttrib2f(index, x, y);
 	}
 
 	public inline function vertexAttrib2fv(index:GLuint, values:GLFloat32Array) {
+		setContext();
 		glVertexAttrib2fv(index, values.toCPointer());
 	}
 
 	public inline function vertexAttrib3f(index:GLuint, x:GLfloat, y:GLfloat, z:GLfloat) {
+		setContext();
 		glVertexAttrib3f(index, x, y, z);
 	}
 
 	public inline function vertexAttrib3fv(index:GLuint, values:GLFloat32Array) {
+		setContext();
 		glVertexAttrib3fv(index, values.toCPointer());
 	}
 
 	public inline function vertexAttrib4f(index:GLuint, x:GLfloat, y:GLfloat, z:GLfloat, w:GLfloat) {
+		setContext();
 		glVertexAttrib4f(index, x, y, z, w);
 	}
 
 	public inline function vertexAttrib4fv(index:GLuint, values:GLFloat32Array) {
+		setContext();
 		glVertexAttrib4fv(index, values.toCPointer());
 	}
 
 	public inline function vertexAttribPointer(index:GLuint, size:GLint, type:DataType, normalized:Bool, stride:GLsizei, offset:GLintptr) {
+		setContext();
 		var offsetAsPointer: ConstStar<cpp.Void> = untyped __cpp__('reinterpret_cast<void*>({0})', offset);
 		glVertexAttribPointer(index, size, type, normalized, stride, offsetAsPointer);
 	}
 
 	public inline function viewport(x:GLint, y:GLint, width:GLsizei, height:GLsizei) {
+		setContext();
 		glViewport(x, y, width, height);
 	}
 

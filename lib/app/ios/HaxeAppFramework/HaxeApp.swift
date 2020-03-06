@@ -10,6 +10,10 @@ public class HaxeApp {
             print("Haxe Error: called haxe method from a thread other than the main thread. This may cause instability because the event-loop runs on the main thread")
         }
 
+        if !HaxeApp.isHaxeInitialized() {
+            HaxeApp.haxeInitialize()
+        }
+
         ptr = HaxeApp_create()
     }
 
@@ -19,7 +23,15 @@ public class HaxeApp {
 
     public func onGraphicsContextReady(_ context: EAGLContext) {
         let contextRef: UnsafeMutableRawPointer = Unmanaged.passUnretained(context).toOpaque()
-        HaxeApp_onGraphicsContextReady(ptr, contextRef)
+        HaxeApp_onGraphicsContextReady(
+            ptr,
+            contextRef,
+            // setGraphicsContext(ref)
+            { ref in
+                let context: EAGLContext = Unmanaged<EAGLContext>.fromOpaque(ref!).takeUnretainedValue()
+                EAGLContext.setCurrent(context)
+            }
+        )
     }
 
     public func onGraphicsContextLost() {
@@ -34,18 +46,21 @@ public class HaxeApp {
         HaxeApp_onDrawFrame(ptr)
     }
 
-    static public func initialize() {
-        HaxeApp_initialize(
+    static public func haxeInitialize() {
+        HaxeApp_haxeInitialize(
             // tickOnMainThread()
             {
                 DispatchQueue.main.async(execute: { HaxeApp_tick() })
-            },
-            // setGraphicsContext(ref)
-            { ref in
-                let context: EAGLContext = Unmanaged<EAGLContext>.fromOpaque(ref!).takeUnretainedValue()
-                EAGLContext.setCurrent(context)
             }
         )
+    }
+
+    static public func isHaxeInitialized() -> Bool {
+        return HaxeApp_isHaxeInitialized();
+    }
+
+    static public func isEventLoopThreadRunning() -> Bool {
+        return HaxeApp_isEventLoopThreadRunning();
     }
 
     static public func startEventLoopThread() {
