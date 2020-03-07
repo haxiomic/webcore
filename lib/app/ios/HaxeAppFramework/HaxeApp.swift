@@ -25,6 +25,10 @@ public class HaxeApp {
         HaxeApp_release(ptr)
     }
 
+    public func onResize(_ width: Double, _ height: Double) {
+        HaxeApp_onResize(ptr, width, height)
+    }
+
     public func onGraphicsContextReady(_ view: GLKView) {
         self.glkView = view
         let viewRef: UnsafeMutableRawPointer = Unmanaged.passUnretained(view).toOpaque()

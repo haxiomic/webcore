@@ -28,6 +28,10 @@ public class HaxeAppViewController: GLKViewController {
         super.viewDidLoad()
         initializeGraphicsContext()
     }
+
+    override public func viewDidLayoutSubviews() {
+        haxeAppInstance.onResize(Double(view.frame.width), Double(view.frame.height))
+    }
     
     private func initializeGraphicsContext() {
         // Create an OpenGL ES context and store it in our local variable.

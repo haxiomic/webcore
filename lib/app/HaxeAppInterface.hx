@@ -20,6 +20,7 @@ import webgl.GLContext;
 interface HaxeAppInterface {
 
     /**
+        - Called once after the view has been created
         - Called _after_ the view has been resized
         - `width` and `height` are in units of **points**
     **/

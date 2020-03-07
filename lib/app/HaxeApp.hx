@@ -1,6 +1,6 @@
 package app;
 
-@:native('HaxeApp')
+@:native('app.HaxeApp')
 @:nativeGen // cpp
 @:expose // js
 @:keep
@@ -96,9 +96,9 @@ class HaxeApp {
     }
 
     /**
-        Checks if new events were scheduled between calls to this method
-        This is a work-around because MainLoop doesn't trigger wakeup when adding events
-        In the future we should probably redefine MainLoop rather than use this method
+        Checks if new events were scheduled between calls to this method.
+        This is a work-around because MainLoop doesn't trigger wakeup when adding events.
+        In the future we can replace it by redefining MainLoop to wakeup the event loop when events are added
     **/
     static public function eventLoopNeedsWake() @:privateAccess {
         var needsWake = haxe.MainLoop.pending != Internal._eventsScheduledBeforeLatestEvent;
@@ -184,10 +184,6 @@ class Internal {
         Should only be called from the main haxe thread
     **/
     static inline function tick() {
-        // it's possible the active graphics context was changed externally between ticks
-        // by setting this variable to null, haxe will make sure the right graphics context is activated before executing graphics calls
-        @:privateAccess webgl.native.GLContext.knownCurrentReference = null;
-
         _nextTick_s = @:privateAccess haxe.EntryPoint.processEvents();
         tickLock.release();
     }

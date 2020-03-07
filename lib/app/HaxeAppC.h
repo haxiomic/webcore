@@ -28,6 +28,7 @@ extern "C" {
     // instance methods
     void* HaxeApp_create();
     void  HaxeApp_release(void* appHandle);
+    void  HaxeApp_onResize(void* appHandle, double width, double height);
     void  HaxeApp_onGraphicsContextReady(void* appHandle, void* contextRef, SetGraphicsContext setGraphicsContext, GetContextParamInt32 getDrawingBufferWidth, GetContextParamInt32 getDrawingBufferHeight);
     void  HaxeApp_onGraphicsContextLost(void* appHandle);
     void  HaxeApp_onDrawFrame(void* appHandle, int32_t drawingBufferWidth, int32_t drawingBufferHeight);
