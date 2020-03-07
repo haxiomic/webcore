@@ -60,9 +60,7 @@
 				canvas.style.width = "100%";
 				canvas.style.height = "100%";
 
-				if (!gl.isContextLost()) {
-					appInstance.onGraphicsContextResize(canvas.width, canvas.height, pixelRatio);
-				}
+				appInstance.onResize(canvas.clientWidth, canvas.clientHeight);
 			}
 
 			canvasFillWindow();
@@ -81,7 +79,7 @@
 			// native browser frame-loop
 			function frameLoop(t_ms) {
 				// tell app to draw a frame 
-				appInstance.onDrawFrame(gl);
+				appInstance.onDrawFrame(gl.drawingBufferWidth, gl.drawingBufferHeight);
 
 				requestAnimationFrameHandle = requestAnimationFrame(frameLoop);
 			}
