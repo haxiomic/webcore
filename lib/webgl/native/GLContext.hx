@@ -9,14 +9,18 @@ import typedarray.Uint8Array;
 import typedarray.BufferSource;
 import webgl.native.ES2Context.*;
 
-typedef SetContext = cpp.Callable<(ref: cpp.Star<cpp.Void>) -> Void>;
-
 @:nullSafety
 class GLContext {
 
-	final defaultFramebuffer: GLFramebuffer;
-	final nativeSetContext: SetContext;
+	public var drawingBufferWidth (get, never): Int;
+	public var drawingBufferHeight (get, never): Int;
+
 	final nativeContextReference: Star<cpp.Void>;
+	final nativeMakeCurrent: Callable<(context: Star<cpp.Void>) -> Void>;
+	final nativeGetDrawingBufferWidth: Callable<(context: Star<cpp.Void>) -> Int32>;
+	final nativeGetDrawingBufferHeight: Callable<(context: Star<cpp.Void>) -> Int32>;
+	
+	final defaultFramebuffer: GLFramebuffer;
 
 	#if windows
 	
@@ -46,9 +50,16 @@ class GLContext {
 		`nativeContextReference` is a pointer to the underlying OpenGL context
 		`nativeSetContext` is a callback that receives the `nativeContextReference` and makes it the active OpenGL context
 	**/
-	public inline function new(nativeContextReference: Pointer<cpp.Void>, nativeSetContext: SetContext) {
+	public inline function new(
+		nativeContextReference: Pointer<cpp.Void>,
+		nativeMakeCurrent: Callable<(context: Star<cpp.Void>) -> Void>,
+		nativeGetDrawingBufferWidth: Callable<(context: Star<cpp.Void>) -> Int32>,
+		nativeGetDrawingBufferHeight: Callable<(context: Star<cpp.Void>) -> Int32>
+	) {
 		this.nativeContextReference = nativeContextReference.ptr;
-		this.nativeSetContext = nativeSetContext;
+		this.nativeMakeCurrent = nativeMakeCurrent;
+		this.nativeGetDrawingBufferWidth = nativeGetDrawingBufferWidth;
+		this.nativeGetDrawingBufferHeight = nativeGetDrawingBufferHeight;
 
 		#if windows
 		initGlew();
@@ -162,7 +173,7 @@ class GLContext {
 		glBufferData(target, data.byteLength, cast data.toCPointer(), usage);
 	}
 
-	public inline function bufferDataOfSize(target:BufferTarget, size:Int, usage:BufferUsage) {
+	public inline function bufferDataOfSize(target:BufferTarget, size:GLsizeiptr, usage:BufferUsage) {
 		setContext();
 		glBufferData(target, size, null, usage);
 	}
@@ -1224,6 +1235,12 @@ class GLContext {
 		setContext();
 		glViewport(x, y, width, height);
 	}
+
+	inline function get_drawingBufferWidth(): Int
+		return nativeGetDrawingBufferWidth(nativeContextReference);
+
+	inline function get_drawingBufferHeight(): Int
+		return nativeGetDrawingBufferHeight(nativeContextReference);
 
 	// internal utility methods
 	inline function getFloat32Array(pname: GLenum, n: Int) {
