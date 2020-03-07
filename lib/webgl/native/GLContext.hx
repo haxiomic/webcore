@@ -80,12 +80,18 @@ class GLContext {
 
 	#end
 	
-	// ensures that OpenGL calls are applied to our context
+	/**
+	 * Ensures that OpenGL calls are applied to our context.
+	 * This method is called for every gl-call, however the overhead of this method is extremely small so it's not expected to have any impact on performance
+	 * However, if there can never be more than 1 graphics context you can pass `-D single_graphics_context` to remove it
+	 **/
 	inline function setContext() {
+		#if !single_graphics_context
 		if (knownCurrentReference == nativeReference) {
 			nativeMakeCurrent(nativeReference);
 			knownCurrentReference = nativeReference;
 		}
+		#end
 	}
 
 	public inline function getContextAttributes(): Null<GLContextAttributes> {
