@@ -51,25 +51,39 @@ class GLContext {
 	#else
 
 	/**
-		- `nativeReference` is a pointer to access the native context
-		- `nativeAttributes` is an object representing the native context's attributes
+		- `nativeReference` is a pointer to access the native context (used by callbacks)
+
 		- `nativeMakeCurrent` is a callback that receives the `nativeReference` and makes it the active OpenGL context
 		- `nativeGetDrawingBufferWidth` is a callback that receives the `nativeReference` and returns the drawing buffer width in pixels
 		- `nativeGetDrawingBufferHeight` is a callback that receives the `nativeReference` and returns the drawing buffer height in pixels
 	**/
 	public inline function new(
 		nativeReference: Pointer<cpp.Void>,
-		nativeAttributes: GLContextAttributes,
+
+		// context attributes
+		alpha: Bool,
+		depth: Bool,
+		stencil: Bool,
+		antialias: Bool,
+
 		// callbacks
 		nativeMakeCurrent: Callable<(nativeReference: Star<cpp.Void>) -> Void>,
 		nativeGetDrawingBufferWidth: Callable<(nativeReference: Star<cpp.Void>) -> Int32>,
 		nativeGetDrawingBufferHeight: Callable<(nativeReference: Star<cpp.Void>) -> Int32>
 	) {
 		this.nativeReference = nativeReference.ptr;
-		this.nativeAttributes = copyAttributes(nativeAttributes);
 		this.nativeMakeCurrent = nativeMakeCurrent;
 		this.nativeGetDrawingBufferWidth = nativeGetDrawingBufferWidth;
 		this.nativeGetDrawingBufferHeight = nativeGetDrawingBufferHeight;
+
+		this.nativeAttributes = {
+			alpha: alpha,
+			depth: depth,
+			stencil: stencil,
+			antialias: antialias,
+			premultipliedAlpha: false,
+			preserveDrawingBuffer: false,
+		};
 
 		#if windows
 		initGlew();

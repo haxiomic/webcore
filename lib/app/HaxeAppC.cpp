@@ -100,6 +100,10 @@ void HaxeApp_onResize(void* untypedAppHandle, double width, double height) {
 void HaxeApp_onGraphicsContextReady(
     void* untypedAppHandle,
     void* contextRef,
+    bool alpha,
+    bool depth,
+    bool stencil,
+    bool antialias,
     SetGraphicsContext setGraphicsContext,
     GetContextParamInt32 getDrawingBufferWidth,
     GetContextParamInt32 getDrawingBufferHeight
@@ -112,6 +116,10 @@ void HaxeApp_onGraphicsContextReady(
     webgl::native::GLContext gl = webgl::native::GLContext_obj::__alloc(
         HX_CTX,
         contextRef,
+        alpha,
+        depth,
+        stencil,
+        antialias,
         setGraphicsContext,
         getDrawingBufferWidth,
         getDrawingBufferHeight

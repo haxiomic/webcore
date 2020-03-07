@@ -31,10 +31,22 @@ public class HaxeApp {
 
     public func onGraphicsContextReady(_ view: GLKView) {
         self.glkView = view
+
         let viewRef: UnsafeMutableRawPointer = Unmanaged.passUnretained(view).toOpaque()
         HaxeApp_onGraphicsContextReady(
             ptr,
             viewRef,
+
+            // context attributes
+            //  alpha
+            view.drawableColorFormat != GLKViewDrawableColorFormat.RGB565,
+            //  depth
+            view.drawableDepthFormat != GLKViewDrawableDepthFormat.formatNone,
+            //  stencil
+            view.drawableStencilFormat != GLKViewDrawableStencilFormat.formatNone,
+            //  antialias
+            view.drawableMultisample != GLKViewDrawableMultisample.multisampleNone,
+            
             // setGraphicsContext(ref)
             { ref in
                 let view: GLKView = Unmanaged<GLKView>.fromOpaque(ref!).takeUnretainedValue()
