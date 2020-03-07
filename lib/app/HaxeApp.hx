@@ -1,6 +1,8 @@
 package app;
 
-@:native('app.HaxeApp')
+#if js
+@:native('HaxeApp')
+#end
 @:nativeGen // cpp
 @:expose // js
 @:keep
