@@ -62,11 +62,11 @@ class App implements app.HaxeAppInterface {
 		volumeNode.connect(audioContext.destination);
 		volumeNode.gain.value = 1.0;
 
-		function volumeLoop() {
-			haxe.Timer.delay(volumeLoop, 4);
-			volumeNode.gain.value = Math.sin(haxe.Timer.stamp()) + 1.0; // 0 to 2
-		}
-		volumeLoop();
+		// function volumeLoop() {
+		// 	haxe.Timer.delay(volumeLoop, 4);
+		// 	volumeNode.gain.value = Math.sin(haxe.Timer.stamp()) + 1.0; // 0 to 2
+		// }
+		// volumeLoop();
 
 		var node = audioContext.createBufferSource();
 		node.connect(volumeNode);
@@ -164,7 +164,7 @@ class App implements app.HaxeAppInterface {
 		this.drawingBufferHeight = drawingBufferHeight;
 	}
 
-	public function onDrawFrame() {
+	public function onDrawFrame(drawingBufferWidth: Int, drawingBufferHeight: Int) {
 		var t_s = haxe.Timer.stamp();
 
 		gl.viewport(0, 0, drawingBufferWidth, drawingBufferHeight);
