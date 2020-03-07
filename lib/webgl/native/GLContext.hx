@@ -18,8 +18,8 @@ class GLContext {
 	public var drawingBufferWidth (get, never): Int;
 	public var drawingBufferHeight (get, never): Int;
 
-
 	final nativeReference: Star<cpp.Void>;
+	final nativeAttributes: GLContextAttributes;
 	final nativeMakeCurrent: Callable<(nativeReference: Star<cpp.Void>) -> Void>;
 	final nativeGetDrawingBufferWidth: Callable<(nativeReference: Star<cpp.Void>) -> Int32>;
 	final nativeGetDrawingBufferHeight: Callable<(nativeReference: Star<cpp.Void>) -> Int32>;
@@ -51,18 +51,22 @@ class GLContext {
 	#else
 
 	/**
-		`nativeReference` is a pointer to access the native context
-		`nativeMakeCurrent` is a callback that receives the `nativeReference` and makes it the active OpenGL context
-		`nativeGetDrawingBufferWidth` is a callback that receives the `nativeReference` and returns the drawing buffer width in pixels
-		`nativeGetDrawingBufferHeight` is a callback that receives the `nativeReference` and returns the drawing buffer height in pixels
+		- `nativeReference` is a pointer to access the native context
+		- `nativeAttributes` is an object representing the native context's attributes
+		- `nativeMakeCurrent` is a callback that receives the `nativeReference` and makes it the active OpenGL context
+		- `nativeGetDrawingBufferWidth` is a callback that receives the `nativeReference` and returns the drawing buffer width in pixels
+		- `nativeGetDrawingBufferHeight` is a callback that receives the `nativeReference` and returns the drawing buffer height in pixels
 	**/
 	public inline function new(
 		nativeReference: Pointer<cpp.Void>,
+		nativeAttributes: GLContextAttributes,
+		// callbacks
 		nativeMakeCurrent: Callable<(nativeReference: Star<cpp.Void>) -> Void>,
 		nativeGetDrawingBufferWidth: Callable<(nativeReference: Star<cpp.Void>) -> Int32>,
 		nativeGetDrawingBufferHeight: Callable<(nativeReference: Star<cpp.Void>) -> Int32>
 	) {
 		this.nativeReference = nativeReference.ptr;
+		this.nativeAttributes = copyAttributes(nativeAttributes);
 		this.nativeMakeCurrent = nativeMakeCurrent;
 		this.nativeGetDrawingBufferWidth = nativeGetDrawingBufferWidth;
 		this.nativeGetDrawingBufferHeight = nativeGetDrawingBufferHeight;
@@ -81,9 +85,9 @@ class GLContext {
 	#end
 	
 	/**
-	 * Ensures that OpenGL calls are applied to our context.
-	 * This method is called for every gl-call, however the overhead of this method is extremely small so it's not expected to have any impact on performance
-	 * However, if there can never be more than 1 graphics context you can pass `-D single_graphics_context` to remove it
+		- Ensures that OpenGL calls are applied to our context
+		- This method is called for every gl-call, however the overhead of this method is extremely small so it's not expected to have any impact on performance. 
+			However, if there can never be more than 1 graphics context you can pass `-D single_graphics_context` to remove it
 	 **/
 	inline function setContext() {
 		#if !single_graphics_context
@@ -94,10 +98,8 @@ class GLContext {
 		#end
 	}
 
-	public inline function getContextAttributes(): Null<GLContextAttributes> {
-		setContext();
-		// @! could use `eglQueryContext` by passing an egl context reference during creation
-		return null;
+	public inline function getContextAttributes(): GLContextAttributes {
+		return copyAttributes(nativeAttributes);
 	}
 	
 	public inline function getSupportedExtensions():Array<String> {
@@ -1255,6 +1257,17 @@ class GLContext {
 
 	inline function get_drawingBufferHeight(): Int
 		return nativeGetDrawingBufferHeight(nativeReference);
+
+	inline function copyAttributes(attributes: GLContextAttributes): GLContextAttributes {
+		return {
+			alpha: attributes.alpha,
+			depth: attributes.depth,
+			stencil: attributes.stencil,
+			antialias: attributes.antialias,
+			premultipliedAlpha: attributes.premultipliedAlpha,
+			preserveDrawingBuffer: attributes.preserveDrawingBuffer,
+		}
+	}
 
 	// internal utility methods
 	inline function getFloat32Array(pname: GLenum, n: Int) {
