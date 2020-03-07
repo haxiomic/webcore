@@ -1,12 +1,12 @@
 package webgl;
 
 typedef GLContextAttributes = {
-    var alpha:Bool;
-    var depth:Bool;
-    var stencil:Bool;
-    var antialias:Bool;
-    var premultipliedAlpha:Bool;
-    var preserveDrawingBuffer:Bool;
+    var alpha: Bool;
+    var depth: Bool;
+    var stencil: Bool;
+    var antialias: Bool;
+    var premultipliedAlpha: Bool;
+    var preserveDrawingBuffer: Bool;
 
     // webgl-specific
     var ?failIfMajorPerformanceCaveat: Bool;
