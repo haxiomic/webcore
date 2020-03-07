@@ -9,8 +9,6 @@ public class HaxeAppViewController: GLKViewController {
     public var context: EAGLContext?
     
     var haxeGraphicsContextReady = false
-    var haxeGraphicsContextWidth = -1
-    var haxeGraphicsContextHeight = -1
 
     public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         haxeAppInstance = HaxeApp()
@@ -55,8 +53,6 @@ public class HaxeAppViewController: GLKViewController {
 
         // tell haxe that we've lost the graphics context
         haxeAppInstance.onGraphicsContextLost()
-        haxeGraphicsContextWidth = -1
-        haxeGraphicsContextHeight = -1
         
         // Set the current EAGLContext to nil.
         EAGLContext.setCurrent(nil)
@@ -73,15 +69,7 @@ public class HaxeAppViewController: GLKViewController {
             haxeGraphicsContextReady = true
         }
         
-        // check if we need to tell haxe that the graphics context has changed size
-        if view.drawableWidth != haxeGraphicsContextWidth || view.drawableHeight != haxeGraphicsContextHeight {
-            let displayPixelRatio = Double(view.drawableWidth) / Double(view.frame.width)
-            haxeAppInstance.onGraphicsContextResize(Int32(view.drawableWidth), Int32(view.drawableHeight), displayPixelRatio);
-            haxeGraphicsContextWidth = view.drawableWidth
-            haxeGraphicsContextHeight = view.drawableHeight
-        }
-        
-        haxeAppInstance.onDrawFrame()
+        haxeAppInstance.onDrawFrame(view.drawableWidth, view.drawableHeight)
     }
 
 }

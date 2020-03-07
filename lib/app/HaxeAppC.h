@@ -29,8 +29,7 @@ extern "C" {
     void  HaxeApp_release(void* appHandle);
     void  HaxeApp_onGraphicsContextReady(void* appHandle, void* contextRef, SetGraphicsContext setGraphicsContext);
     void  HaxeApp_onGraphicsContextLost(void* appHandle);
-    void  HaxeApp_onGraphicsContextResize(void* appHandle, int drawingBufferWidth, int drawingBufferHeight, double displayPixelRatio);
-    void  HaxeApp_onDrawFrame(void* appHandle);
+    void  HaxeApp_onDrawFrame(void* appHandle, int drawingBufferWidth, int drawingBufferHeight);
 
 #ifdef __cplusplus
 }
