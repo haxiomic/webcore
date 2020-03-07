@@ -184,6 +184,10 @@ class Internal {
         Should only be called from the main haxe thread
     **/
     static inline function tick() {
+        // it's possible the active graphics context was changed externally between ticks
+        // by setting this variable to null, haxe will make sure the right graphics context is activated before executing graphics calls
+        @:privateAccess webgl.native.GLContext.knownCurrentReference = null;
+
         _nextTick_s = @:privateAccess haxe.EntryPoint.processEvents();
         tickLock.release();
     }

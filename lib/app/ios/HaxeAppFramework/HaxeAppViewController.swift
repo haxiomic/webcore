@@ -38,7 +38,7 @@ public class HaxeAppViewController: GLKViewController {
         
         // Perform checks and unwrap options in order to perform more OpenGL setup.
         if let view = self.view as? GLKView, let context = context {
-            // Set our view's context to the EAGLContext we just created.s
+            // Set our view's context to the EAGLContext we just created
             view.context = context
         }
         
@@ -65,11 +65,11 @@ public class HaxeAppViewController: GLKViewController {
         // call onGraphicsContextReady() on first frame because at this point the view's drawable is fully initialized
         // we also rely on the screen framebuffer being bound during initialization of the GLContext
         if !haxeGraphicsContextReady {
-            haxeAppInstance.onGraphicsContextReady(context!)
+            haxeAppInstance.onGraphicsContextReady(view)
             haxeGraphicsContextReady = true
         }
         
-        haxeAppInstance.onDrawFrame(view.drawableWidth, view.drawableHeight)
+        haxeAppInstance.onDrawFrame(Int32(view.drawableWidth), Int32(view.drawableHeight))
     }
 
 }

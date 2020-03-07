@@ -1,9 +1,13 @@
+import GLKit
+
 /**
     Swift wrapper for HaxeAppC.h
 **/
 public class HaxeApp {
 
     let ptr: UnsafeMutableRawPointer
+    // we keep a reference to the glkView to prevent it from being collected
+    var glkView: GLKView?
 
     public init() {
         if !Thread.isMainThread {
@@ -21,20 +25,32 @@ public class HaxeApp {
         HaxeApp_release(ptr)
     }
 
-    public func onGraphicsContextReady(_ context: EAGLContext) {
-        let contextRef: UnsafeMutableRawPointer = Unmanaged.passUnretained(context).toOpaque()
+    public func onGraphicsContextReady(_ view: GLKView) {
+        self.glkView = view
+        let viewRef: UnsafeMutableRawPointer = Unmanaged.passUnretained(view).toOpaque()
         HaxeApp_onGraphicsContextReady(
             ptr,
-            contextRef,
+            viewRef,
             // setGraphicsContext(ref)
             { ref in
-                let context: EAGLContext = Unmanaged<EAGLContext>.fromOpaque(ref!).takeUnretainedValue()
-                EAGLContext.setCurrent(context)
+                let view: GLKView = Unmanaged<GLKView>.fromOpaque(ref!).takeUnretainedValue()
+                EAGLContext.setCurrent(view.context)
+            },
+            // getDrawingBufferWidth
+            { ref in
+                let view: GLKView = Unmanaged<GLKView>.fromOpaque(ref!).takeUnretainedValue()
+                return Int32(view.drawableWidth)
+            },
+            // getDrawingBufferHeight
+            { ref in
+                let view: GLKView = Unmanaged<GLKView>.fromOpaque(ref!).takeUnretainedValue()
+                return Int32(view.drawableHeight)
             }
         )
     }
 
     public func onGraphicsContextLost() {
+        self.glkView = nil
         HaxeApp_onGraphicsContextLost(ptr)
     }
 
@@ -70,6 +86,5 @@ public class HaxeApp {
     static public func runGc(major: Bool) {
         HaxeApp_runGc(major);
     }
-
 
 }

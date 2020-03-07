@@ -11,14 +11,18 @@ import webgl.native.ES2Context.*;
 
 @:nullSafety
 class GLContext {
+	
+	// set this variable to null whenever it is possible that the current graphics context has been changed externally
+	static var knownCurrentReference: Star<cpp.Void> = null;
 
 	public var drawingBufferWidth (get, never): Int;
 	public var drawingBufferHeight (get, never): Int;
 
-	final nativeContextReference: Star<cpp.Void>;
-	final nativeMakeCurrent: Callable<(context: Star<cpp.Void>) -> Void>;
-	final nativeGetDrawingBufferWidth: Callable<(context: Star<cpp.Void>) -> Int32>;
-	final nativeGetDrawingBufferHeight: Callable<(context: Star<cpp.Void>) -> Int32>;
+
+	final nativeReference: Star<cpp.Void>;
+	final nativeMakeCurrent: Callable<(nativeReference: Star<cpp.Void>) -> Void>;
+	final nativeGetDrawingBufferWidth: Callable<(nativeReference: Star<cpp.Void>) -> Int32>;
+	final nativeGetDrawingBufferHeight: Callable<(nativeReference: Star<cpp.Void>) -> Int32>;
 	
 	final defaultFramebuffer: GLFramebuffer;
 
@@ -47,16 +51,18 @@ class GLContext {
 	#else
 
 	/**
-		`nativeContextReference` is a pointer to the underlying OpenGL context
-		`nativeMakeCurrent` is a callback that receives the `nativeContextReference` and makes it the active OpenGL context
+		`nativeReference` is a pointer to access the native context
+		`nativeMakeCurrent` is a callback that receives the `nativeReference` and makes it the active OpenGL context
+		`nativeGetDrawingBufferWidth` is a callback that receives the `nativeReference` and returns the drawing buffer width in pixels
+		`nativeGetDrawingBufferHeight` is a callback that receives the `nativeReference` and returns the drawing buffer height in pixels
 	**/
 	public inline function new(
-		nativeContextReference: Pointer<cpp.Void>,
-		nativeMakeCurrent: Callable<(context: Star<cpp.Void>) -> Void>,
-		nativeGetDrawingBufferWidth: Callable<(context: Star<cpp.Void>) -> Int32>,
-		nativeGetDrawingBufferHeight: Callable<(context: Star<cpp.Void>) -> Int32>
+		nativeReference: Pointer<cpp.Void>,
+		nativeMakeCurrent: Callable<(nativeReference: Star<cpp.Void>) -> Void>,
+		nativeGetDrawingBufferWidth: Callable<(nativeReference: Star<cpp.Void>) -> Int32>,
+		nativeGetDrawingBufferHeight: Callable<(nativeReference: Star<cpp.Void>) -> Int32>
 	) {
-		this.nativeContextReference = nativeContextReference.ptr;
+		this.nativeReference = nativeReference.ptr;
 		this.nativeMakeCurrent = nativeMakeCurrent;
 		this.nativeGetDrawingBufferWidth = nativeGetDrawingBufferWidth;
 		this.nativeGetDrawingBufferHeight = nativeGetDrawingBufferHeight;
@@ -76,9 +82,10 @@ class GLContext {
 	
 	// ensures that OpenGL calls are applied to our context
 	inline function setContext() {
-		#if !single_graphics_context
-		nativeMakeCurrent(this.nativeContextReference);
-		#end
+		if (knownCurrentReference == nativeReference) {
+			nativeMakeCurrent(nativeReference);
+			knownCurrentReference = nativeReference;
+		}
 	}
 
 	public inline function getContextAttributes(): Null<GLContextAttributes> {
@@ -1238,10 +1245,10 @@ class GLContext {
 	}
 
 	inline function get_drawingBufferWidth(): Int
-		return nativeGetDrawingBufferWidth(nativeContextReference);
+		return nativeGetDrawingBufferWidth(nativeReference);
 
 	inline function get_drawingBufferHeight(): Int
-		return nativeGetDrawingBufferHeight(nativeContextReference);
+		return nativeGetDrawingBufferHeight(nativeReference);
 
 	// internal utility methods
 	inline function getFloat32Array(pname: GLenum, n: Int) {

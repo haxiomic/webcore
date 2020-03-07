@@ -8,8 +8,9 @@
 #include <stdbool.h>
 
 // callbacks
-typedef void (* MainThreadTick) ();
-typedef void (* SetGraphicsContext) (void* ref);
+typedef void     (* MainThreadTick) ();
+typedef void     (* SetGraphicsContext) (void* ref);
+typedef int32_t  (* GetContextParamInt32) (void* ref);
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,9 +28,9 @@ extern "C" {
     // instance methods
     void* HaxeApp_create();
     void  HaxeApp_release(void* appHandle);
-    void  HaxeApp_onGraphicsContextReady(void* appHandle, void* contextRef, SetGraphicsContext setGraphicsContext);
+    void  HaxeApp_onGraphicsContextReady(void* appHandle, void* contextRef, SetGraphicsContext setGraphicsContext, GetContextParamInt32 getDrawingBufferWidth, GetContextParamInt32 getDrawingBufferHeight);
     void  HaxeApp_onGraphicsContextLost(void* appHandle);
-    void  HaxeApp_onDrawFrame(void* appHandle, int drawingBufferWidth, int drawingBufferHeight);
+    void  HaxeApp_onDrawFrame(void* appHandle, int32_t drawingBufferWidth, int32_t drawingBufferHeight);
 
 #ifdef __cplusplus
 }

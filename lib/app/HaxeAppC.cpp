@@ -87,13 +87,25 @@ void HaxeApp_release(void* untypedAppHandle) {
     delete appHandle;
 }
 
-void HaxeApp_onGraphicsContextReady(void* untypedAppHandle, void* contextRef, SetGraphicsContext setGraphicsContext) {
+void HaxeApp_onGraphicsContextReady(
+    void* untypedAppHandle,
+    void* contextRef,
+    SetGraphicsContext setGraphicsContext,
+    GetContextParamInt32 getDrawingBufferWidth,
+    GetContextParamInt32 getDrawingBufferHeight
+) {
     hx::NativeAttach haxeGcScope;
 
     AppHandle* appHandle = (AppHandle*) untypedAppHandle;
     HX_JUST_GC_STACKFRAME
     // create an gl context wrapper (the real context must already be created)
-    webgl::native::GLContext gl = webgl::native::GLContext_obj::__alloc(HX_CTX, contextRef, setGraphicsContext);
+    webgl::native::GLContext gl = webgl::native::GLContext_obj::__alloc(
+        HX_CTX,
+        contextRef,
+        setGraphicsContext,
+        getDrawingBufferWidth,
+        getDrawingBufferHeight
+    );
     appHandle->haxeRef->onGraphicsContextReady(gl);
 
     if (HaxeApp::eventLoopNeedsWake()) HaxeApp::wakeEventLoop();
@@ -108,7 +120,7 @@ void HaxeApp_onGraphicsContextLost(void* untypedAppHandle) {
     if (HaxeApp::eventLoopNeedsWake()) HaxeApp::wakeEventLoop();
 }
 
-void HaxeApp_onDrawFrame(void* untypedAppHandle, int drawingBufferWidth, int drawingBufferHeight) {
+void HaxeApp_onDrawFrame(void* untypedAppHandle, int32_t drawingBufferWidth, int32_t drawingBufferHeight) {
     hx::NativeAttach haxeGcScope;
 
     AppHandle* appHandle = (AppHandle*) untypedAppHandle;

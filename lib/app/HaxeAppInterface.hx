@@ -16,8 +16,6 @@ interface HaxeAppInterface {
     function onGraphicsContextReady(context: GLContext): Void;
     function onGraphicsContextLost(): Void;
 
-    function onGraphicsContextResize(drawingBufferWidth: Int, drawingBufferHeight: Int, displayPixelRatio: Float): Void;
-
     /**
         - Only called after `onGraphicsContextReady` and stops after `onGraphicsContextLost`
         - `drawingBufferWidth` and `drawingBufferHeight` are the dimensions of the graphics context in pixels
