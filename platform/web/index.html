@@ -116,10 +116,14 @@
 						break;
 					case 'touchend':
 					case 'touchcancel':
-						if (touch.identifier === primaryTouchId) {
-							primaryTouchId = null;
+						for (let i = 0; i < touchEvent.changedTouches.length; i++) {
+							let touch = touchEvent.changedTouches[i];
+							if (touch.identifier === primaryTouchId) {
+								primaryTouchId = null;
+							}
+							delete activeTouches[touch.identifier];
 						}
-						delete activeTouches[touch.identifier];
+						
 						break;
 				}
 
