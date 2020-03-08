@@ -2,7 +2,22 @@ package audio;
 
 #if js
 
-typedef AudioContext = js.html.audio.AudioContext;
+// Amazingly Safari 13 in 2020 does not support WebAudio without a prefix
+// this abstract checks for `webkitAudioContext` if `AudioContext` is not available
+@:forward
+abstract AudioContext(js.html.audio.AudioContext) {
+
+    public inline function new(?contextOptions: js.html.audio.AudioContextOptions) {
+        if (js.Syntax.typeof(js.html.audio.AudioContext) != 'undefined') {
+            this = new js.html.audio.AudioContext(contextOptions);
+        } else if (js.Syntax.typeof(untyped webkitAudioContext) != 'undefined') {
+            this = js.Syntax.code('new webkitAudioContext({0})', contextOptions);
+        } else {
+            throw 'Browser does not support WebAudio';
+        }
+    }
+
+}
 
 #else
 
@@ -29,12 +44,12 @@ class AudioContext {
     final userData: DeviceUserData;
     var _state: AudioContextState = SUSPENDED;
 
-    public function new(?options: {
+    public function new(?contextOptions: {
         ?sampleRate: Int,
         ?latencyHint: LatencyHint, // default "interactive"
     }) {
-        if (options == null) {
-            options = {};
+        if (contextOptions == null) {
+            contextOptions = {};
         }
 
         // @! should be manually creating the context here
@@ -42,9 +57,9 @@ class AudioContext {
         maDevice = Device.alloc();
 
         var deviceConfig = DeviceConfig.init(PLAYBACK);
-        deviceConfig.sampleRate = options.sampleRate != null ? options.sampleRate : 0;
+        deviceConfig.sampleRate = contextOptions.sampleRate != null ? contextOptions.sampleRate : 0;
         deviceConfig.playback.format = F32;
-        deviceConfig.performanceProfile = switch options.latencyHint {
+        deviceConfig.performanceProfile = switch contextOptions.latencyHint {
             case null, INTERACTIVE: LOW_LATENCY;
             case PLAYBACK, BALANCED: CONSERVATIVE; 
             
