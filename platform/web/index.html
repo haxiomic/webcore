@@ -107,7 +107,7 @@
 				switch (touchEvent) {
 					case 'touchstart':
 						if (primaryTouchId == null || Object.keys(activeTouches) === 0) {
-							primaryTouchId = touch.identifier;
+							primaryTouchId = touchEvent.changedTouches[0].identifier;
 						}
 						for (let i = 0; i < touchEvent.changedTouches.length; i++) {
 							let touch = touchEvent.changedTouches[i];
