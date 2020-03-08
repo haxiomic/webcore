@@ -52,8 +52,8 @@ class GLContext {
 
 	/**
 		- `nativeReference` is a pointer to access the native context (used by callbacks)
-
-		- `nativeMakeCurrent` is a callback that receives the `nativeReference` and makes it the active OpenGL context
+		- `alpha`, `depth`, `stencil`, `antialias` describe the native context's attributes
+		- `nativeMakeCurrent` is a callback that receives the `nativeReference` and makes it's context the active OpenGL context
 		- `nativeGetDrawingBufferWidth` is a callback that receives the `nativeReference` and returns the drawing buffer width in pixels
 		- `nativeGetDrawingBufferHeight` is a callback that receives the `nativeReference` and returns the drawing buffer height in pixels
 	**/
@@ -620,6 +620,7 @@ class GLContext {
 				var ref = getInt32(pname);
 				return ref != 0 ? new GLTexture(this, ref) : null;
 
+			// @! todo: add support for these
 			// case UNPACK_COLORSPACE_CONVERSION_WEBGL:
 			// 	args.GetReturnValue().Set(args.Holder()->GetHiddenValue(v8::String::NewFromUtf8(isolate, "UNPACK_COLORSPACE_CONVERSION_WEBGL")));
 			// case UNPACK_FLIP_Y_WEBGL:
