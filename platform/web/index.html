@@ -31,6 +31,24 @@
 			// disable default touch actions, this helps disable view dragging on touch devices
 			canvas.style.touchAction = 'none';
 			canvas.setAttribute('touch-action', 'none');
+			// prevent native touch-scroll
+			let cancelEvent = (e) => {
+				e.preventDefault();
+				e.stopPropagation();
+			}
+			canvas.addEventListener('gesturestart', cancelEvent, false);
+			canvas.addEventListener('gesturechange', cancelEvent, false);
+			// canvas.addEventListener('scroll', cancelEvent);
+
+			// add canvas gl context listeners to encourage powerPreference to be respected
+			canvas.addEventListener('webglcontextlost', () => {
+				appInstance.onNativeGraphicsContextLost();
+				cancelAnimationFrame(requestAnimationFrameHandle);
+			});
+			canvas.addEventListener('webglcontextrestored', () => {
+				appInstance.onGraphicsContextReady(gl);
+				frameLoop(performance.now());
+			});
 
 			// get the webgl context
 			let webglContextAttributes = {
@@ -49,6 +67,117 @@
 			
 			appInstance.onGraphicsContextReady(gl);
 
+			// pointer events	
+
+			function executePointerMethodFromMouseEvent(mouseEvent, pointerMethod) {
+				// trackpad force
+				let force = mouseEvent.force || mouseEvent.webkitForce;
+
+				// convert force to a 0 - 1 range
+				let pressure = force !== undefined ? Math.max((force - 1), 0) : 0.5;
+
+				pointerMethod({
+					pointerId: -1,
+					pointerType: 'mouse',
+					isPrimary: true,
+					button: mouseEvent.button,
+					buttons: mouseEvent.buttons,
+					x: mouseEvent.clientX,
+					y: mouseEvent.clientY,
+					width: 1,
+					height: 1,
+					pressure: pressure,
+					tangentialPressure: 0,
+					tiltX: 0,
+					tiltY: 0,
+					twist: 0,
+				});
+			}
+
+			let primaryTouchId = null;
+			let activeTouchTypeMap = {};
+			function executePointerMethodFromTouchEvent(touchEvent, pointerMethod, preventDefault) {
+				if (preventDefault === true) {
+					touchEvent.preventDefault(); 
+				}
+
+				let activeTouches = activeTouchTypeMap[touchEvent.touchType] || {};
+				activeTouchTypeMap[touchEvent.touchType] = activeTouches;
+
+				switch (touchEvent) {
+					case 'touchstart':
+						if (primaryTouchId == null || Object.keys(activeTouches) === 0) {
+							primaryTouchId = touch.identifier;
+						}
+						for (let i = 0; i < touchEvent.changedTouches.length; i++) {
+							let touch = touchEvent.changedTouches[i];
+							activeTouches[touch.identifier] = touch;
+						}
+						break;
+					case 'touchend':
+					case 'touchcancel':
+						if (touch.identifier === primaryTouchId) {
+							primaryTouchId = null;
+						}
+						delete activeTouches[touch.identifier];
+						break;
+				}
+
+				let buttons = 0;
+				switch (touchEvent) {
+					case 'touchstart':
+					case 'touchmove':
+					case 'touchforcechange':
+						buttons = 1;
+						break;
+				}
+
+				for (let i = 0; i < touchEvent.changedTouches.length; i++) {
+					let touch = touchEvent.changedTouches[i];
+
+					// convert altitude-azimuth to tilt xy
+					let tanAlt = Math.tan(touch.altitudeAngle);
+					let radToDeg = 180.0 / Math.PI;
+					let tiltX = Math.atan(Math.cos(touch.azimuthAngle) / tanAlt) * radToDeg;
+					let tiltY = Math.atan(Math.sin(touch.azimuthAngle) / tanAlt) * radToDeg;
+
+					pointerMethod({
+						pointerId: touch.identifier,
+						pointerType: (touch.touchType === 'stylus') ? 'pen' : 'touch',
+						isPrimary: primaryTouchId === touch.identifier,
+						button: 0,
+						buttons: buttons,
+						x: touch.clientX,
+						y: touch.clientY,
+						width: (touch.radiusX || touch.webkitRadiusX) * 2,
+						height: (touch.radiusY || touch.webkitRadiusY) * 2,
+						pressure: touch.force,
+						tangentialPressure: 0,
+						tiltX: tiltX || 0,
+						tiltY: tiltY || 0,
+						twist: touch.rotationAngle,
+					});
+				}
+			}
+
+			let onPointerDown = appInstance.onPointerDown.bind(appInstance);
+			let onPointerChange = appInstance.onPointerChange.bind(appInstance);
+			let onPointerUp = appInstance.onPointerUp.bind(appInstance);
+			let onPointerCancel = appInstance.onPointerCancel.bind(appInstance);
+
+			canvas.addEventListener('mousedown', (e) => executePointerMethodFromMouseEvent(e, onPointerDown));
+			window.addEventListener('mousemove', (e) => executePointerMethodFromMouseEvent(e, onPointerChange));
+			window.addEventListener('mouseup', (e) => executePointerMethodFromMouseEvent(e, onPointerUp));
+			window.addEventListener('webkitmouseforcechanged', (e) => executePointerMethodFromMouseEvent(e, onPointerChange));
+			window.addEventListener('mouseforcechanged', (e) => executePointerMethodFromMouseEvent(e, onPointerChange));
+
+			let useCapture = true;
+			canvas.addEventListener('touchstart', (e) => executePointerMethodFromTouchEvent(e, onPointerDown, true), { capture: useCapture, passive: false });
+			window.addEventListener('touchmove', (e) => executePointerMethodFromTouchEvent(e, onPointerChange, true), { capture: useCapture, passive: false });
+			window.addEventListener('touchforcechange', (e) => executePointerMethodFromTouchEvent(e, onPointerChange, false), { capture: useCapture, passive: true });
+			window.addEventListener('touchend', (e) => executePointerMethodFromTouchEvent(e, onPointerUp, false), {capture: useCapture, passive: true});
+			window.addEventListener('touchcancel', (e) => executePointerMethodFromTouchEvent(e, onPointerCancel, false), { capture: useCapture, passive: true });
+
 			// resize canvas with window
 			function canvasFillWindow() {
 				// - html px units do not match the screen's native resolution
@@ -66,21 +195,10 @@
 			canvasFillWindow();
 			window.addEventListener('resize', canvasFillWindow);
 
-			// add canvas gl context listeners to encourage powerPreference to be respected
-			canvas.addEventListener('webglcontextlost', () => {
-				appInstance.onNativeGraphicsContextLost();
-				cancelAnimationFrame(requestAnimationFrameHandle);
-			});
-			canvas.addEventListener('webglcontextrestored', () => {
-				appInstance.onGraphicsContextReady(gl);
-				frameLoop(performance.now());
-			});
-
 			// native browser frame-loop
 			function frameLoop(t_ms) {
 				// tell app to draw a frame 
 				appInstance.onDrawFrame(gl.drawingBufferWidth, gl.drawingBufferHeight);
-
 				requestAnimationFrameHandle = requestAnimationFrame(frameLoop);
 			}
 
