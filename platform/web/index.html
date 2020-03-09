@@ -94,8 +94,18 @@
 				});
 			}
 
-			let primaryTouchIdentifier = null;
-			let activeTouchCount = 0;
+			// Map<type, {primaryTouchIdentifier: Int, activeCount: Int}>
+			let touchInfoForType = {}
+			function getTouchInfoForType(type) {
+				let touchInfo = touchInfoForType[type];
+				if (touchInfo == null) {
+					touchInfoForType[type] = touchInfo = {
+						primaryTouchIdentifier: null,
+						activeCount: 0,
+					}
+				}
+				return touchInfo;
+			}
 			function executePointerMethodFromTouchEvent(touchEvent, pointerMethod, preventDefault) {
 				if (preventDefault === true) {
 					touchEvent.preventDefault(); 
@@ -113,11 +123,6 @@
 						button = -1;
 						buttons = 1;
 						break;
-				}
-
-				// set primary touch as the first active touch
-				if (activeTouchCount === 0 && touchEvent.type === 'touchstart') {
-					primaryTouchIdentifier = touchEvent.changedTouches[0].identifier;
 				}
 
 				for (let i = 0; i < touchEvent.changedTouches.length; i++) {
@@ -138,6 +143,13 @@
 						}
 					}
 
+					let touchInfo = getTouchInfoForType(touch.touchType);
+
+					// set primary touch as the first active touch
+					if (touchInfo.activeCount === 0 && i === 0 && touchEvent.type === 'touchstart') {
+						touchInfo.primaryTouchIdentifier = touch.identifier;
+					}
+
 					// convert altitude-azimuth to tilt xy
 					let tanAlt = Math.tan(touch.altitudeAngle);
 					let radToDeg = 180.0 / Math.PI;
@@ -147,7 +159,7 @@
 					pointerMethod({
 						pointerId: touch.identifier,
 						pointerType: (touch.touchType === 'stylus') ? 'pen' : 'touch',
-						isPrimary: touch.identifier === primaryTouchIdentifier,
+						isPrimary: touch.identifier === touchInfo.primaryTouchIdentifier,
 						button: button,
 						buttons: buttons,
 						x: touch.clientX,
@@ -179,7 +191,7 @@
 			let onPointerCancel = appInstance.onPointerCancel.bind(appInstance);
 			
 			// use PointerEvent API if supported
-			if (window.PointerEvent && false) {
+			if (window.PointerEvent) {
 				canvas.addEventListener('pointerdown', onPointerDown);
 				window.addEventListener('pointermove', onPointerMove);
 				window.addEventListener('pointerup', onPointerUp);
