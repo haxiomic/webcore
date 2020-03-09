@@ -94,23 +94,49 @@
 				});
 			}
 
-			let primaryTouchOfType = {};
+			let primaryTouchIdentifier = null;
+			let activeTouchCount = 0;
 			function executePointerMethodFromTouchEvent(touchEvent, pointerMethod, preventDefault) {
 				if (preventDefault === true) {
 					touchEvent.preventDefault(); 
 				}
 
+				let button = 0;
 				let buttons = 0;
 				switch (touchEvent.type) {
 					case 'touchstart':
+						button = 0;
+						buttons = 1;
+						break;
 					case 'touchmove':
 					case 'touchforcechange':
+						button = -1;
 						buttons = 1;
 						break;
 				}
 
+				// set primary touch as the first active touch
+				if (activeTouchCount === 0 && touchEvent.type === 'touchstart') {
+					primaryTouchIdentifier = touchEvent.changedTouches[0].identifier;
+				}
+
 				for (let i = 0; i < touchEvent.changedTouches.length; i++) {
 					let touch = touchEvent.changedTouches[i];
+
+					// touchforcechange can fire _after_ touchup fires
+					// we filter it out by checking if the touch is included in the list of active touches
+					if (touchEvent.type === 'touchforcechange') {
+						let touchIsActive = false;
+						for (let t of touchEvent.touches) {
+							if (touch === t) {
+								touchIsActive = true;
+								break;
+							}
+						}
+						if (!touchIsActive) {
+							continue;
+						}
+					}
 
 					// convert altitude-azimuth to tilt xy
 					let tanAlt = Math.tan(touch.altitudeAngle);
@@ -118,17 +144,11 @@
 					let tiltX = Math.atan(Math.cos(touch.azimuthAngle) / tanAlt) * radToDeg;
 					let tiltY = Math.atan(Math.sin(touch.azimuthAngle) / tanAlt) * radToDeg;
 
-					if (touchEvent.type === 'touchstart') {
-						primaryTouchOfType[touch.touchType] = touchEvent.touches.item(0);
-					}
-
-					let primaryTouch = primaryTouchOfType[touch.touchType];
-
 					pointerMethod({
 						pointerId: touch.identifier,
 						pointerType: (touch.touchType === 'stylus') ? 'pen' : 'touch',
-						isPrimary: primaryTouch != null ? touch.identifier === primaryTouch.identifier : false,
-						button: 0,
+						isPrimary: touch.identifier === primaryTouchIdentifier,
+						button: button,
 						buttons: buttons,
 						x: touch.clientX,
 						y: touch.clientY,
@@ -141,6 +161,16 @@
 						twist: touch.rotationAngle,
 					});
 				}
+
+				switch (touchEvent.type) {
+					case 'touchstart':
+						activeTouchCount += touchEvent.changedTouches.length;
+						break;
+					case 'touchend':
+					case 'touchcancel':
+						activeTouchCount -= touchEvent.changedTouches.length;
+						break;
+				}
 			}
 
 			let onPointerDown = appInstance.onPointerDown.bind(appInstance);
@@ -149,7 +179,7 @@
 			let onPointerCancel = appInstance.onPointerCancel.bind(appInstance);
 			
 			// use PointerEvent API if supported
-			if (window.PointerEvent) {
+			if (window.PointerEvent && false) {
 				canvas.addEventListener('pointerdown', onPointerDown);
 				window.addEventListener('pointermove', onPointerMove);
 				window.addEventListener('pointerup', onPointerUp);
