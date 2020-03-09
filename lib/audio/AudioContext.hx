@@ -52,7 +52,7 @@ class AudioContext {
             contextOptions = {};
         }
 
-        // @! should be manually creating the context here
+        // @! explore if it's better to manually create the context here (currently it's created by miniaudio when the device is initialized)
 
         maDevice = Device.alloc();
 
