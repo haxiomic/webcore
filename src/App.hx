@@ -1,3 +1,4 @@
+import audio.AudioContext;
 import app.HaxeAppInterface.PointerType;
 import app.HaxeAppInterface.PointerEvent;
 import webgl.GLUniformLocation;
@@ -34,6 +35,7 @@ class App implements app.HaxeAppInterface {
 	var height: Float = 0;
 
 	var gl: Null<GLContext>;
+	var audioContext: AudioContext;
 	var program: GLProgram;
 	var triangleBuffer: GLBuffer;
 	var texture: GLTexture;
@@ -69,7 +71,7 @@ class App implements app.HaxeAppInterface {
 
 		// play a song
 		trace('about to create audio context');
-		var audioContext = new audio.AudioContext();
+		audioContext = new AudioContext();
 		trace('audio context = $audioContext');
 
 		var volumeNode = audioContext.createGain();
@@ -88,10 +90,6 @@ class App implements app.HaxeAppInterface {
 				trace('Song ended');
 			}
 		});
-
-		#if js
-		js.Browser.window.addEventListener('click', () -> audioContext.resume());
-		#end
 	}
 
 	public function onResize(width: Float, height: Float) {
@@ -237,6 +235,9 @@ class App implements app.HaxeAppInterface {
 				var scale = (pointer.pressure + 1);
 				var scaleX = pointer.width / width;
 				var scaleY = pointer.height / width;
+				if (pointer.pointerType == MOUSE) {
+					scale = 20;
+				}
 				gl.uniform2f(uScale, scale * scaleX, scale * scaleY * aspectRatio);
 				gl.uniform2f(uTranslation, x, y);
 				gl.uniform1f(uIsPrimary, pointer.isPrimary ? 1.0 : 0.0);
@@ -246,12 +247,11 @@ class App implements app.HaxeAppInterface {
 	}
 
 	public function onPointerDown(event: PointerEvent): Void {
-		trace('onPointerDown', event.isPrimary);
+		audioContext.resume();
 		getActivePointers(event.pointerType).set(event.pointerId, event);
 	}
 
 	public function onPointerMove(event: PointerEvent): Void {
-		// trace('onPointerMove', event.isPrimary);
 		var activePointers = getActivePointers(event.pointerType);
 		if (activePointers.exists(event.pointerId)) {
 			activePointers.set(event.pointerId, event);
@@ -259,12 +259,10 @@ class App implements app.HaxeAppInterface {
 	}
 
 	public function onPointerUp(event: PointerEvent): Void {
-		trace('onPointerUp', event.isPrimary);
 		getActivePointers(event.pointerType).remove(event.pointerId);
 	}
 
 	public function onPointerCancel(event: PointerEvent): Void {
-		trace('onPointerCancel', event.isPrimary);
 		onPointerUp(event);
 	}
 
