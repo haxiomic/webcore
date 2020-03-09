@@ -94,50 +94,11 @@
 				});
 			}
 
-			// Map<type: String, touches: Array<Touch>>
-			/*
-			let activeTouchTypeMap = {};
-			function getActiveTouches(type) {
-				let activeTouches = activeTouchTypeMap[type];
-				if (activeTouches == null) {
-					activeTouches = [];
-					activeTouchTypeMap[type] = activeTouches;
-				}
-				return activeTouches;
-			}
-			*/
 			let primaryTouchOfType = {};
 			function executePointerMethodFromTouchEvent(touchEvent, pointerMethod, preventDefault) {
 				if (preventDefault === true) {
 					touchEvent.preventDefault(); 
 				}
-
-				// track active touches so we can identify the primary pointer
-				/*
-				switch (touchEvent.type) {
-					case 'touchstart':
-						for (let i = 0; i < touchEvent.changedTouches.length; i++) {
-							let touch = touchEvent.changedTouches[i];
-							getActiveTouches(touch.touchType).push(touch);
-						}
-						break;
-					case 'touchend':
-					case 'touchcancel':
-						for (let i = 0; i < touchEvent.changedTouches.length; i++) {
-							let touch = touchEvent.changedTouches[i];
-							let activeTouches = getActiveTouches(touch.touchType);
-							let j = activeTouches.length - 1;
-							while (j >= 0) {
-								if (activeTouches[j].identifier === touch.identifier) {
-									activeTouches.splice(j, 1);
-									break;
-								}
-								j--;
-							}
-						}
-						break;
-				}
-				*/
 
 				let buttons = 0;
 				switch (touchEvent.type) {
