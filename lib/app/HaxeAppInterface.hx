@@ -13,9 +13,7 @@ import webgl.GLContext;
     See [iOS Documentation: Points Verses Pixels](https://developer.apple.com/library/archive/documentation/2DDrawing/Conceptual/DrawingPrintingiOS/GraphicsDrawingOverview/GraphicsDrawingOverview.html#//apple_ref/doc/uid/TP40010156-CH14-SW7)
 
     **Input**
-    For mouse, touch and pen input, an interface that closely follows the PointerEvent API is used. However there are some key differences to makeup for shortcomings in the PointerEvent specification:
-    - `onPointerMove` has been renamed to `onPointerChange`, unlike `onPointerMove`, `onPointerChange` will also be called if there's a change in pressure of the pointer
-    - `tangentialPressure` has been removed
+    For mouse, touch and pen input, an interface that closely follows the PointerEvent API is used
 **/
 @:nativeGen
 @:keep
@@ -35,7 +33,7 @@ interface HaxeAppInterface {
     /**
         Called when an active pointer changes either position or pressure (if supported)
     **/
-    function onPointerChange(event: PointerEvent): Void;
+    function onPointerMove(event: PointerEvent): Void;
     function onPointerUp(event: PointerEvent): Void;
     function onPointerCancel(event: PointerEvent): Void;
 
