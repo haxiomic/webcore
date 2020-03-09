@@ -78,179 +78,23 @@ public class HaxeAppViewController: GLKViewController {
 
     // PointerEvent input
     override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        haxeAppInstance.touchesBegan(touches, in: view)
         super.touchesBegan(touches, with: event)
-        
-        for touch in touches {
-            let buttonStates = getButtonStates(touch)
-            let pos = touch.location(in: view)
-            let tilt = getTilt(touch)
-            
-            haxeAppInstance.onPointerDown(
-                pointerId: getTouchId(touch),
-                pointerType: getPointerType(touch),
-                isPrimary: isPrimary(touch),
-                button: buttonStates.0,
-                buttons: buttonStates.1,
-                x: Double(pos.x),
-                y: Double(pos.y),
-                width: Double(touch.majorRadius * 2),
-                height: Double(touch.majorRadius * 2),
-                pressure: getPressure(touch),
-                tangentialPressure: 0,
-                tiltX: tilt.0,
-                tiltY: tilt.1,
-                twist: 0
-            );
-        }
     }
 
     override public func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        haxeAppInstance.touchesMoved(touches, in: view)
         super.touchesMoved(touches, with: event)
-        for touch in touches {
-            let buttonStates = getButtonStates(touch)
-            let pos = touch.location(in: view)
-            let tilt = getTilt(touch)
-            
-            haxeAppInstance.onPointerMove(
-                pointerId: getTouchId(touch),
-                pointerType: getPointerType(touch),
-                isPrimary: isPrimary(touch),
-                button: buttonStates.0,
-                buttons: buttonStates.1,
-                x: Double(pos.x),
-                y: Double(pos.y),
-                width: Double(touch.majorRadius * 2),
-                height: Double(touch.majorRadius * 2),
-                pressure: getPressure(touch),
-                tangentialPressure: 0,
-                tiltX: tilt.0,
-                tiltY: tilt.1,
-                twist: 0
-            );
-        }
     }
 
     override public func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        haxeAppInstance.touchesEnded(touches, in: view)
         super.touchesEnded(touches, with: event)
-        for touch in touches {
-            let buttonStates = getButtonStates(touch)
-            let pos = touch.location(in: view)
-            let tilt = getTilt(touch)
-            
-            haxeAppInstance.onPointerUp(
-                pointerId: getTouchId(touch),
-                pointerType: getPointerType(touch),
-                isPrimary: isPrimary(touch),
-                button: buttonStates.0,
-                buttons: buttonStates.1,
-                x: Double(pos.x),
-                y: Double(pos.y),
-                width: Double(touch.majorRadius * 2),
-                height: Double(touch.majorRadius * 2),
-                pressure: getPressure(touch),
-                tangentialPressure: 0,
-                tiltX: tilt.0,
-                tiltY: tilt.1,
-                twist: 0
-            );
-            removeTouch(touch)
-        }
     }
 
     override public func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        haxeAppInstance.touchesCancelled(touches, in: view)
         super.touchesCancelled(touches, with: event)
-        for touch in touches {
-            let buttonStates = getButtonStates(touch)
-            let pos = touch.location(in: view)
-            let tilt = getTilt(touch)
-            
-            haxeAppInstance.onPointerCancel(
-                pointerId: getTouchId(touch),
-                pointerType: getPointerType(touch),
-                isPrimary: isPrimary(touch),
-                button: buttonStates.0,
-                buttons: buttonStates.1,
-                x: Double(pos.x),
-                y: Double(pos.y),
-                width: Double(touch.majorRadius * 2),
-                height: Double(touch.majorRadius * 2),
-                pressure: getPressure(touch),
-                tangentialPressure: 0,
-                tiltX: tilt.0,
-                tiltY: tilt.1,
-                twist: 0
-            );
-            removeTouch(touch)
-        }
-    }
-
-    private var touchIdMap: Dictionary<UITouch, Int32> = [:]
-    private var touchIdCounter: Int32 = 0
-
-    func getPressure(_ touch: UITouch) -> Double {
-        if touch.maximumPossibleForce > 0 {
-            return Double(touch.force / touch.maximumPossibleForce)
-        } else {
-            return 0.5
-        }
-    }
-    
-    func getPointerType(_ touch: UITouch) -> String {
-        switch touch.type {
-        case .direct, .indirect: return "touch"
-        case .pencil: return "pen"
-        @unknown default:
-            fatalError()
-        }
-    }
-    
-    func getButtonStates(_ touch: UITouch) -> (Int32, Int32) {
-        switch touch.phase {
-        case .began:
-            return (button: 0, buttons: 1)
-        case .moved, .stationary:
-            return (button: -1, buttons: 1)
-        case .ended, .cancelled:
-            return (button: 0, buttons: 0)
-        @unknown default:
-            fatalError()
-        }
-    }
-    
-    func getTilt(_ touch: UITouch) -> (Double, Double) {
-        // convert altitude-azimuth to tilt xy
-        let azimuthAngle = touch.azimuthAngle(in: view)
-        let tanAlt = tan(touch.altitudeAngle);
-        let radToDeg = 180.0 / Double.pi;
-        return (
-            tiltX: Double(atan(cos(azimuthAngle) / tanAlt)) * radToDeg,
-            tiltY: Double(atan(sin(azimuthAngle) / tanAlt)) * radToDeg
-        )
-    }
-
-    func getTouchId(_ touch: UITouch) -> Int32 {
-        if let id = touchIdMap[touch] {
-            return id
-        } else {
-            let id: Int32 = touchIdCounter
-            touchIdCounter = touchIdCounter + 1
-            touchIdMap[touch] = id
-            return id
-        }
-    }
-
-    func isPrimary(_ touch: UITouch) -> Bool {
-        // this relies on the touchIdCounter being reset to 0 when all touches have been removed
-        // see removeTouch
-        return getTouchId(touch) == 0
-    }
-    
-    func removeTouch(_ touch: UITouch) {
-        touchIdMap.removeValue(forKey: touch)
-        // reset touch counter if we have no touches
-        if touchIdMap.count == 0 {
-            touchIdCounter = 0
-        }
     }
 
 }
