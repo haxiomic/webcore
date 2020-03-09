@@ -1,3 +1,5 @@
+import app.HaxeAppInterface.PointerType;
+import app.HaxeAppInterface.PointerEvent;
 import webgl.GLUniformLocation;
 import webgl.GLTexture;
 import webgl.GLBuffer;
@@ -5,6 +7,7 @@ import webgl.GLProgram;
 import webgl.GLShader;
 import webgl.GLContext;
 import typedarray.Float32Array;
+import typedarray.Uint8Array;
 
 @:embedFile('../assets/my-triangle.mp3')
 // @:embedFile('../assets/multi-channel-test.mp3')
@@ -27,13 +30,24 @@ class Assets extends asset.Assets {
 #end
 class App implements app.HaxeAppInterface {
 
+	var width: Float = 0;
+	var height: Float = 0;
+
 	var gl: Null<GLContext>;
-	var drawingBufferWidth: Int = 0;
-	var drawingBufferHeight: Int = 0;
 	var program: GLProgram;
 	var triangleBuffer: GLBuffer;
 	var texture: GLTexture;
-	var uTextureLoc: GLUniformLocation;
+
+	var circleVertexBuffer: GLBuffer;
+	var circleIndexBuffer: GLBuffer;
+	var circleVertexCount: Int;
+
+	var uTexture: GLUniformLocation;
+	var uTranslation: GLUniformLocation;
+	var uScale: GLUniformLocation;
+	var uIsPrimary: GLUniformLocation;
+
+	var activePointerTypes = new Map<String, Map<Int, PointerEvent>>();
 
 	public function new() {
 		trace('App instance created');
@@ -62,12 +76,6 @@ class App implements app.HaxeAppInterface {
 		volumeNode.connect(audioContext.destination);
 		volumeNode.gain.value = 1.0;
 
-		// function volumeLoop() {
-		// 	haxe.Timer.delay(volumeLoop, 4);
-		// 	volumeNode.gain.value = Math.sin(haxe.Timer.stamp()) + 1.0; // 0 to 2
-		// }
-		// volumeLoop();
-
 		var node = audioContext.createBufferSource();
 		node.connect(volumeNode);
 
@@ -86,8 +94,17 @@ class App implements app.HaxeAppInterface {
 		#end
 	}
 
+	public function onResize(width: Float, height: Float) {
+		this.width = width;
+		this.height = height;
+
+		trace('onResize', width, height);
+	}
+
 	public function onGraphicsContextReady(gl: GLContext) {
 		this.gl = gl;
+
+		trace(gl.getContextAttributes());
 
 		// create programs
 		program = try {
@@ -99,7 +116,10 @@ class App implements app.HaxeAppInterface {
 			null;
 		}
 		
-		uTextureLoc = gl.getUniformLocation(program, 'uTexture');
+		uTexture = gl.getUniformLocation(program, 'uTexture');
+		uTranslation = gl.getUniformLocation(program, 'uTranslation');
+		uScale = gl.getUniformLocation(program, 'uScale');
+		uIsPrimary = gl.getUniformLocation(program, 'uIsPrimary');
 
 		// create triangle buffer
 		var angle = Math.PI * 2 / 3;
@@ -150,18 +170,43 @@ class App implements app.HaxeAppInterface {
 			}
 		);
 
+		// create a circle
+		var sides = 30;
+		var radius = 1;
+		// Array({x,y})
+		var circleVertices = new Float32Array((sides + 1) * 2);
+		for (i in 0...sides) {
+			var t = i / sides;
+			var angle = t * 2 * Math.PI;
+			var x = Math.cos(angle) * radius;
+			var y = Math.sin(angle) * radius;
+			circleVertices[i * 2 + 0] = x;
+			circleVertices[i * 2 + 1] = y;
+		}
+		// indices
+		var circleIndices = new Uint8Array(sides * 3);
+		for (i in 0...sides) {
+			circleIndices[i * 3 + 0] = i;
+			circleIndices[i * 3 + 1] = (i + 1) % (sides);
+			circleIndices[i * 3 + 2] = sides;
+		}
+
+		circleVertexBuffer = gl.createBuffer();
+		gl.bindBuffer(ARRAY_BUFFER, circleVertexBuffer);
+		gl.bufferData(ARRAY_BUFFER, circleVertices, STATIC_DRAW);
+
+		circleIndexBuffer = gl.createBuffer();
+		gl.bindBuffer(ELEMENT_ARRAY_BUFFER, circleIndexBuffer);
+		gl.bufferData(ELEMENT_ARRAY_BUFFER, circleIndices, STATIC_DRAW);
+
+		circleVertexCount = circleIndices.length;
+
 		gl.disable(CULL_FACE);
 	}
 
 	public function onGraphicsContextLost() {
 		trace('Graphics context lost');
 		gl = null;
-	}
-
-	public function onGraphicsContextResize(drawingBufferWidth: Int, drawingBufferHeight: Int, displayPixelRatio: Float) {
-		trace('onGraphicsContextResize', drawingBufferWidth, drawingBufferHeight, displayPixelRatio);
-		this.drawingBufferWidth = drawingBufferWidth;
-		this.drawingBufferHeight = drawingBufferHeight;
 	}
 
 	public function onDrawFrame(drawingBufferWidth: Int, drawingBufferHeight: Int) {
@@ -175,14 +220,61 @@ class App implements app.HaxeAppInterface {
 
 		gl.useProgram(program);
 
-		gl.bindBuffer(ARRAY_BUFFER, triangleBuffer);
+		// texture is at unit 0
+		gl.uniform1i(uTexture, 0);
+
+		var aspectRatio = drawingBufferWidth / drawingBufferHeight;
+
+		gl.bindBuffer(ARRAY_BUFFER, circleVertexBuffer);
 		gl.enableVertexAttribArray(0);
 		gl.vertexAttribPointer(0, 2, FLOAT, false, 0, 0);
+		gl.bindBuffer(ELEMENT_ARRAY_BUFFER, circleIndexBuffer);
 
-		// texture is at unit 0
-		gl.uniform1i(uTextureLoc, 0);
+		for (pointers in activePointerTypes) {
+			for (pointer in pointers) {
+				var x = (pointer.x / width) * 2 - 1;
+				var y = -((pointer.y / height) * 2 - 1);
+				var scale = (pointer.pressure + 1);
+				var scaleX = pointer.width / width;
+				var scaleY = pointer.height / width;
+				gl.uniform2f(uScale, scale * scaleX, scale * scaleY * aspectRatio);
+				gl.uniform2f(uTranslation, x, y);
+				gl.uniform1f(uIsPrimary, pointer.isPrimary ? 1.0 : 0.0);
+				gl.drawElements(TRIANGLES, circleVertexCount, UNSIGNED_BYTE, 0);
+			}
+		}
+	}
 
-		gl.drawArrays(TRIANGLES, 0, 3);
+	public function onPointerDown(event: PointerEvent): Void {
+		trace('onPointerDown', event.isPrimary);
+		getActivePointers(event.pointerType).set(event.pointerId, event);
+	}
+
+	public function onPointerMove(event: PointerEvent): Void {
+		// trace('onPointerMove', event.isPrimary);
+		var activePointers = getActivePointers(event.pointerType);
+		if (activePointers.exists(event.pointerId)) {
+			activePointers.set(event.pointerId, event);
+		}
+	}
+
+	public function onPointerUp(event: PointerEvent): Void {
+		trace('onPointerUp', event.isPrimary);
+		getActivePointers(event.pointerType).remove(event.pointerId);
+	}
+
+	public function onPointerCancel(event: PointerEvent): Void {
+		trace('onPointerCancel', event.isPrimary);
+		onPointerUp(event);
+	}
+
+	function getActivePointers(type: PointerType) {
+		var activePointers = activePointerTypes.get(type);
+		if (activePointers == null) {
+			activePointers = new Map();
+			activePointerTypes.set(type, activePointers);
+		}
+		return activePointers;
 	}
 
 	function releaseGraphicsResources() {
@@ -240,11 +332,15 @@ class App implements app.HaxeAppInterface {
 	static var vertexShaderSource = '
 		attribute vec2 position;
 
+		uniform vec2 uTranslation;
+		uniform vec2 uScale;
+		uniform float uIsPrimary;
+
 		varying vec2 vPosition;
 		void main() {
 			vPosition = position * vec2(1.0, -1.) * 0.5 + 0.5;
 
-			gl_Position = vec4(position * 0.5, 0., 1.);
+			gl_Position = vec4(position * uScale + uTranslation, 0., 1.);
 		}
 	';
 
@@ -254,13 +350,15 @@ class App implements app.HaxeAppInterface {
 		precision highp sampler2D;
 		#endif
 
+		uniform float uIsPrimary;
+
 		varying vec2 vPosition;
 
 		uniform sampler2D uTexture;
 
 		void main() {
 			vec4 sample = texture2D(uTexture, vPosition);
-			gl_FragColor = sample;
+			gl_FragColor = mix(sample, vec4(1., 0., 0., 1.), uIsPrimary);
 		}
 	';
 
