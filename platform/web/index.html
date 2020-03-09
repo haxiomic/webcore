@@ -94,41 +94,53 @@
 				});
 			}
 
-			let primaryTouchId = null;
+			// Map<type: String, touches: Array<Touch>>
+			/*
 			let activeTouchTypeMap = {};
+			function getActiveTouches(type) {
+				let activeTouches = activeTouchTypeMap[type];
+				if (activeTouches == null) {
+					activeTouches = [];
+					activeTouchTypeMap[type] = activeTouches;
+				}
+				return activeTouches;
+			}
+			*/
+			let primaryTouchOfType = {};
 			function executePointerMethodFromTouchEvent(touchEvent, pointerMethod, preventDefault) {
 				if (preventDefault === true) {
 					touchEvent.preventDefault(); 
 				}
 
-				let activeTouches = activeTouchTypeMap[touchEvent.touchType] || {};
-				activeTouchTypeMap[touchEvent.touchType] = activeTouches;
-
-				switch (touchEvent) {
+				// track active touches so we can identify the primary pointer
+				/*
+				switch (touchEvent.type) {
 					case 'touchstart':
-						if (primaryTouchId == null || Object.keys(activeTouches) === 0) {
-							primaryTouchId = touchEvent.changedTouches[0].identifier;
-						}
 						for (let i = 0; i < touchEvent.changedTouches.length; i++) {
 							let touch = touchEvent.changedTouches[i];
-							activeTouches[touch.identifier] = touch;
+							getActiveTouches(touch.touchType).push(touch);
 						}
 						break;
 					case 'touchend':
 					case 'touchcancel':
 						for (let i = 0; i < touchEvent.changedTouches.length; i++) {
 							let touch = touchEvent.changedTouches[i];
-							if (touch.identifier === primaryTouchId) {
-								primaryTouchId = null;
+							let activeTouches = getActiveTouches(touch.touchType);
+							let j = activeTouches.length - 1;
+							while (j >= 0) {
+								if (activeTouches[j].identifier === touch.identifier) {
+									activeTouches.splice(j, 1);
+									break;
+								}
+								j--;
 							}
-							delete activeTouches[touch.identifier];
 						}
-						
 						break;
 				}
+				*/
 
 				let buttons = 0;
-				switch (touchEvent) {
+				switch (touchEvent.type) {
 					case 'touchstart':
 					case 'touchmove':
 					case 'touchforcechange':
@@ -145,10 +157,16 @@
 					let tiltX = Math.atan(Math.cos(touch.azimuthAngle) / tanAlt) * radToDeg;
 					let tiltY = Math.atan(Math.sin(touch.azimuthAngle) / tanAlt) * radToDeg;
 
+					if (touchEvent.type === 'touchstart') {
+						primaryTouchOfType[touch.touchType] = touchEvent.touches.item(0);
+					}
+
+					let primaryTouch = primaryTouchOfType[touch.touchType];
+
 					pointerMethod({
 						pointerId: touch.identifier,
 						pointerType: (touch.touchType === 'stylus') ? 'pen' : 'touch',
-						isPrimary: primaryTouchId === touch.identifier,
+						isPrimary: primaryTouch != null ? touch.identifier === primaryTouch.identifier : false,
 						button: 0,
 						buttons: buttons,
 						x: touch.clientX,
@@ -165,22 +183,29 @@
 			}
 
 			let onPointerDown = appInstance.onPointerDown.bind(appInstance);
-			let onPointerChange = appInstance.onPointerChange.bind(appInstance);
+			let onPointerMove = appInstance.onPointerMove.bind(appInstance);
 			let onPointerUp = appInstance.onPointerUp.bind(appInstance);
 			let onPointerCancel = appInstance.onPointerCancel.bind(appInstance);
-
-			canvas.addEventListener('mousedown', (e) => executePointerMethodFromMouseEvent(e, onPointerDown));
-			window.addEventListener('mousemove', (e) => executePointerMethodFromMouseEvent(e, onPointerChange));
-			window.addEventListener('mouseup', (e) => executePointerMethodFromMouseEvent(e, onPointerUp));
-			window.addEventListener('webkitmouseforcechanged', (e) => executePointerMethodFromMouseEvent(e, onPointerChange));
-			window.addEventListener('mouseforcechanged', (e) => executePointerMethodFromMouseEvent(e, onPointerChange));
-
-			let useCapture = true;
-			canvas.addEventListener('touchstart', (e) => executePointerMethodFromTouchEvent(e, onPointerDown, true), { capture: useCapture, passive: false });
-			window.addEventListener('touchmove', (e) => executePointerMethodFromTouchEvent(e, onPointerChange, true), { capture: useCapture, passive: false });
-			window.addEventListener('touchforcechange', (e) => executePointerMethodFromTouchEvent(e, onPointerChange, false), { capture: useCapture, passive: true });
-			window.addEventListener('touchend', (e) => executePointerMethodFromTouchEvent(e, onPointerUp, false), {capture: useCapture, passive: true});
-			window.addEventListener('touchcancel', (e) => executePointerMethodFromTouchEvent(e, onPointerCancel, false), { capture: useCapture, passive: true });
+			
+			// use PointerEvent API if supported
+			if (window.PointerEvent) {
+				canvas.addEventListener('pointerdown', onPointerDown);
+				window.addEventListener('pointermove', onPointerMove);
+				window.addEventListener('pointerup', onPointerUp);
+				window.addEventListener('pointercancel', onPointerCancel);
+			} else {
+				canvas.addEventListener('mousedown', (e) => executePointerMethodFromMouseEvent(e, onPointerDown));
+				window.addEventListener('mousemove', (e) => executePointerMethodFromMouseEvent(e, onPointerMove));
+				window.addEventListener('webkitmouseforcechanged', (e) => executePointerMethodFromMouseEvent(e, onPointerMove));
+				window.addEventListener('mouseforcechanged', (e) => executePointerMethodFromMouseEvent(e, onPointerMove));
+				window.addEventListener('mouseup', (e) => executePointerMethodFromMouseEvent(e, onPointerUp));
+				let useCapture = true;
+				canvas.addEventListener('touchstart', (e) => executePointerMethodFromTouchEvent(e, onPointerDown, true), { capture: useCapture, passive: false });
+				window.addEventListener('touchmove', (e) => executePointerMethodFromTouchEvent(e, onPointerMove, true), { capture: useCapture, passive: false });
+				window.addEventListener('touchforcechange', (e) => executePointerMethodFromTouchEvent(e, onPointerMove, true), { capture: useCapture, passive: true });
+				window.addEventListener('touchend', (e) => executePointerMethodFromTouchEvent(e, onPointerUp, true), {capture: useCapture, passive: true});
+				window.addEventListener('touchcancel', (e) => executePointerMethodFromTouchEvent(e, onPointerCancel, true), { capture: useCapture, passive: true });
+			}
 
 			// resize canvas with window
 			function canvasFillWindow() {
