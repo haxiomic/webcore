@@ -74,6 +74,22 @@ public class HaxeApp {
         HaxeApp_onDrawFrame(ptr, drawingBufferWidth, drawingBufferHeight)
     }
 
+    public func onPointerDown(pointerId: Int32, pointerType: String, isPrimary: Bool, button: Int32, buttons: Int32, x: Double, y: Double, width: Double, height: Double, pressure: Double, tangentialPressure: Double, tiltX: Double, tiltY: Double, twist: Double) {
+        HaxeApp_onPointerDown(ptr, pointerId, pointerType, isPrimary, button, buttons, x, y, width, height, pressure, tangentialPressure, tiltX, tiltY, twist);
+    }
+
+    public func onPointerMove(pointerId: Int32, pointerType: String, isPrimary: Bool, button: Int32, buttons: Int32, x: Double, y: Double, width: Double, height: Double, pressure: Double, tangentialPressure: Double, tiltX: Double, tiltY: Double, twist: Double) {
+        HaxeApp_onPointerMove(ptr, pointerId, pointerType, isPrimary, button, buttons, x, y, width, height, pressure, tangentialPressure, tiltX, tiltY, twist);
+    }
+
+    public func onPointerUp(pointerId: Int32, pointerType: String, isPrimary: Bool, button: Int32, buttons: Int32, x: Double, y: Double, width: Double, height: Double, pressure: Double, tangentialPressure: Double, tiltX: Double, tiltY: Double, twist: Double) {
+        HaxeApp_onPointerUp(ptr, pointerId, pointerType, isPrimary, button, buttons, x, y, width, height, pressure, tangentialPressure, tiltX, tiltY, twist);
+    }
+    
+    public func onPointerCancel(pointerId: Int32, pointerType: String, isPrimary: Bool, button: Int32, buttons: Int32, x: Double, y: Double, width: Double, height: Double, pressure: Double, tangentialPressure: Double, tiltX: Double, tiltY: Double, twist: Double) {
+        HaxeApp_onPointerCancel(ptr, pointerId, pointerType, isPrimary, button, buttons, x, y, width, height, pressure, tangentialPressure, tiltX, tiltY, twist);
+    }
+
     static public func haxeInitialize() {
         HaxeApp_haxeInitialize(
             // tickOnMainThread()

@@ -28,16 +28,15 @@ interface HaxeAppInterface {
         - `width` and `height` are in units of **points**
     **/
     function onResize(width: Float, height: Float): Void;
-    
-    function onPointerDown(event: PointerEvent): Void;
-    /**
-        Called when an active pointer changes either position or pressure (if supported)
-    **/
-    function onPointerMove(event: PointerEvent): Void;
-    function onPointerUp(event: PointerEvent): Void;
-    function onPointerCancel(event: PointerEvent): Void;
 
+    /**
+        Graphics context is ready to be used. Save a reference to the context so it can be used in `onDrawFrame` and clear it when the context is lost.
+    **/
     function onGraphicsContextReady(context: GLContext): Void;
+
+    /**
+        Called when the graphics context is invalidated (for example, the device encountered an error or needs to reclaim resources)
+    **/
     function onGraphicsContextLost(): Void;
 
     /**
@@ -45,6 +44,30 @@ interface HaxeAppInterface {
         - `drawingBufferWidth` and `drawingBufferHeight` are the dimensions of the graphics context in **pixels**
     **/
     function onDrawFrame(drawingBufferWidth: Int, drawingBufferHeight: Int): Void;
+    
+    /**
+        Called when a pointer (mouse, touch or pen) is activated, for a mouse this happens when a button is pressed.
+        See https://www.w3.org/TR/pointerevents/#the-pointerdown-event
+    **/
+    function onPointerDown(event: PointerEvent): Void;
+
+    /**
+        Called when an active pointer changes either position or pressure (if supported).
+        See https://www.w3.org/TR/pointerevents/#the-pointermove-event
+    **/
+    function onPointerMove(event: PointerEvent): Void;
+
+    /**
+        Called when a pointer (mouse, touch or pen) is activated, for a mouse this happens when a button is released.
+        See https://www.w3.org/TR/pointerevents/#the-pointerup-event
+    **/
+    function onPointerUp(event: PointerEvent): Void;
+
+    /**
+        Called when the pointer is unlikely to continue to produce events or the interaction was interrupted by a gesture recognition.
+        See https://www.w3.org/TR/pointerevents/#the-pointercancel-event
+    **/
+    function onPointerCancel(event: PointerEvent): Void;
 
 }
 
@@ -53,9 +76,6 @@ enum abstract PointerType(String) to String from String {
     var PEN = "pen";
     var TOUCH = "touch";
 }
-
-// @:unreflective
-// typedef PointerEvent = {
 
 @:publicFields
 @:structInit

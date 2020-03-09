@@ -20,6 +20,7 @@
 // include hxcpp generated classes
 #include <app/HaxeApp.h>
 #include <app/HaxeAppInterface.h>
+#include <app/PointerEvent.h>
 #include <webgl/native/GLContext.h>
 
 using namespace app;
@@ -83,15 +84,15 @@ void* HaxeApp_create() {
 
 void HaxeApp_release(void* untypedAppHandle) {
     hx::NativeAttach haxeGcScope;
-
     AppHandle* appHandle = (AppHandle*) untypedAppHandle;
+
     delete appHandle;
 }
 
 void HaxeApp_onResize(void* untypedAppHandle, double width, double height) {
     hx::NativeAttach haxeGcScope;
-
     AppHandle* appHandle = (AppHandle*) untypedAppHandle;
+
     appHandle->haxeRef->onResize(width, height);
 
     postHaxeExecution();
@@ -109,8 +110,8 @@ void HaxeApp_onGraphicsContextReady(
     GetContextParamInt32 getDrawingBufferHeight
 ) {
     hx::NativeAttach haxeGcScope;
-
     AppHandle* appHandle = (AppHandle*) untypedAppHandle;
+
     HX_JUST_GC_STACKFRAME
     // create an gl context wrapper (the real context must already be created)
     webgl::native::GLContext gl = webgl::native::GLContext_obj::__alloc(
@@ -131,8 +132,8 @@ void HaxeApp_onGraphicsContextReady(
 
 void HaxeApp_onGraphicsContextLost(void* untypedAppHandle) {
     hx::NativeAttach haxeGcScope;
-
     AppHandle* appHandle = (AppHandle*) untypedAppHandle;
+
     appHandle->haxeRef->onGraphicsContextLost();
 
     postHaxeExecution();
@@ -140,12 +141,69 @@ void HaxeApp_onGraphicsContextLost(void* untypedAppHandle) {
 
 void HaxeApp_onDrawFrame(void* untypedAppHandle, int32_t drawingBufferWidth, int32_t drawingBufferHeight) {
     hx::NativeAttach haxeGcScope;
-
     AppHandle* appHandle = (AppHandle*) untypedAppHandle;
+
     appHandle->haxeRef->onDrawFrame(drawingBufferWidth, drawingBufferHeight);
 
     postHaxeExecution();
 }
+
+void  HaxeApp_onPointerDown(void* untypedAppHandle, int32_t pointerId, const char* pointerType, bool isPrimary, int32_t button, int32_t buttons, double x, double y, double width, double height, double pressure, double tangentialPressure, double tiltX, double tiltY, double twist) {
+    hx::NativeAttach haxeGcScope;
+    AppHandle* appHandle = (AppHandle*) untypedAppHandle;
+
+    HX_JUST_GC_STACKFRAME
+    
+    // construct a PointerEvent object
+    app::PointerEvent pointerEvent = app::PointerEvent_obj::__alloc(HX_CTX, pointerId, ::String(pointerType), isPrimary, button, buttons, x, y, width, height, pressure, tangentialPressure, tiltX, tiltY, twist);
+
+    appHandle->haxeRef->onPointerDown(pointerEvent);
+
+    postHaxeExecution();
+}
+
+void  HaxeApp_onPointerMove(void* untypedAppHandle, int32_t pointerId, const char* pointerType, bool isPrimary, int32_t button, int32_t buttons, double x, double y, double width, double height, double pressure, double tangentialPressure, double tiltX, double tiltY, double twist) {
+    hx::NativeAttach haxeGcScope;
+    AppHandle* appHandle = (AppHandle*) untypedAppHandle;
+
+    HX_JUST_GC_STACKFRAME
+
+    // construct a PointerEvent object
+    app::PointerEvent pointerEvent = app::PointerEvent_obj::__alloc(HX_CTX, pointerId, ::String(pointerType), isPrimary, button, buttons, x, y, width, height, pressure, tangentialPressure, tiltX, tiltY, twist);
+
+    appHandle->haxeRef->onPointerMove(pointerEvent);
+
+    postHaxeExecution();
+}
+
+void  HaxeApp_onPointerUp(void* untypedAppHandle, int32_t pointerId, const char* pointerType, bool isPrimary, int32_t button, int32_t buttons, double x, double y, double width, double height, double pressure, double tangentialPressure, double tiltX, double tiltY, double twist) {
+    hx::NativeAttach haxeGcScope;
+    AppHandle* appHandle = (AppHandle*) untypedAppHandle;
+
+    HX_JUST_GC_STACKFRAME
+
+    // construct a PointerEvent object
+    app::PointerEvent pointerEvent = app::PointerEvent_obj::__alloc(HX_CTX, pointerId, ::String(pointerType), isPrimary, button, buttons, x, y, width, height, pressure, tangentialPressure, tiltX, tiltY, twist);
+
+    appHandle->haxeRef->onPointerUp(pointerEvent);
+
+    postHaxeExecution();
+}
+
+void  HaxeApp_onPointerCancel(void* untypedAppHandle, int32_t pointerId, const char* pointerType, bool isPrimary, int32_t button, int32_t buttons, double x, double y, double width, double height, double pressure, double tangentialPressure, double tiltX, double tiltY, double twist) {
+    hx::NativeAttach haxeGcScope;
+    AppHandle* appHandle = (AppHandle*) untypedAppHandle;
+
+    HX_JUST_GC_STACKFRAME
+
+    // construct a PointerEvent object
+    app::PointerEvent pointerEvent = app::PointerEvent_obj::__alloc(HX_CTX, pointerId, ::String(pointerType), isPrimary, button, buttons, x, y, width, height, pressure, tangentialPressure, tiltX, tiltY, twist);
+
+    appHandle->haxeRef->onPointerCancel(pointerEvent);
+
+    postHaxeExecution();
+}
+
 
 /**
  * Should be called after executing haxe code and before returning to external code
