@@ -146,7 +146,7 @@
 					let touchInfo = getTouchInfoForType(touch.touchType);
 
 					// set primary touch as the first active touch
-					if (touchInfo.activeCount === 0 && i === 0 && touchEvent.type === 'touchstart') {
+					if (touchInfo.activeCount === 0 && touchEvent.type === 'touchstart') {
 						touchInfo.primaryTouchIdentifier = touch.identifier;
 					}
 					// update activeCount

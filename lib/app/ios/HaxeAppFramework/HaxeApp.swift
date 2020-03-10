@@ -5,7 +5,7 @@ import GLKit
 **/
 public class HaxeApp {
 
-    public let ptr: UnsafeMutableRawPointer
+    let ptr: UnsafeMutableRawPointer
     let touchEventHandler: TouchEventHandler
     // we keep a reference to the glkView to prevent it from being collected
     var glkView: GLKView?
@@ -143,6 +143,10 @@ public class HaxeApp {
 class TouchEventHandler {
 
     let ptr: UnsafeMutableRawPointer
+    
+    var touchTypeActiveCount = Dictionary<String, Int>()
+    var touchTypePrimaryId = Dictionary<String, Int32>()
+    
     var touchIdMap: Dictionary<UITouch, Int32> = [:]
     var touchIdCounter: Int32 = 0
 
@@ -153,14 +157,24 @@ class TouchEventHandler {
     // PointerEvent input
     public func touchesBegan(_ touches: Set<UITouch>, in view: UIView) {
         for touch in touches {
+            let pointerType = getTouchPointerType(touch)
+            let activeCount = touchTypeActiveCount[pointerType]
+
+            addTouch(touch)
+
             let buttonStates = getTouchButtonStates(touch)
             let pos = touch.location(in: view)
             let tilt = getTouchTilt(touch, in: view)
+            let pointerId = getTouchPointerId(touch)
+        
+            if activeCount == 0 {
+                touchTypePrimaryId[pointerType] = pointerId
+            }
 
             HaxeApp_onPointerDown(
                 ptr,
-                getTouchPointerId(touch), // pointerId
-                getTouchPointerType(touch), // pointerType
+                pointerId, // pointerId
+                pointerType, // pointerType
                 isTouchPrimary(touch), // isPrimary
                 buttonStates.0, // button
                 buttonStates.1, // buttons
@@ -226,6 +240,7 @@ class TouchEventHandler {
                 tilt.1, // tiltY
                 0 // twist
             );
+
             removeTouch(touch)
         }
     }
@@ -253,6 +268,7 @@ class TouchEventHandler {
                 tilt.1, // tiltY
                 0 // twist
             );
+
             removeTouch(touch)
         }
     }
@@ -299,24 +315,33 @@ class TouchEventHandler {
     }
 
     func getTouchPointerId(_ touch: UITouch) -> Int32 {
-        if let id = touchIdMap[touch] {
-            return id
-        } else {
-            let id: Int32 = touchIdCounter
-            touchIdCounter = touchIdCounter + 1
-            touchIdMap[touch] = id
-            return id
-        }
+        return touchIdMap[touch]!
     }
 
     func isTouchPrimary(_ touch: UITouch) -> Bool {
-        // this relies on the touchIdCounter being reset to 0 when all touches have been removed
-        // see removeTouch
-        return getTouchPointerId(touch) == 0
+        let pointerType = getTouchPointerType(touch)
+        return getTouchPointerId(touch) == touchTypePrimaryId[pointerType]
+    }
+    
+    func addTouch(_ touch: UITouch) {
+        let id: Int32 = touchIdCounter
+        touchIdCounter = touchIdCounter + 1
+        touchIdMap[touch] = id
+        
+        let pointerType = getTouchPointerType(touch)
+        let activeCount = touchTypeActiveCount[pointerType] ?? 0
+        touchTypeActiveCount[pointerType] = activeCount + 1
     }
 
     func removeTouch(_ touch: UITouch) {
-        touchIdMap.removeValue(forKey: touch)
+        if touchIdMap.removeValue(forKey: touch) == nil {
+            return
+        }
+        
+        let pointerType = getTouchPointerType(touch)
+        let activeCount = touchTypeActiveCount[pointerType]!
+        touchTypeActiveCount[pointerType] = activeCount - 1
+
         // reset touch counter if we have no touches
         if touchIdMap.count == 0 {
             touchIdCounter = 0
