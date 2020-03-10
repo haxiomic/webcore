@@ -11,8 +11,8 @@
 #define AUDIO_NATIVE_NATIVE_H
 
 #ifdef HXCPP_DEBUG
-    // #define MA_DEBUG_OUTPUT
-    #define MA_LOG_LEVEL 1
+	// #define MA_DEBUG_OUTPUT
+	#define MA_LOG_LEVEL 1
 #endif
 
 // disable some of the backends we don't need
@@ -35,9 +35,9 @@ extern "C" {
  */
 
 typedef struct {
-    ma_mutex*   lock;
-    ma_decoder* maDecoder;
-    ma_uint64   frameIndex;
+	ma_mutex*   lock;
+	ma_decoder* maDecoder;
+	ma_uint64   frameIndex;
 } AudioDecoder;
 
 /**
@@ -60,19 +60,19 @@ typedef struct AudioNode AudioNode;
 typedef ma_uint64 (* AudioNode_ReadFramesCallback) (void* audioNodeUserData, ma_uint32 nChannels, ma_uint64 frameCount, ma_int64 schedulingCurrentFrameBlock, float* buffer);
 
 struct AudioNode {
-    AudioNode_ReadFramesCallback readFramesCallback; // allowed to be  NULL, when not null, this takes priority over reading from the decoder
-    ma_mutex*                    lock;
-    AudioDecoder*                decoder; // allowed to be  NULL
-    ma_int64                     scheduledStartFrame; // -1 for none
-    ma_int64                     scheduledStopFrame;  // -1 for none
-    ma_bool32                    loop;
-    ma_bool32                    active;
-    ma_bool32                    onReachEndFlag;
-    void*                        userData;
+	AudioNode_ReadFramesCallback readFramesCallback; // allowed to be  NULL, when not null, this takes priority over reading from the decoder
+	ma_mutex*                    lock;
+	AudioDecoder*                decoder; // allowed to be  NULL
+	ma_int64                     scheduledStartFrame; // -1 for none
+	ma_int64                     scheduledStopFrame;  // -1 for none
+	ma_bool32                    loop;
+	ma_bool32                    active;
+	ma_bool32                    onReachEndFlag;
+	void*                        userData;
 
-    // used for node-tree cycle detection; when a node is read, it's marked with the schedulingCurrentFrameBlock at the time of reading
-    // should only be accessed from within the audio thread
-    ma_int64                     _lastReadFrameBlock;
+	// used for node-tree cycle detection; when a node is read, it's marked with the schedulingCurrentFrameBlock at the time of reading
+	// should only be accessed from within the audio thread
+	ma_int64                     _lastReadFrameBlock;
 };
 
 AudioNode* AudioNode_create(ma_context* context);
@@ -84,8 +84,8 @@ void       AudioNode_destroy(AudioNode* instance);
  */
 
 typedef struct AudioNodeListNode {
-    AudioNode*                item;
-    struct AudioNodeListNode* next;
+	AudioNode*                item;
+	struct AudioNodeListNode* next;
 } AudioNodeListNode;
 
 
@@ -95,8 +95,8 @@ typedef struct AudioNodeListNode {
  */
 
 typedef struct {
-    ma_mutex*          lock; // acquire when accessing sourceNext list
-    AudioNodeListNode* sourceNext;
+	ma_mutex*          lock; // acquire when accessing sourceNext list
+	AudioNodeListNode* sourceNext;
 } AudioNodeList;
 
 

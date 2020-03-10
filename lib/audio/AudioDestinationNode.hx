@@ -11,11 +11,11 @@ import audio.native.AudioDecoder;
 @:allow(audio.AudioContext)
 class AudioDestinationNode extends AudioNode {
 
-    function new(context: AudioContext, ?decoder: AudioDecoder) {
-        super(context, decoder);
-        numberOfInputs = 1;
-        numberOfOutputs = 1;
-    }
+	function new(context: AudioContext, ?decoder: AudioDecoder) {
+		super(context, decoder);
+		numberOfInputs = 1;
+		numberOfOutputs = 1;
+	}
 
 }
 

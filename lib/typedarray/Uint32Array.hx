@@ -24,7 +24,7 @@ private typedef UInt32 = Int;
 #end
 abstract Uint32Array(Uint32ArrayImpl)
 	to Uint32ArrayImpl from Uint32ArrayImpl
- 	to ArrayBufferView
+	to ArrayBufferView
 	to ArrayLike<UInt32>
 {
 	// typed filled by macro

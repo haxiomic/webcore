@@ -1,15 +1,14 @@
 package image;
 
-/**
-    Native implementation of html image
-**/
-
 #if js
 
 import js.html.Blob;
 import js.html.URL;
 import typedarray.ArrayBuffer;
 
+/**
+    HTMLImageElement extended to add `decodeImageData()`
+**/
 @:forward
 abstract Image(js.html.Image) from js.html.Image to js.html.Image {
 
@@ -249,7 +248,9 @@ class Image {
 
 #end
 
-// opengl-style image formats
+/**
+    OpenGL-style image formats
+**/
 enum abstract PixelDataType(Int) {
     var FLOAT;
     var UNSIGNED_BYTE;

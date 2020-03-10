@@ -24,7 +24,7 @@ private typedef UInt8 = Int;
 #end
 abstract Uint8Array(Uint8ArrayImpl)
 	to Uint8ArrayImpl from Uint8ArrayImpl
- 	to ArrayBufferView
+	to ArrayBufferView
 	to ArrayLike<UInt8>
 {
 	// typed filled by macro

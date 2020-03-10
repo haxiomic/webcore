@@ -23,7 +23,7 @@ private typedef ArrayType = Float;
 #end
 abstract Float32Array(Float32ArrayImpl)
 	to Float32ArrayImpl from Float32ArrayImpl
- 	to ArrayBufferView
+	to ArrayBufferView
 	to ArrayLike<ArrayType>
 {
 	// typed filled by macro

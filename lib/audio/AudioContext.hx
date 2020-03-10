@@ -106,10 +106,10 @@ class AudioContext {
     }
 
     /**
-		Creates a new, empty `AudioBuffer` object, which can then be populated by data and played via an `AudioBufferSourceNode`.
-		@throws String
-	**/
-	public function createBuffer(numberOfChannels: Int, frameCount: Int, sampleRate: Float): AudioBuffer {
+        Creates a new, empty `AudioBuffer` object, which can then be populated by data and played via an `AudioBufferSourceNode`.
+        @throws String
+    **/
+    public function createBuffer(numberOfChannels: Int, frameCount: Int, sampleRate: Float): AudioBuffer {
         // allocate bytes
         var bytesPerFrame = MiniAudio.get_bytes_per_frame(F32, numberOfChannels);
         var totalBytes = bytesPerFrame * frameCount;

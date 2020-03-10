@@ -24,7 +24,7 @@ private typedef Int16 = Int;
 #end
 abstract Int16Array(Int16ArrayImpl)
 	to Int16ArrayImpl from Int16ArrayImpl
- 	to ArrayBufferView
+	to ArrayBufferView
 	to ArrayLike<Int16>
 {
 	// typed filled by macro

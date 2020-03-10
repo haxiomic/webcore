@@ -9,28 +9,28 @@ import cpp.*;
 import audio.native.MiniAudio;
 
 /**
-    Represents raw PCM frames
-    Internally this is stored as interleaved samples for each channel
+	Represents raw PCM frames
+	Internally this is stored as interleaved samples for each channel
 **/
 @:allow(audio.AudioContext)
 @:allow(audio.AudioBufferSourceNode)
 class AudioBuffer {
-    
-    // could use ma_deinterleave_pcm_frames to get separate buffers
-    final interleavedPcmBytes: haxe.io.Bytes;
-    final config: DecoderConfig;
+	
+	// could use ma_deinterleave_pcm_frames to get separate buffers
+	final interleavedPcmBytes: haxe.io.Bytes;
+	final config: DecoderConfig;
 
-    function new(interleavedPcmBytes: haxe.io.Bytes, interleavedPcmBytesConfig: {
-        final channels: UInt32;
-        final sampleRate: UInt32;
-    }) {
-        this.interleavedPcmBytes = interleavedPcmBytes;
-        this.config  = DecoderConfig.init(
-            F32,
-            interleavedPcmBytesConfig.channels,
-            interleavedPcmBytesConfig.sampleRate
-        );
-    }
+	function new(interleavedPcmBytes: haxe.io.Bytes, interleavedPcmBytesConfig: {
+		final channels: UInt32;
+		final sampleRate: UInt32;
+	}) {
+		this.interleavedPcmBytes = interleavedPcmBytes;
+		this.config  = DecoderConfig.init(
+			F32,
+			interleavedPcmBytesConfig.channels,
+			interleavedPcmBytesConfig.sampleRate
+		);
+	}
 
 }
 
