@@ -1,23 +1,4 @@
-- AudioNode GC improvement: don't make the connection two-way until start() occurs
-That is
-{
-    var node = audioContext.createNode();
-    node.connect(audioContext.destination) // only store connected destination in node, not in destination
-    // node.start(), now a two-way link is created
-    node = null;
-    // node should get collected if used or not
-}
-    -> Need to iterate through node tree activating nodes
-
-- Implement AudioParam and GainNode value
-
-- Generate an .aar for easy Android integration
-    https://medium.com/@yushulx/how-to-build-so-library-files-into-aar-bundle-in-android-studio-a44387c9a012
-
-- [ ] Fix iOS web
-
 - [ ] App main + platform native code
-    - [ ] View resized
     - [ ] App life cycle
     - [ ] Keyboard events
 - [ ] Asset system
@@ -27,10 +8,15 @@ That is
     - [ ] iOS settings
     - [ ] Android settings
     - [ ] Desktop to file? Or Windows/mac settings?
-- [ ] Switch to dynamic libraries so we can link with system libraries during haxe compile (and not platform compile). Or add metadata to add flags to platform projects
+- [ ] Maybe: Switch to dynamic libraries so we can link with system libraries during haxe compile (and not platform compile). Or add metadata to add flags to platform projects
     - [ ] Link with AVFoundation and AudioToolbox when building lib for iOS and OpenSLES for Android
 
+- Generate an .aar for easy Android integration
+    https://medium.com/@yushulx/how-to-build-so-library-files-into-aar-bundle-in-android-studio-a44387c9a012
+
 - [ ] New desktop demo
+
+- [ ] Some way to supply platform view templates
 
 - Review calling finalizers if throw when contructing
 
@@ -38,10 +24,6 @@ That is
 -----
 
 # Auditing
-
-- Why is tsan reporting two different mutexes for the same lock?
-    - ma_mutex_lock(&source->lock) 
-    - and this.nativeNode.setDecoder(decoder.nativeAudioDecoder);
 
 -> Maybe, avoid using hxcpp threads; crash risk:
     - Make async method `readAllPcmFramesAsync()`
