@@ -67,7 +67,7 @@ class App implements app.HaxeAppInterface {
 			#end
 		}
 
-		helloLoop();
+		// helloLoop();
 
 		// play a song
 		trace('about to create audio context');
@@ -213,7 +213,7 @@ class App implements app.HaxeAppInterface {
 		gl.viewport(0, 0, drawingBufferWidth, drawingBufferHeight);
 
 		// execute commands on the OpenGL context
-		gl.clearColor(Math.sin(t_s * 0.1), Math.cos(t_s * 0.5), Math.sin(t_s * 0.3), 1);
+		gl.clearColor(0.0, Math.cos(t_s * 0.5), Math.sin(t_s * 0.3), 1);
 		gl.clear(COLOR_BUFFER_BIT);
 
 		gl.useProgram(program);
@@ -247,11 +247,15 @@ class App implements app.HaxeAppInterface {
 	}
 
 	public function onPointerDown(event: PointerEvent): Void {
+		trace('down', event.pointerId, event.button, event.buttons);
 		audioContext.resume();
+		// ignore right mouse click
+		if (event.button == 2) return;
 		getActivePointers(event.pointerType).set(event.pointerId, event);
 	}
 
 	public function onPointerMove(event: PointerEvent): Void {
+		// trace('move', event.button, event.buttons);
 		var activePointers = getActivePointers(event.pointerType);
 		if (activePointers.exists(event.pointerId)) {
 			activePointers.set(event.pointerId, event);
@@ -259,6 +263,7 @@ class App implements app.HaxeAppInterface {
 	}
 
 	public function onPointerUp(event: PointerEvent): Void {
+		trace('up', event.pointerId, event.button, event.buttons);
 		getActivePointers(event.pointerType).remove(event.pointerId);
 	}
 
