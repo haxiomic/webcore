@@ -1,3 +1,4 @@
+import app.HaxeAppInterface.KeyboardEvent;
 import app.HaxeAppInterface.WheelEvent;
 import audio.AudioContext;
 import app.HaxeAppInterface.PointerType;
@@ -86,7 +87,7 @@ class App implements app.HaxeAppInterface {
 		audioContext.decodeAudioData(Assets.my_triangle_mp3, (audioBuffer) -> {
 			trace('Trying to play audio', audioBuffer, haxe.Timer.stamp() - t0);
 			node.buffer = audioBuffer;
-			node.start();
+			// node.start();
 			node.onended = () -> {
 				trace('Song ended');
 			}
@@ -247,33 +248,47 @@ class App implements app.HaxeAppInterface {
 		}
 	}
 
-	public function onPointerDown(event: PointerEvent): Void {
+	public function onPointerDown(event: PointerEvent) {
 		trace('down', event.pointerId, event.button, event.buttons);
 		audioContext.resume();
 		// ignore right mouse click
-		if (event.button == 2) return;
+		if (event.button == 2) return false;
 		getActivePointers(event.pointerType).set(event.pointerId, event);
+		return false;
 	}
 
-	public function onPointerMove(event: PointerEvent): Void {
+	public function onPointerMove(event: PointerEvent) {
 		// trace('move', event.button, event.buttons);
 		var activePointers = getActivePointers(event.pointerType);
 		if (activePointers.exists(event.pointerId)) {
 			activePointers.set(event.pointerId, event);
 		}
+		return false;
 	}
 
-	public function onPointerUp(event: PointerEvent): Void {
+	public function onPointerUp(event: PointerEvent) {
 		trace('up', event.pointerId, event.button, event.buttons);
 		getActivePointers(event.pointerType).remove(event.pointerId);
+		return false;
 	}
 
-	public function onPointerCancel(event: PointerEvent): Void {
-		onPointerUp(event);
+	public function onPointerCancel(event: PointerEvent) {
+		return onPointerUp(event);
 	}
 
-	public function onWheel(event: WheelEvent): Void {
+	public function onWheel(event: WheelEvent) {
 		trace('wheel', event.x, event.y, event.deltaX, event.deltaY, event.deltaZ);
+		return true;
+	}
+
+	public function onKeyDown(event: KeyboardEvent, hasFocus: Bool) {
+		trace('keydown', hasFocus, event.key, event.code, event.location);
+		return false;
+	}
+
+	public function onKeyUp(event: KeyboardEvent, hasFocus: Bool) {
+		trace('keyup', hasFocus, event.key, event.code, event.location);
+		return false;
 	}
 
 	function getActivePointers(type: PointerType) {
