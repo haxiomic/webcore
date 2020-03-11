@@ -1,3 +1,4 @@
+import app.HaxeAppInterface.WheelEvent;
 import audio.AudioContext;
 import app.HaxeAppInterface.PointerType;
 import app.HaxeAppInterface.PointerEvent;
@@ -269,6 +270,10 @@ class App implements app.HaxeAppInterface {
 
 	public function onPointerCancel(event: PointerEvent): Void {
 		onPointerUp(event);
+	}
+
+	public function onWheel(event: WheelEvent): Void {
+		trace('wheel', event.x, event.y, event.deltaX, event.deltaY, event.deltaZ);
 	}
 
 	function getActivePointers(type: PointerType) {
