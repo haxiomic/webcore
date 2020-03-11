@@ -273,6 +273,23 @@
 				}
 			});
 
+			// life-cycle events
+			document.addEventListener('visibilitychange', (e) => {
+				let phase;
+				switch (document.visibilityState) {
+					case "visible": phase = 'foreground'; break;
+					case "hidden": phase = 'background'; break;
+					case "prerender": return; // initial prerender state
+					case "unloaded": return; // deprecated
+					default: {
+						console.warn('App entered an unrecognized visibility state "' + document.visibilityState + '" (ignoring)');
+						return;
+					}
+				}
+				appInstance.onLifeCycleChange(phase);
+			});
+
+
 			// resize canvas with window
 			function canvasFillWindow() {
 				// - html px units do not match the screen's native resolution
