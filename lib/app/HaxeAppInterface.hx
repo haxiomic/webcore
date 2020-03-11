@@ -69,6 +69,46 @@ interface HaxeAppInterface {
 	**/
 	function onPointerCancel(event: PointerEvent): Void;
 
+	/**
+		Called when a scroll interaction is performed on the view
+	**/
+	function onWheel(event: WheelEvent): Void;
+
+}
+
+/**
+	See https://developer.mozilla.org/en-US/docs/Web/API/WheelEvent
+**/
+@:publicFields
+@:structInit
+@:unreflective
+class WheelEvent {
+
+	/**
+		The horizontal scroll amount in **points**, if scrolling a page this corresponds to the horizontal scroll distance that would be applied
+	**/
+	final deltaX: Float;
+
+	/**
+		The vertical scroll amount in **points**, if scrolling a page this corresponds to the vertical scroll distance that would be applied
+	**/
+	final deltaY: Float;
+
+	/**
+		Z-axis scroll amount (and 0 when unsupported)
+	**/
+	final deltaZ: Float;
+
+	/**
+		Horizontal position in units of **points** where 0 corresponds to the left of the view
+	**/
+	final x: Float;
+
+	/**
+		Vertical position in units of **points** where 0 corresponds to the top of the view
+	**/
+	final y: Float;
+
 }
 
 enum abstract PointerType(String) to String from String {
@@ -77,10 +117,14 @@ enum abstract PointerType(String) to String from String {
 	var TOUCH = "touch";
 }
 
+/**
+	See https://www.w3.org/TR/pointerevents
+**/
 @:publicFields
 @:structInit
 @:unreflective
 class PointerEvent {
+
 	/**
 		Unique identifier for the pointer.
 		See https://www.w3.org/TR/pointerevents/#dom-pointerevent-pointerid
@@ -118,12 +162,12 @@ class PointerEvent {
 	final buttons: Int;
 
 	/**
-		Horizontal position in units of **points** where 0 corresponds to the left of the views
+		Horizontal position in units of **points** where 0 corresponds to the left of the view
 	**/
 	final x: Float;
 
 	/**
-		Vertical position in units of **points** where 0 corresponds to the top of the views
+		Vertical position in units of **points** where 0 corresponds to the top of the view
 	**/
 	final y: Float;
 	
@@ -164,4 +208,5 @@ class PointerEvent {
 		Clockwise rotation in units of **degrees** (see `rotationAngle` for touches https://w3c.github.io/touch-events/#dom-touch-rotationangle)
 	**/
 	final twist: Float;
+
 }
