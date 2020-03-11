@@ -28,6 +28,10 @@
 
 			canvas.style.display = 'block';
 
+			// make the canvas focusable
+			// this enables us to determine if our canvas has focus when receiving key events
+			canvas.tabIndex = '1';
+
 			// disable default touch actions, this helps disable view dragging on touch devices
 			canvas.style.touchAction = 'none';
 			canvas.setAttribute('touch-action', 'none');
@@ -76,7 +80,7 @@
 				// convert force to a 0 - 1 range
 				let pressure = force !== undefined ? Math.max((force - 1), 0) : 0.5;
 
-				pointerMethod({
+				if (pointerMethod({
 					pointerId: -1,
 					pointerType: 'mouse',
 					isPrimary: true,
@@ -91,7 +95,9 @@
 					tiltX: 0,
 					tiltY: 0,
 					twist: 0,
-				});
+				})) {
+					mouseEvent.preventDefault();
+				}
 			}
 
 			// Map<type, {primaryTouchIdentifier: Int, activeCount: Int}>
@@ -106,11 +112,7 @@
 				}
 				return touchInfo;
 			}
-			function executePointerMethodFromTouchEvent(touchEvent, pointerMethod, preventDefault) {
-				if (preventDefault === true) {
-					touchEvent.preventDefault(); 
-				}
-
+			function executePointerMethodFromTouchEvent(touchEvent, pointerMethod) {
 				let button = 0;
 				let buttons = 0;
 				switch (touchEvent.type) {
@@ -166,7 +168,7 @@
 					let tiltX = Math.atan(Math.cos(touch.azimuthAngle) / tanAlt) * radToDeg;
 					let tiltY = Math.atan(Math.sin(touch.azimuthAngle) / tanAlt) * radToDeg;
 
-					pointerMethod({
+					if (pointerMethod({
 						pointerId: touch.identifier,
 						pointerType: (touch.touchType === 'stylus') ? 'pen' : 'touch',
 						isPrimary: touch.identifier === touchInfo.primaryTouchIdentifier,
@@ -181,7 +183,9 @@
 						tiltX: tiltX || 0,
 						tiltY: tiltY || 0,
 						twist: touch.rotationAngle,
-					});
+					})) {
+						touchEvent.preventDefault();
+					}
 				}
 			}
 
@@ -203,12 +207,71 @@
 				window.addEventListener('mouseforcechanged', (e) => executePointerMethodFromMouseEvent(e, onPointerMove));
 				window.addEventListener('mouseup', (e) => executePointerMethodFromMouseEvent(e, onPointerUp));
 				let useCapture = true;
-				canvas.addEventListener('touchstart', (e) => executePointerMethodFromTouchEvent(e, onPointerDown, true), { capture: useCapture, passive: false });
-				window.addEventListener('touchmove', (e) => executePointerMethodFromTouchEvent(e, onPointerMove, true), { capture: useCapture, passive: false });
-				window.addEventListener('touchforcechange', (e) => executePointerMethodFromTouchEvent(e, onPointerMove, true), { capture: useCapture, passive: true });
-				window.addEventListener('touchend', (e) => executePointerMethodFromTouchEvent(e, onPointerUp, true), {capture: useCapture, passive: true});
-				window.addEventListener('touchcancel', (e) => executePointerMethodFromTouchEvent(e, onPointerCancel, true), { capture: useCapture, passive: true });
+				canvas.addEventListener('touchstart', (e) => executePointerMethodFromTouchEvent(e, onPointerDown), { capture: useCapture, /*passive: false*/ });
+				window.addEventListener('touchmove', (e) => executePointerMethodFromTouchEvent(e, onPointerMove), { capture: useCapture, /*passive: false*/ });
+				window.addEventListener('touchforcechange', (e) => executePointerMethodFromTouchEvent(e, onPointerMove), { capture: useCapture, /*passive: true*/ });
+				window.addEventListener('touchend', (e) => executePointerMethodFromTouchEvent(e, onPointerUp), {capture: useCapture, /*passive: true*/});
+				window.addEventListener('touchcancel', (e) => executePointerMethodFromTouchEvent(e, onPointerCancel), { capture: useCapture, /*passive: true*/ });
 			}
+
+			// wheel event
+			canvas.addEventListener('wheel', (e) => {
+				// we normalize for delta modes, so we always scroll in px
+				// chrome always uses pixels but firefox can sometime uses lines and pages
+				// see https://stackoverflow.com/questions/20110224/what-is-the-height-of-a-line-in-a-wheel-event-deltamode-dom-delta-line
+				let x_px = e.clientX;
+				let y_px = e.clientY;
+				let deltaX_px = e.deltaX;
+				let deltaY_px = e.deltaY;
+				let deltaZ_px = e.deltaZ;
+				switch (e.deltaMode) {
+					case WheelEvent.DOM_DELTA_PIXEL: {
+						deltaX_px = e.deltaX;
+						deltaY_px = e.deltaY;
+						deltaZ_px = e.deltaZ;
+					} break;
+					case WheelEvent.DOM_DELTA_LINE: {
+						// lets assume the line-height is 16px
+						deltaX_px = e.deltaX * 16;
+						deltaY_px = e.deltaY * 16;
+						deltaZ_px = e.deltaZ * 16;
+					} break;
+					case WheelEvent.DOM_DELTA_PAGE: {
+						// this needs further testing
+						deltaX_px = e.deltaX * 100;
+						deltaY_px = e.deltaY * 100;
+						deltaZ_px = e.deltaZ * 100;
+					} break;
+				}
+				if (appInstance.onWheel({
+					x: x_px,
+					y: y_px,
+					deltaX: deltaX_px,
+					deltaY: deltaY_px,
+					deltaZ: deltaZ_px,
+					deltaMode: e.deltaMode,
+					altKey: e.altKey,
+					ctrlKey: e.ctrlKey,
+					metaKey: e.metaKey,
+					shiftKey: e.shiftKey,
+				})) {
+					e.preventDefault();
+				}
+			});
+
+			// keyboard event
+			window.addEventListener('keydown', (e) => {
+				let hasFocus = e.target === canvas;
+				if (appInstance.onKeyDown(e, hasFocus)) {
+					e.preventDefault();
+				}
+			});
+			window.addEventListener('keyup', (e) => {
+				let hasFocus = e.target === canvas;
+				if (appInstance.onKeyUp(e, hasFocus)) {
+					e.preventDefault();
+				}
+			});
 
 			// resize canvas with window
 			function canvasFillWindow() {
@@ -216,9 +279,9 @@
 				// - the ratio between html px units and the screen's pixels is stored in devicePixelRatio
 				// - the canvas width / height attribute set the size of the drawing buffer
 				// - to create a canvas that draws at the screen's native resolution we set 
-				canvas.width = Math.round(window.innerWidth * pixelRatio);
+				canvas.width = Math.round(window.innerWidth * pixelRatio * 0.5);
 				canvas.height = Math.round(window.innerHeight * pixelRatio);
-				canvas.style.width = "100%";
+				canvas.style.width = "50%";
 				canvas.style.height = "100%";
 
 				appInstance.onResize(canvas.clientWidth, canvas.clientHeight);

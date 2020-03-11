@@ -13,7 +13,9 @@ import webgl.GLContext;
 	See [iOS Documentation: Points Verses Pixels](https://developer.apple.com/library/archive/documentation/2DDrawing/Conceptual/DrawingPrintingiOS/GraphicsDrawingOverview/GraphicsDrawingOverview.html#//apple_ref/doc/uid/TP40010156-CH14-SW7)
 
 	**Input**
-	For mouse, touch and pen input, an interface that closely follows the PointerEvent API is used
+	- For mouse, touch and pen input, an interface that closely follows the PointerEvent API is used
+	- Wheel events mirror modern browser [WheelEvent](https://developer.mozilla.org/en-US/docs/Web/API/WheelEvent) where all deltas are in units of **points**, normalizing for `deltaMode`
+	- KeyboardEvents mirror modern browser [KeyboardEvent](https://w3c.github.io/uievents/#idl-keyboardevent)
 **/
 @:nativeGen
 @:keep
@@ -47,32 +49,51 @@ interface HaxeAppInterface {
 	
 	/**
 		Called when a pointer (mouse, touch or pen) is activated, for a mouse this happens when a button is pressed.
+		Return true to prevent default behavior.
 		See https://www.w3.org/TR/pointerevents/#the-pointerdown-event
 	**/
-	function onPointerDown(event: PointerEvent): Void;
+	function onPointerDown(event: PointerEvent): Bool;
 
 	/**
 		Called when an active pointer changes either position or pressure (if supported).
+		Return true to prevent default behavior.
 		See https://www.w3.org/TR/pointerevents/#the-pointermove-event
 	**/
-	function onPointerMove(event: PointerEvent): Void;
+	function onPointerMove(event: PointerEvent): Bool;
 
 	/**
 		Called when a pointer (mouse, touch or pen) is activated, for a mouse this happens when a button is released.
+		Return true to prevent default behavior.
 		See https://www.w3.org/TR/pointerevents/#the-pointerup-event
 	**/
-	function onPointerUp(event: PointerEvent): Void;
+	function onPointerUp(event: PointerEvent): Bool;
 
 	/**
 		Called when the pointer is unlikely to continue to produce events or the interaction was interrupted by a gesture recognition.
+		Return true to prevent default behavior.
 		See https://www.w3.org/TR/pointerevents/#the-pointercancel-event
 	**/
-	function onPointerCancel(event: PointerEvent): Void;
+	function onPointerCancel(event: PointerEvent): Bool;
 
 	/**
-		Called when a scroll interaction is performed on the view
+		Called when a scroll interaction is performed on the view.
+		Return true to prevent default behavior.
 	**/
-	function onWheel(event: WheelEvent): Void;
+	function onWheel(event: WheelEvent): Bool;
+
+	/**
+		Called when a key is pressed down with the view focused.
+		Return true to prevent default behavior.
+		`hasFocus` is true if our view has input focus for the event
+	**/
+	function onKeyDown(event: KeyboardEvent, hasFocus: Bool): Bool;
+
+	/**
+		Called when a key is released with the view focused.
+		Return true to prevent default behavior.
+		`hasFocus` is true if our view has input focus for the event
+	**/
+	function onKeyUp(event: KeyboardEvent, hasFocus: Bool): Bool;
 
 }
 
@@ -108,6 +129,11 @@ class WheelEvent {
 		Vertical position in units of **points** where 0 corresponds to the top of the view
 	**/
 	final y: Float;
+
+	final altKey: Bool;
+	final ctrlKey: Bool;
+	final metaKey: Bool;
+	final shiftKey: Bool;
 
 }
 
@@ -208,5 +234,55 @@ class PointerEvent {
 		Clockwise rotation in units of **degrees** (see `rotationAngle` for touches https://w3c.github.io/touch-events/#dom-touch-rotationangle)
 	**/
 	final twist: Float;
+
+}
+
+/**
+	See https://w3c.github.io/uievents/#dom-keyboardevent-dom_key_location_standard
+**/
+enum abstract KeyLocation(Int) to Int from Int {
+	var STANDARD = 0;
+	var LEFT = 1;
+	var RIGHT = 2;
+	var NUMPAD = 3;
+}
+
+/**
+	See https://w3c.github.io/uievents/#idl-keyboardevent
+**/
+@:publicFields
+@:structInit
+@:unreflective
+class KeyboardEvent {
+
+	/**
+		Locale-aware key
+
+		Either a
+		- A key string that corresponds to the character typed (accounting for the user's current locale and mappings), e.g. `"a"`
+		- A named key mapping to the values in the [specification](https://www.w3.org/TR/uievents-key/#named-key-attribute-value) e.g. `"ArrowDown"`
+
+		Example use-cases include detecting keyboard shortcuts
+
+		See https://www.w3.org/TR/uievents-key/#key-attribute-value
+	**/
+	final key: String;
+
+	/**
+		A string that identifies the physical key being pressed, it differs from the `key` field in that it **doesn't** account for the user's current locale and mappings.
+		The list of possible codes and their mappings to physical keys is given here https://www.w3.org/TR/uievents-code/.
+
+		Example use-cases include detecting WASD keys for moving controls in a game
+
+		See https://w3c.github.io/uievents/#keys-codevalues
+	**/
+	final code: String;
+
+	final location: KeyLocation;
+
+	final altKey: Bool;
+	final ctrlKey: Bool;
+	final metaKey: Bool;
+	final shiftKey: Bool;
 
 }
