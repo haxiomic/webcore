@@ -59,6 +59,7 @@ interface HaxeAppInterface {
 
 	/**
 		Called when an active pointer changes either position or pressure (if supported).
+		This is called when a cursor moves, whether or not any buttons are down.
 		Return true to prevent default behavior.
 		See https://www.w3.org/TR/pointerevents/#the-pointermove-event
 	**/
