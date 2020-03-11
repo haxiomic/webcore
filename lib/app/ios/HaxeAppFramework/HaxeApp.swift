@@ -158,7 +158,7 @@ class TouchEventHandler {
     public func touchesBegan(_ touches: Set<UITouch>, in view: UIView) {
         for touch in touches {
             let pointerType = getTouchPointerType(touch)
-            let activeCount = touchTypeActiveCount[pointerType]
+            let initialActiveCount = getActiveCountForPointerType(pointerType)
 
             addTouch(touch)
 
@@ -167,7 +167,7 @@ class TouchEventHandler {
             let tilt = getTouchTilt(touch, in: view)
             let pointerId = getTouchPointerId(touch)
         
-            if activeCount == 0 {
+            if initialActiveCount == 0 {
                 touchTypePrimaryId[pointerType] = pointerId
             }
 
@@ -323,13 +323,17 @@ class TouchEventHandler {
         return getTouchPointerId(touch) == touchTypePrimaryId[pointerType]
     }
     
+    func getActiveCountForPointerType(_ pointerType: String) -> Int {
+        return touchTypeActiveCount[pointerType] ?? 0
+    }
+    
     func addTouch(_ touch: UITouch) {
         let id: Int32 = touchIdCounter
         touchIdCounter = touchIdCounter + 1
         touchIdMap[touch] = id
         
         let pointerType = getTouchPointerType(touch)
-        let activeCount = touchTypeActiveCount[pointerType] ?? 0
+        let activeCount = getActiveCountForPointerType(pointerType)
         touchTypeActiveCount[pointerType] = activeCount + 1
     }
 
