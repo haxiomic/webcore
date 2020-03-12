@@ -330,7 +330,9 @@ class TouchEventHandler {
     func addTouch(_ touch: UITouch) {
         let id: Int32 = touchIdCounter
         touchIdCounter = touchIdCounter + 1
-        touchIdMap[touch] = id
+
+        // we use negative IDs for touch and pointers to distingush from traditional pointers
+        touchIdMap[touch] = -id - 1
         
         let pointerType = getTouchPointerType(touch)
         let activeCount = getActiveCountForPointerType(pointerType)
