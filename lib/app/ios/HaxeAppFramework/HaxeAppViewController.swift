@@ -5,23 +5,51 @@ import GLKit
  */
 public class HaxeAppViewController: GLKViewController {
     
-    public var haxeAppInstance: HaxeApp
+    public let haxeAppInstance: HaxeApp
     public var context: EAGLContext?
     
     var haxeGraphicsContextReady = false
+    var haxeFrameWidth: CGFloat = -1
+    var haxeFrameHeight: CGFloat = -1
 
     public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         haxeAppInstance = HaxeApp()
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        postInit()
     }
     
     required init?(coder aDecoder: NSCoder) {
         haxeAppInstance = HaxeApp()
         super.init(coder: aDecoder)
+        postInit()
     }
     
     deinit {
         releaseGraphicsContext()
+    }
+    
+    func postInit() {
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onApplicationDidBecomeActive(notification:)), name: UIApplication.didBecomeActiveNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onApplicationDidEnterBackground(notification:)), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onApplicationWillEnterForeground(notification:)), name: UIApplication.willEnterForegroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onApplicationWillResignActive(notification:)), name: UIApplication.willResignActiveNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onApplicationWillTerminate(notification:)), name: UIApplication.willTerminateNotification, object: nil)
+    }
+    
+    @objc func onApplicationDidBecomeActive(notification: Notification) {
+        print("-- onDidBecomeActive --")
+    }
+    @objc func onApplicationDidEnterBackground(notification: Notification) {
+        print("-- onDidEnterBackground --")
+    }
+    @objc func onApplicationWillEnterForeground(notification: Notification) {
+        print("-- onWillEnterForeground --")
+    }
+    @objc func onApplicationWillResignActive(notification: Notification) {
+        print("-- onWillResignActive --")
+    }
+    @objc func onApplicationWillTerminate(notification: Notification) {
+        print("-- onWillTerminate --")
     }
 
     override public func viewDidLoad() {
@@ -30,7 +58,11 @@ public class HaxeAppViewController: GLKViewController {
     }
 
     override public func viewDidLayoutSubviews() {
-        haxeAppInstance.onResize(Double(view.frame.width), Double(view.frame.height))
+        if view.frame.width != haxeFrameWidth || view.frame.height != haxeFrameHeight {
+            haxeAppInstance.onResize(Double(view.frame.width), Double(view.frame.height))
+            haxeFrameWidth = view.frame.width
+            haxeFrameHeight = view.frame.height
+        }
     }
     
     private func initializeGraphicsContext() {
