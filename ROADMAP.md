@@ -1,7 +1,3 @@
-- [ ] App main + platform native code
-    - [ ] App life cycle
-        - [ ] Tab change / view lose focus
-    - [ ] Cursor visibility
 - [ ] Asset system
     - [ ] Platform native code
         - [ ] Read from bundle
@@ -61,3 +57,24 @@
 - Maybe rename HaxeApp -> HaxeAppView or similar
 
 - Maybe Switch to dynamic libraries so we can link with system libraries during haxe compile (and not platform compile). Or add metadata to add flags to platform projects
+
+- EventLoop per thread
+    - We should use an event loop per thread so async code returns to the same thread for async callbacks and promises. For example
+    ```
+    main-thread {
+        
+        // do something async on another thread and callback to this thread
+        start thread-2, readyCallback() {
+            var callingThread = main-thread
+
+            loadPlaceholder(onComplete: () => {
+                // this should be running on thread-2, not the main thread (which is the current situation)
+                // callback to whatever thread started this one
+                runInThread(callingThread, readyCallback)
+            })
+
+        }
+
+    }
+    ```
+    
