@@ -1,5 +1,7 @@
 /**
  * C language wrapper for HaxeApp
+ * 
+ * See HaxeAppInterface for API details
  */
 
 #ifndef HaxeAppC_h
@@ -11,6 +13,13 @@
 typedef void     (* MainThreadTick) ();
 typedef void     (* SetGraphicsContext) (void* ref);
 typedef int32_t  (* GetContextParamInt32) (void* ref);
+
+typedef enum {
+    STANDARD = 0,
+    LEFT = 1,
+    RIGHT = 2,
+    NUMPAD = 3
+} KeyLocation;
 
 #ifdef __cplusplus
 extern "C" {
@@ -63,10 +72,27 @@ extern "C" {
      * - double tiltY
      * - double twist
      */
-    void  HaxeApp_onPointerDown(void* ptr, int32_t pointerId, const char* pointerType, bool isPrimary, int32_t button, int32_t buttons, double x, double y, double width, double height, double pressure, double tangentialPressure, double tiltX, double tiltY, double twist);
-    void  HaxeApp_onPointerMove(void* ptr, int32_t pointerId, const char* pointerType, bool isPrimary, int32_t button, int32_t buttons, double x, double y, double width, double height, double pressure, double tangentialPressure, double tiltX, double tiltY, double twist);
-    void  HaxeApp_onPointerUp(void* ptr, int32_t pointerId, const char* pointerType, bool isPrimary, int32_t button, int32_t buttons, double x, double y, double width, double height, double pressure, double tangentialPressure, double tiltX, double tiltY, double twist);
-    void  HaxeApp_onPointerCancel(void* ptr, int32_t pointerId, const char* pointerType, bool isPrimary, int32_t button, int32_t buttons, double x, double y, double width, double height, double pressure, double tangentialPressure, double tiltX, double tiltY, double twist);
+    bool  HaxeApp_onPointerDown(void* ptr, int32_t pointerId, const char* pointerType, bool isPrimary, int32_t button, int32_t buttons, double x, double y, double width, double height, double pressure, double tangentialPressure, double tiltX, double tiltY, double twist);
+    bool  HaxeApp_onPointerMove(void* ptr, int32_t pointerId, const char* pointerType, bool isPrimary, int32_t button, int32_t buttons, double x, double y, double width, double height, double pressure, double tangentialPressure, double tiltX, double tiltY, double twist);
+    bool  HaxeApp_onPointerUp(void* ptr, int32_t pointerId, const char* pointerType, bool isPrimary, int32_t button, int32_t buttons, double x, double y, double width, double height, double pressure, double tangentialPressure, double tiltX, double tiltY, double twist);
+    bool  HaxeApp_onPointerCancel(void* ptr, int32_t pointerId, const char* pointerType, bool isPrimary, int32_t button, int32_t buttons, double x, double y, double width, double height, double pressure, double tangentialPressure, double tiltX, double tiltY, double twist);
+
+    /**
+     * Mouse wheel and trackpad scroll event
+     */
+    bool  HaxeApp_onWheel(void* ptr, double deltaX, double deltaY, double deltaZ, double x, double y, bool altKey, bool ctrlKey, bool metaKey, bool shiftKey);
+
+    /**
+     * Keyboard events
+     */
+    bool  HaxeApp_onKeyDown(void* ptr, const char* key, const char* code, KeyLocation location, bool altKey, bool ctrlKey, bool metaKey, bool shiftKey, bool hasFocus);
+    bool  HaxeApp_onKeyUp(void* ptr, const char* key, const char* code, KeyLocation location, bool altKey, bool ctrlKey, bool metaKey, bool shiftKey, bool hasFocus);
+
+    /**
+     * Life-cycle events
+     */
+    void  HaxeApp_onActivate(void* ptr);
+    void  HaxeApp_onDeactivate(void* ptr);
 
 #ifdef __cplusplus
 }
