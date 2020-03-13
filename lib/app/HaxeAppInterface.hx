@@ -101,15 +101,17 @@ interface HaxeAppInterface {
 	function onKeyUp(event: KeyboardEvent, hasFocus: Bool): Bool;
 
 	/**
-		Called after the app goes from a deactivated state (minimized tab, hidden view, background-mode app) to a foreground active state.
-		For example, you can use this event to resume activities and connect to sensor events.
+		Called when the haxe view goes from a deactivated state (hidden view, minimized tab, background-mode app) to a foreground active state.
+		For example, you should use this event to resume activities and connect to sensor events.
+		This method is called as early as possible in the transition and may not yet be visible.
 		**It is called once at startup.**
 	**/
 	function onActivate(): Void;
 
 	/**
-		Called before the app transitions into a deactivated state (minimized tab, hidden view, background-mode app).
-		Use this event to suspend activities to save power, save state or disconnect from sensors.
+		Called before the app transitions into a deactivated state (hidden view, minimized tab, background-mode app).
+		For example you should use this event to suspend activities to save power, pause a game, save state or disconnect from sensors.
+		This method is called as early as possible in the transition and may still be visible.
 	**/
 	function onDeactivate(): Void;
 
