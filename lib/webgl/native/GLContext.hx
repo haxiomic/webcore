@@ -57,6 +57,7 @@ class GLContext {
 		- `nativeGetDrawingBufferWidth` is a callback that receives the `nativeReference` and returns the drawing buffer width in pixels
 		- `nativeGetDrawingBufferHeight` is a callback that receives the `nativeReference` and returns the drawing buffer height in pixels
 	**/
+	@:keep
 	public inline function new(
 		nativeReference: Pointer<cpp.Void>,
 
