@@ -100,10 +100,17 @@ interface HaxeAppInterface {
 	function onKeyUp(event: KeyboardEvent, hasFocus: Bool): Bool;
 
 	/**
-		Called when the app changes phase in its life cycle – i.e. enters the background or the foreground.
-		At startup this method is **not** called and the app is assumed to be in the `FOREGROUND` state.
+		Called after the app goes from a deactivated state (minimized tab, hidden view, background-mode app) to a foreground active state.
+		For example, you can use this event to resume activities and connect to sensor events.
+		**It is called once at startup.**
 	**/
-	function onLifeCycleChange(phase: LifeCyclePhase): Void;
+	function onActivate(): Void;
+
+	/**
+		Called before the app transitions into a deactivated state (minimized tab, hidden view, background-mode app).
+		Use this event to suspend activities to save power, save state or disconnect from sensors.
+	**/
+	function onDeactivate(): Void;
 
 }
 
@@ -294,19 +301,5 @@ class KeyboardEvent {
 	final ctrlKey: Bool;
 	final metaKey: Bool;
 	final shiftKey: Bool;
-
-}
-
-enum abstract LifeCyclePhase(String) to String from String {
-
-	/**
-		The view is considered in the foreground (but not necessarily focused)
-	**/
-	var FOREGROUND = "foreground";
-
-	/**
-		The view is considered in the background (e.g, tab minimized, app switched away)
-	**/
-	var BACKGROUND = "background";
 
 }
