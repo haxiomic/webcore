@@ -258,7 +258,6 @@ class App implements app.HaxeAppInterface {
 	}
 
 	public function onPointerMove(event: PointerEvent) {
-		// trace('move', event.button, event.buttons);
 		var activePointers = getActivePointers(event.pointerType);
 		if (activePointers.exists(event.pointerId)) {
 			activePointers.set(event.pointerId, event);
@@ -289,6 +288,14 @@ class App implements app.HaxeAppInterface {
 	public function onKeyUp(event: KeyboardEvent, hasFocus: Bool) {
 		trace('keyup', hasFocus, event.key, event.code, event.location);
 		return false;
+	}
+
+	public function onActivate() {
+		trace('onActivate');
+	}
+
+	public function onDeactivate() {
+		trace('onDeactivate');
 	}
 
 	function getActivePointers(type: PointerType) {
