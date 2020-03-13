@@ -9,8 +9,7 @@ public class HaxeAppViewController: GLKViewController {
     public var context: EAGLContext?
     
     var haxeGraphicsContextReady = false
-    var haxeFrameWidth: CGFloat = -1
-    var haxeFrameHeight: CGFloat = -1
+    var isVisible: Bool?
 
     public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         haxeAppInstance = HaxeApp()
@@ -29,27 +28,11 @@ public class HaxeAppViewController: GLKViewController {
     }
     
     func postInit() {
+        // catch application events
         NotificationCenter.default.addObserver(self, selector: #selector(self.onApplicationDidBecomeActive(notification:)), name: UIApplication.didBecomeActiveNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.onApplicationDidEnterBackground(notification:)), name: UIApplication.didEnterBackgroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.onApplicationWillEnterForeground(notification:)), name: UIApplication.willEnterForegroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.onApplicationWillResignActive(notification:)), name: UIApplication.willResignActiveNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.onApplicationWillTerminate(notification:)), name: UIApplication.willTerminateNotification, object: nil)
-    }
-    
-    @objc func onApplicationDidBecomeActive(notification: Notification) {
-        print("-- onDidBecomeActive --")
-    }
-    @objc func onApplicationDidEnterBackground(notification: Notification) {
-        print("-- onDidEnterBackground --")
-    }
-    @objc func onApplicationWillEnterForeground(notification: Notification) {
-        print("-- onWillEnterForeground --")
-    }
-    @objc func onApplicationWillResignActive(notification: Notification) {
-        print("-- onWillResignActive --")
-    }
-    @objc func onApplicationWillTerminate(notification: Notification) {
-        print("-- onWillTerminate --")
     }
 
     override public func viewDidLoad() {
@@ -58,11 +41,19 @@ public class HaxeAppViewController: GLKViewController {
     }
 
     override public func viewDidLayoutSubviews() {
-        if view.frame.width != haxeFrameWidth || view.frame.height != haxeFrameHeight {
-            haxeAppInstance.onResize(Double(view.frame.width), Double(view.frame.height))
-            haxeFrameWidth = view.frame.width
-            haxeFrameHeight = view.frame.height
-        }
+        haxeAppInstance.onResize(Double(view.frame.width), Double(view.frame.height))
+    }
+    
+    override public func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        haxeAppInstance.onActivate()
+        isVisible = true
+    }
+    
+    override public func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        haxeAppInstance.onDeactivate()
+        isVisible = false
     }
     
     private func initializeGraphicsContext() {
@@ -127,6 +118,30 @@ public class HaxeAppViewController: GLKViewController {
     override public func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         haxeAppInstance.touchesCancelled(touches, in: view)
         super.touchesCancelled(touches, with: event)
+    }
+    
+    // handle application events
+    // we only trigger haxe activate/deactivate event if the view is visible
+    // this is because view visiblity changes already trigger activate deactivate events
+    @objc func onApplicationDidBecomeActive(notification: Notification) {
+        if isVisible == true {
+            haxeAppInstance.onActivate()
+        }
+    }
+    @objc func onApplicationWillEnterForeground(notification: Notification) {
+        if isVisible == true {
+            haxeAppInstance.onActivate()
+        }
+    }
+    @objc func onApplicationWillResignActive(notification: Notification) {
+        if isVisible == true {
+            haxeAppInstance.onDeactivate()
+        }
+    }
+    @objc func onApplicationWillTerminate(notification: Notification) {
+        if isVisible == true {
+            haxeAppInstance.onDeactivate()
+        }
     }
 
 }

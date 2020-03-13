@@ -9,7 +9,13 @@ public class HaxeApp {
     let touchEventHandler: TouchEventHandler
     // we keep a reference to the glkView to prevent it from being collected
     var glkView: GLKView?
+    
+    // track known state so we know if haxe needs a state update
+    var frameWidth: Double?
+    var frameHeight: Double?
+    var isActive: Bool?
 
+    /// Calling this automatically initializes haxe if it's not already initialized
     public init() {
         if !Thread.isMainThread {
             print("Haxe Error: called haxe method from a thread other than the main thread. This may cause instability because the event-loop runs on the main thread")
@@ -27,11 +33,33 @@ public class HaxeApp {
     deinit {
         HaxeApp_release(ptr)
     }
-
+    
+    /// Only calls haxe onResize if dimensions have changed (so it is fine to call multiple times with the same values)
     public func onResize(_ width: Double, _ height: Double) {
-        HaxeApp_onResize(ptr, width, height)
+        if width != frameWidth || height != frameHeight {
+            HaxeApp_onResize(ptr, width, height)
+            frameWidth = width
+            frameHeight = height
+        }
+    }
+    
+    /// Only calls haxe onActivate once when state changes (so it is fine to call multiple times withouth a state change)
+    public func onActivate() {
+        if isActive != true {
+            HaxeApp_onActivate(ptr)
+            isActive = true
+        }
+    }
+    
+    /// Only calls haxe onDeactivate once when state changes (so it is fine to call multiple times withouth a state change)
+    public func onDeactivate() {
+        if isActive != false {
+            HaxeApp_onDeactivate(ptr)
+            isActive = false
+        }
     }
 
+    /// Call this when the graphics context is fully initialized and the **context draw buffer is the currently bound framebuffer**
     public func onGraphicsContextReady(_ view: GLKView) {
         self.glkView = view
 
