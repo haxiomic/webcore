@@ -82,6 +82,7 @@ interface HaxeAppInterface {
 	/**
 		Called when a scroll interaction is performed on the view.
 		Return true to prevent default behavior.
+		If `ctrlKey` is true, the event can be assumed to be a pinch gesture on a trackpad.
 	**/
 	function onWheel(event: WheelEvent): Bool;
 
@@ -120,6 +121,7 @@ interface HaxeAppInterface {
 @:publicFields
 @:structInit
 @:unreflective
+@:keep
 class WheelEvent {
 
 	/**
@@ -147,6 +149,9 @@ class WheelEvent {
 	**/
 	final y: Float;
 
+	// The motivation for supplying special-key state with the wheel event (when it can also be obtained from keyboard events) is to catch state when the document is not focused
+	// for example, you mouse wheel on a page without the document focused keyboard events will not fire but special-key state will still be available in this event
+
 	final altKey: Bool;
 	final ctrlKey: Bool;
 	final metaKey: Bool;
@@ -166,6 +171,7 @@ enum abstract PointerType(String) to String from String {
 @:publicFields
 @:structInit
 @:unreflective
+@:keep
 class PointerEvent {
 
 	/**
@@ -270,6 +276,7 @@ enum abstract KeyLocation(Int) to Int from Int {
 @:publicFields
 @:structInit
 @:unreflective
+@:keep
 class KeyboardEvent {
 
 	/**
