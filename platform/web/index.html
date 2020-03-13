@@ -81,7 +81,7 @@
 				let pressure = force !== undefined ? Math.max((force - 1), 0) : 0.5;
 
 				if (pointerMethod({
-					pointerId: -1,
+					pointerId: 1,
 					pointerType: 'mouse',
 					isPrimary: true,
 					button: mouseEvent.button,
@@ -273,22 +273,23 @@
 				}
 			});
 
-			// life-cycle events
-			document.addEventListener('visibilitychange', (e) => {
-				let phase;
-				switch (document.visibilityState) {
-					case "visible": phase = 'foreground'; break;
-					case "hidden": phase = 'background'; break;
-					case "prerender": return; // initial prerender state
-					case "unloaded": return; // deprecated
-					default: {
-						console.warn('App entered an unrecognized visibility state "' + document.visibilityState + '" (ignoring)');
-						return;
-					}
-				}
-				appInstance.onLifeCycleChange(phase);
-			});
+			let haxeAppActivated = false;
 
+			function onVisibilityChange() {
+				switch (document.visibilityState) {
+					case "visible": if (!haxeAppActivated) {
+						appInstance.onActivate();
+						haxeAppActivated = true;
+					} break;
+					case "hidden": if (haxeAppActivated) {
+						appInstance.onDeactivate();
+						haxeAppActivated = false;
+					} break;
+				}
+			}
+
+			// life-cycle events
+			document.addEventListener('visibilitychange', onVisibilityChange);
 
 			// resize canvas with window
 			function canvasFillWindow() {
@@ -296,15 +297,14 @@
 				// - the ratio between html px units and the screen's pixels is stored in devicePixelRatio
 				// - the canvas width / height attribute set the size of the drawing buffer
 				// - to create a canvas that draws at the screen's native resolution we set 
-				canvas.width = Math.round(window.innerWidth * pixelRatio * 0.5);
+				canvas.width = Math.round(window.innerWidth * pixelRatio);
 				canvas.height = Math.round(window.innerHeight * pixelRatio);
-				canvas.style.width = "50%";
+				canvas.style.width = "100%";
 				canvas.style.height = "100%";
 
 				appInstance.onResize(canvas.clientWidth, canvas.clientHeight);
 			}
 
-			canvasFillWindow();
 			window.addEventListener('resize', canvasFillWindow);
 
 			// native browser frame-loop
@@ -314,6 +314,11 @@
 				requestAnimationFrameHandle = requestAnimationFrame(frameLoop);
 			}
 
+			// initialization events
+			// activate
+			onVisibilityChange();
+			// resize
+			canvasFillWindow();
 			// start the frame loop
 			frameLoop(performance.now());
 		</script>
