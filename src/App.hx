@@ -1,3 +1,4 @@
+import haxe.io.Path;
 import app.HaxeAppInterface.KeyboardEvent;
 import app.HaxeAppInterface.WheelEvent;
 import audio.AudioContext;
@@ -17,7 +18,33 @@ import typedarray.Uint8Array;
 @:embedFile('../assets/testcase.mp3')
 @:embedFile('../assets/red-panda.jpg')
 @:embedFile('../assets/pnggrad16rgb.png')
+@:copyToBundle('../assets')
 class Assets extends asset.Assets {
+
+	static public final embededFiles = {
+		triangle_mp3: Assets.my_triangle_mp3
+	}
+
+	static public final bundlePaths = {
+		songs: {
+			example_mp3: "song/example.mp3"
+		},
+	}
+
+	// @! this is a macro that checks if if the file exists in the bundle and warns if not at compile-time
+	// calls into
+	public static function readBundleFile(
+		path: String,
+		?onComplete: (typedarray.ArrayBuffer) -> Void,
+		?onError: (String) -> Void
+	): {
+		cancel: () -> Void,
+	} {
+		var cancellationToken = {
+			cancel: () -> {}
+		}
+		return cancellationToken;
+	}
 
 }
 
@@ -62,14 +89,14 @@ class App implements app.HaxeAppInterface {
 
 		// test the haxe event loop
 		function helloLoop() {
-			haxe.Timer.delay(helloLoop, 1000);
+			haxe.Timer.delay(helloLoop, 50);
 			#if cpp
 			cpp.vm.Gc.run(true);
 			trace('hello', haxe.Timer.stamp(), '${cpp.vm.Gc.memInfo(cpp.vm.Gc.MEM_INFO_CURRENT) / 1e6}MB');
 			#end
 		}
 
-		// helloLoop();
+		helloLoop();
 
 		// play a song
 		trace('about to create audio context');
@@ -84,13 +111,13 @@ class App implements app.HaxeAppInterface {
 		node.connect(volumeNode);
 
 		var t0 = haxe.Timer.stamp();
-		audioContext.decodeAudioData(Assets.my_triangle_mp3, (audioBuffer) -> {
-			trace('Trying to play audio', audioBuffer, haxe.Timer.stamp() - t0);
-			node.buffer = audioBuffer;
-			// node.start();
-			node.onended = () -> {
-				trace('Song ended');
-			}
+		asset.Assets.readBundleFile('', 'multi-channel-test.mp3', (arraybuffer) -> {
+			audioContext.decodeAudioData(arraybuffer, (audioBuffer) -> {
+				trace('Trying to play audio', audioBuffer, haxe.Timer.stamp() - t0);
+				node.buffer = audioBuffer;
+				node.onended = () -> trace('Song ended');
+				node.start();
+			});
 		});
 	}
 
@@ -276,7 +303,7 @@ class App implements app.HaxeAppInterface {
 	}
 
 	public function onWheel(event: WheelEvent) {
-		trace('wheel', event.x, event.y, event.deltaX, event.deltaY, event.deltaZ);
+		trace('wheel', event);
 		return true;
 	}
 
