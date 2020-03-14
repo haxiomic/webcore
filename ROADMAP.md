@@ -1,7 +1,13 @@
 - [ ] Asset system
     - [ ] Platform native code
-        - [ ] Read from bundle
-        - [ ] Copy files to bundle
+        - [ ] Read from native bundle
+            - [ ] js
+            - [ ] desktop
+            - [ ] ios
+        - [ ] macro, move to embedded
+        - [ ] support copyToBundle
+            - bundles are named after the class and the name overridden with metadata
+
 - [ ] Device info
     - Screen size
     - systemLanguage
@@ -12,6 +18,11 @@
     - [ ] Android settings
     - [ ] Desktop to file? Or Windows/mac settings?
 
+- [ ] Pass arbitrary message to haxe
+    - What should the signature look like?
+    - Allow native payload?
+    - Require JSON?
+
 - Generate an .aar for easy Android integration
     https://medium.com/@yushulx/how-to-build-so-library-files-into-aar-bundle-in-android-studio-a44387c9a012
 
@@ -20,24 +31,6 @@
 - [ ] Some way to supply platform view templates
 
 - Review calling finalizers if throw when contructing
-
-
------
-
-# Auditing
-
--> Maybe, avoid using hxcpp threads; crash risk:
-    - Make async method `readAllPcmFramesAsync()`
-    - These methods should spawn a miniaudio thread and execute a haxe callback
-        -> How do we call successCallback when complete
-            -> poll a flag (short-term fix)
-            -> write to a linked list of callbacks and wake up the main event loop lock
-                -> Probably requires overriding EntryPoint 
-        - `AudioDecoder_readPcmFramesAsync(AudioDecoder* decoder, ma_uint64 frameCount, void* pFramesOut, callback onComplete, void* callbackData)`
-
-    ===> Did thread stress-test without issue so not sure if this is critical
-
------
 
 # Future
 
@@ -78,3 +71,6 @@
 
     }
     ```
+
+- Assets
+    - Partial file reads
