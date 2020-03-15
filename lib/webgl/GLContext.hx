@@ -89,10 +89,11 @@ private typedef InternalConstGLContext =
 #end
 #end
 // @:nullSafety (cannot enable null safety because webgl externs are missing nullablity in certain cases)
+@:forward(
+	drawingBufferWidth,
+	drawingBufferHeight
+)
 abstract GLContext(InternalGLContext) from InternalGLContext to InternalGLContext {
-
-	public var drawingBufferWidth (get, never): Int;
-	public var drawingBufferHeight (get, never): Int;
 
 	public inline function getContextAttributes():Null<GLContextAttributes>
 		return this.getContextAttributes();
@@ -523,12 +524,6 @@ abstract GLContext(InternalGLContext) from InternalGLContext to InternalGLContex
 
 	public inline function viewport(x:GLint, y:GLint, width:GLsizei, height:GLsizei)
 		this.viewport(x, y, width, height);
-
-	inline function get_drawingBufferWidth(): Int
-		return this.drawingBufferWidth;
-
-	inline function get_drawingBufferHeight(): Int
-		return this.drawingBufferHeight;
 
 }
 
