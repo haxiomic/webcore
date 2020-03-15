@@ -23,7 +23,7 @@ import webgl.GLContext;
 @:nativeGen
 @:keep
 #if !display
-@:autoBuild(app.Macro.makeMainApp())
+@:autoBuild(app.Macro.registerAppClass())
 #end
 interface HaxeAppInterface {
 
@@ -123,7 +123,7 @@ interface HaxeAppInterface {
 @:publicFields
 @:structInit
 @:unreflective
-@:keep
+#if cpp @:keep #end
 class WheelEvent {
 
 	/**
@@ -173,7 +173,7 @@ enum abstract PointerType(String) to String from String {
 @:publicFields
 @:structInit
 @:unreflective
-@:keep
+#if cpp @:keep #end
 class PointerEvent {
 
 	/**
@@ -278,7 +278,7 @@ enum abstract KeyLocation(Int) to Int from Int {
 @:publicFields
 @:structInit
 @:unreflective
-@:keep
+#if cpp @:keep #end
 class KeyboardEvent {
 
 	/**
