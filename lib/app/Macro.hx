@@ -13,36 +13,44 @@ using Lambda;
 class Macro {
 
 	/**
-		Adds sets `HaxeAppInterface.Static.createMainApp` in the class' __init__ method
+		Adds code to register the class in the class' __init__ method.
+		This enables `HaxeAppInterface.Internal.create(classPath)` to construct an instance.
 	**/
-	static function makeMainApp() {
+	static function registerAppClass() {
 		var localClass = Context.getLocalClass().get();
 		var fields = Context.getBuildFields();
 
+		var isCpp = Context.definedValue('target.name') == 'cpp';
+		if (!isCpp) return fields;
+
 		if (localClass.meta.has(':notMainApp')) return fields;
+
+		var printer = new haxe.macro.Printer();
+
+		var moduleName = localClass.module.split('.').pop();
 
 		var localTypePath: TypePath = {
 			pack: localClass.pack,
-			name: localClass.module.split('.').pop(),
-			sub: localClass.name,
+			name: moduleName,
+			sub: localClass.name != moduleName ? localClass.name : null,
 		}
 
-		var isCpp = Context.definedValue('target.name') == 'cpp';
+		var localTypePathIdent = printer.printTypePath(localTypePath);
 		
 		var initExpr = if (isCpp) {
 			// add static constructor function
 			fields = fields.concat((macro class X {
-				static function __construct__(): app.HaxeAppInterface {
+				@:noDebug static function __construct__(): app.HaxeAppInterface {
 					return new $localTypePath();
 				}
 			}).fields);
-			macro @:privateAccess {
-				app.HaxeApp.Internal.createMainApp = cpp.Function.fromStaticFunction($i{localClass.module}.__construct__);
-			};
+			macro {
+				@:privateAccess app.HaxeApp.Internal.registerConstructor($v{localTypePathIdent}, cpp.Function.fromStaticFunction(__construct__));
+			}
 		} else {
-			macro @:privateAccess {
-				app.HaxeApp.Internal.createMainApp = () -> new $localTypePath();
-			};
+			macro {
+				@:privateAccess app.HaxeApp.Internal.registerConstructor($v{localTypePathIdent}, () -> new $localTypePath());
+			}
 		}
 
 		// add initExpr to __init__

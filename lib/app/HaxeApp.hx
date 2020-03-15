@@ -4,7 +4,6 @@ package app;
 @:native('HaxeApp')
 #end
 @:nativeGen // cpp
-@:expose // js
 @:keep
 #if !display
 
@@ -18,8 +17,30 @@ package app;
 #end
 class HaxeApp {
 
-	static public function create(): HaxeAppInterface {
-		return Internal.createMainApp();
+	#if cpp
+	/**
+		Create an instance of a class that implements `HaxeAppInterface`.
+		If `classPath` is `null`, an instance of the first class that implements `HaxeAppInterface` will be returned
+	**/
+	@:analyzer(no_optimize)
+	static public function create(classPath: cpp.ConstCharStar): HaxeAppInterface {
+		try {
+			if (classPath != null) {
+				var constructor: cpp.Callable<() -> HaxeAppInterface> = Internal.constructors.get(classPath);
+				if (constructor == null) {
+					var possibleClassPaths = [for (key in Internal.constructors.keys()) key];
+					throw 'Haxe class path "$classPath" was not registered. Implement HaxeAppInterface to register a class. Registered classes: $possibleClassPaths';
+				}
+				return constructor();
+			}
+			if (Internal.defaultConstructor != null) {
+				return Internal.defaultConstructor();
+			}
+		} catch(e: Any) {
+			Sys.println('Haxe Exception: ${Std.string(e)}');
+			throw e;
+		}
+		return null;
 	}
 
 	/**
@@ -39,7 +60,6 @@ class HaxeApp {
 		- https://github.com/HaxeFoundation/hxcpp/blob/master/docs/ThreadsAndStacks.md
 		- https://groups.google.com/forum/#!topic/haxelang/V-jzaEX7YD8
 	**/
-	#if cpp
 	@:noDebug static public function haxeInitialize(tickOnMainThread: MainThreadTick): cpp.ConstCharStar {
 		if (Internal.initialized) {
 			return null;
@@ -122,16 +142,22 @@ typedef MainThreadTick = cpp.Callable<() -> Void>;
 @:allow(app.HaxeApp)
 @:unreflective
 class Internal {
-
 	
 	#if cpp
-	static var createMainApp: cpp.Callable<() -> HaxeAppInterface>;
-	#else
-	static var createMainApp: () -> HaxeAppInterface;
-	#end
+	// these are intentionally _not_ assigned initial values
+	// this is because if this classes __init__ method is called after registerConstructor, we lose their values
+	static var constructors: Map<String, cpp.Callable<() -> HaxeAppInterface>>;
+	static var defaultConstructor: Null<cpp.Callable<() -> HaxeAppInterface>>;
+	static function registerConstructor(classPath: String, constructor: cpp.Callable<() -> HaxeAppInterface>) {
+		if (defaultConstructor == null) {
+			defaultConstructor = constructor;
+		}
+		if (constructors == null) {
+			constructors = new Map();
+		}
+		constructors.set(classPath, constructor);
+	}
 
-
-	#if cpp
 	// native platform callbacks
 	static var nativeTickOnMainThread: MainThreadTick;
 

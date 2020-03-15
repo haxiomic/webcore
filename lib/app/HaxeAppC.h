@@ -35,7 +35,7 @@ extern "C" {
     bool        HaxeApp_isEventLoopThreadRunning();
 
     // instance methods
-    void* HaxeApp_create();
+    void* HaxeApp_create(const char* classPath);
     void  HaxeApp_release(void* ptr);
     void  HaxeApp_onResize(void* ptr, double width, double height);
     void  HaxeApp_onGraphicsContextReady(

@@ -78,9 +78,9 @@ void HaxeApp_runGc(bool major) {
  * Instance contructor
  */
 
-void* HaxeApp_create() {
+void* HaxeApp_create(const char* classPath) {
     hx::NativeAttach haxeGcScope;
-    hx::Native<app::HaxeAppInterface*> app = HaxeApp::create();
+    hx::Native<app::HaxeAppInterface*> app = HaxeApp::create(classPath);
     postHaxeExecution();
     return new AppHandle(app);
 }
@@ -239,6 +239,7 @@ void HaxeApp_onActivate(void* ptr) {
     appHandle->haxeRef->onActivate();
     postHaxeExecution();
 }
+
 void HaxeApp_onDeactivate(void* ptr) {
     hx::NativeAttach haxeGcScope;
     AppHandle* appHandle = (AppHandle*) ptr;

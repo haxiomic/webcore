@@ -16,7 +16,7 @@ public class HaxeApp {
     var isActive: Bool?
 
     /// Calling this automatically initializes haxe if it's not already initialized
-    public init() {
+    public init(classPath: String?) {
         if !Thread.isMainThread {
             print("Haxe Error: called haxe method from a thread other than the main thread. This may cause instability because the event-loop runs on the main thread")
         }
@@ -25,7 +25,7 @@ public class HaxeApp {
             HaxeApp.haxeInitialize()
         }
 
-        ptr = HaxeApp_create()
+        ptr = HaxeApp_create(classPath)
 
         touchEventHandler = TouchEventHandler(ptr)
     }

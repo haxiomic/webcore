@@ -5,38 +5,30 @@ import GLKit
  */
 public class HaxeAppViewController: GLKViewController {
     
-    public let haxeAppInstance: HaxeApp
+    // set the desired haxe class path from interface builder
+    @IBInspectable var haxeClassPath: String?
+    
+    public var haxeAppInstance: HaxeApp!
     public var context: EAGLContext?
     
     var haxeGraphicsContextReady = false
     var isVisible: Bool?
-
-    public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        haxeAppInstance = HaxeApp()
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        postInit()
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        haxeAppInstance = HaxeApp()
-        super.init(coder: aDecoder)
-        postInit()
-    }
     
     deinit {
         releaseGraphicsContext()
     }
     
-    func postInit() {
+    override public func awakeFromNib() {
+        super.awakeFromNib()
+        
+        haxeAppInstance = HaxeApp(classPath: haxeClassPath ?? nil)
+
         // catch application events
         NotificationCenter.default.addObserver(self, selector: #selector(self.onApplicationDidBecomeActive(notification:)), name: UIApplication.didBecomeActiveNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.onApplicationWillEnterForeground(notification:)), name: UIApplication.willEnterForegroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.onApplicationWillResignActive(notification:)), name: UIApplication.willResignActiveNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.onApplicationWillTerminate(notification:)), name: UIApplication.willTerminateNotification, object: nil)
-    }
-
-    override public func viewDidLoad() {
-        super.viewDidLoad()
+        
         initializeGraphicsContext()
     }
 
@@ -79,7 +71,7 @@ public class HaxeAppViewController: GLKViewController {
         EAGLContext.setCurrent(context)
 
         // tell haxe that we've lost the graphics context
-        haxeAppInstance.onGraphicsContextLost()
+        haxeAppInstance?.onGraphicsContextLost()
         
         // Set the current EAGLContext to nil.
         EAGLContext.setCurrent(nil)
