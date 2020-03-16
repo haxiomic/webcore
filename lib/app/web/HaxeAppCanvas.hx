@@ -123,6 +123,7 @@ class HaxeAppCanvas {
 				0.5;
 			}
 
+			// force ranges from 1 (WEBKIT_FORCE_AT_MOUSE_DOWN) to >2 when using a force-press
 			// convert force to a 0 - 1 range
 			var pressure = Math.max((force - 1), 0);
 
