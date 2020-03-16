@@ -96,7 +96,7 @@ private typedef InternalConstGLContext =
 abstract GLContext(InternalGLContext) from InternalGLContext to InternalGLContext {
 
 	public inline function getContextAttributes():Null<GLContextAttributes>
-		return this.getContextAttributes();
+		return cast this.getContextAttributes(); // cast because HTML externs may not have all possible properties
 
 	public inline function getSupportedExtensions():Array<String>
 		return this.getSupportedExtensions();

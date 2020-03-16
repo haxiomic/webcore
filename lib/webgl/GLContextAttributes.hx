@@ -11,6 +11,7 @@ typedef GLContextAttributes = {
 	// webgl-specific
 	var ?failIfMajorPerformanceCaveat: Bool;
 	var ?powerPreference: PowerPreference;
+	var ?desynchronized: Bool;
 };
 
 #if js
