@@ -12,7 +12,6 @@
 		BE24799923E5C91800D9F118 /* HaxeAppFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = BE24799723E5C91800D9F118 /* HaxeAppFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BE60D9B623E5F90000BFFB3C /* HaxeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE60D9B423E5F90000BFFB3C /* HaxeApp.swift */; };
 		BE60D9B723E5F90000BFFB3C /* HaxeAppViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE60D9B523E5F90000BFFB3C /* HaxeAppViewController.swift */; };
-		BE6FC30723E884C900E2FAF6 /* lib in Resources */ = {isa = PBXBuildFile; fileRef = BE6FC30623E884C900E2FAF6 /* lib */; };
 		BEE38F0A23E8917200EE0F87 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEE38F0923E8917200EE0F87 /* AVFoundation.framework */; };
 		BEE38F0C23E8917700EE0F87 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEE38F0B23E8917700EE0F87 /* AudioToolbox.framework */; };
 /* End PBXBuildFile section */
@@ -157,7 +156,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BE6FC30723E884C900E2FAF6 /* lib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
