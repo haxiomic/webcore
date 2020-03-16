@@ -13,7 +13,7 @@ import haxe.io.Path;
 	var cancellationToken = Assets.readBundleFile("asset-bundle", "songs/theme.mp3", (bytes) => {...});
 	```
 
-	Paths should be assumed to be case-sensitive, however some platforms will be case-insensitive so you should have filename that differ only by case)
+	Paths should be assumed to be case-sensitive, however some platforms will be case-insensitive so you should have filename that differ only by case
 
 	To include files in the a bundle generated alongside the compiler output, extend this class and use the following metadata:
 
@@ -47,7 +47,7 @@ class Assets {
 	/**
 		Read bytes from platform's native file store
 
-		Either one of the callbacks `onComplete` or `onError` will always be called when the file request resolves, including when the cancellation token is used.
+		Either one of the callbacks `onComplete` or `onError` will always be called when the file request resolves, including `onError` when the cancellation token is used.
 
 		**Implementations**
 		- iOS: read file from mainBundle
@@ -56,11 +56,11 @@ class Assets {
 		- Web: read file relative to current page path
 	**/
 	public static function readBundleFile(
-			bundleName: String,
-			path: String,
-			?onComplete: (typedarray.ArrayBuffer) -> Void,
-			?onError: (String) -> Void,
-			?onProgress: (bytesLoaded: Int, bytesTotal: Int) -> Void
+		bundleName: String,
+		path: String,
+		?onComplete: (typedarray.ArrayBuffer) -> Void,
+		?onError: (String) -> Void,
+		?onProgress: (bytesLoaded: Int, bytesTotal: Int) -> Void
 	): {
 		cancel: () -> Void,
 	} {
@@ -78,7 +78,8 @@ class Assets {
 		}
 
 		#if js
-			return readBundleFileWeb(bundleName, path, onComplete, onError, onProgress);
+			var filePath = '$bundleName/$path'; // avoid Path.join on web to keep output smaller
+			return readFileWeb(filePath, onComplete, onError, onProgress);
 		#else
 		#if (iphoneos || iphonesim)
 
@@ -86,9 +87,12 @@ class Assets {
 		// local file read
 		#end
 		#end
+
+		// @! remove
+		return nullCancellationToken;
 	}
 
-	static inline function readBundleFileWeb(
+	static inline function readFileStdLib(
 		bundleName: String,
 		path: String,
 		onComplete: (typedarray.ArrayBuffer) -> Void,
@@ -97,10 +101,31 @@ class Assets {
 	): {
 		cancel: () -> Void,
 	} {
-		var filePath = Path.join([bundleName, path]);
+		// should we spawn a thread?
+		// NSData *fileData = [NSData dataWithContentsOfURL:fileUrl];
+		// C-level api
+		// https://stackoverflow.com/questions/18436311/how-to-get-byte-data-from-file-in-object-c
+		// maybe fopen will work
+		// that way we can reuse code between iOS and android ~~ actually this doesn't work for android and we need to use AAssetManager https://stackoverflow.com/questions/18090483/fopen-fread-apk-assets-from-nativeactivity-on-android
+		//		https://stackoverflow.com/questions/23372819/android-ndk-read-file-from-assets-inside-of-shared-library
+		// https://stackoverflow.com/questions/26746062/open-file-in-bundle-using-fopen
+		// that impiles the haxe std lib might work since that uses fopen (File.cpp:355)
 
-		js.Browser.console.log('filePath: "$filePath"');
+		// in android _maaaybe_ we can use hx stdlib zip
+		// http://www.anddev.org/ndk_opengl_-_loading_resources_and_assets_from_native_code-t11978.html
+		// https://stackoverflow.com/questions/13827639/accessing-a-compressed-file-in-an-apk-from-native-code-read-a-zip-from-inside-a
+		return null;
+	}
 
+	#if js
+	static inline function readFileWeb(
+		filePath: String,
+		onComplete: (typedarray.ArrayBuffer) -> Void,
+		onError: (String) -> Void,
+		onProgress: (bytesLoaded: Int, bytesTotal: Int) -> Void
+	): {
+		cancel: () -> Void,
+	} {
 		// we use XMLHttpRequest because fetch doesn't yet have reliably available aborting
 		var req = new js.html.XMLHttpRequest();
 		req.open('GET', filePath, true);
@@ -118,10 +143,8 @@ class Assets {
 			default:
 				onError('HTTP request ended with status: ${req.statusText} (${req.status})');
 		}
-		req.onprogress = (e) -> {
-			if (req.status >= 200 && req.status < 300 && e.lengthComputable) {
-				onProgress(e.loaded, e.total);
-			}
+		req.onprogress = (e) -> if (req.status >= 200 && req.status < 300 && e.lengthComputable) {
+			onProgress(e.loaded, e.total);
 		}
 		req.send();
 
@@ -129,6 +152,7 @@ class Assets {
 			cancel: () -> req.abort()
 		}
 	}
+	#end
 
 }
 
