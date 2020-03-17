@@ -23,7 +23,7 @@ class Macro {
 		var isCpp = Context.definedValue('target.name') == 'cpp';
 		if (!isCpp) return fields;
 
-		if (localClass.meta.has(':notMainApp')) return fields;
+		if (localClass.meta.has(':notDefault')) return fields;
 
 		var printer = new haxe.macro.Printer();
 

@@ -4,7 +4,7 @@ import webgl.GLContext;
 
 /**
 	Implement this interface to set the main app class.
-	If the implementing class should not be the main app class then add `@:notMainApp`
+	If the implementing class should not be the main app class then add `@:notDefault`
 
 	**Units**
 
