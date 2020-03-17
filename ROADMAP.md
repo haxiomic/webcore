@@ -1,11 +1,9 @@
 - Message Jonathan
 
-- [ ] Asset system
-    - [ ] Platform native code
-        - [ ] macro, move to embedded
-        - [ ] support @:copyToBundle
-            - bundles are named after the class and the name overridden with metadata
-        - [ ] macro for readBundleFile that checks for file existence
+- API renaming
+    -> HaxeApp seems to be only cpp
+    -> Maybe rename to HaxeApi?
+    -> Maybe move into sub folder?
 
 - [ ] Device info
     - Screen size
@@ -34,8 +32,6 @@
     https://medium.com/@yushulx/how-to-build-so-library-files-into-aar-bundle-in-android-studio-a44387c9a012
 
 - [ ] New desktop demo
-
-- [ ] Some way to supply platform view templates
 
 - Review calling finalizers if throw when contructing
 
@@ -78,6 +74,7 @@
 
     }
     ```
+    - Could also use thread pooling here
 
 - Assets
     - Partial file reads
