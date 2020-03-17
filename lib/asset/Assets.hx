@@ -43,6 +43,9 @@ import haxe.io.Path;
 @:autoBuild(asset.Assets.Macro.build())
 class Assets {
 
+	/**
+		If the platform uses a bundle system (iOS, macOS), this variables sets the bundle identifer to find assets in
+	**/
 	static public var bundleIdentifier: String = null;
 	
 	/**
@@ -75,11 +78,14 @@ class Assets {
 		}
 
 		#if js
+
 			var filePath = '$bundleName/$path'; // avoid Path.join on web to keep output smaller
 			return readFileWeb(filePath, onComplete, onError, onProgress);
-		#else
-		#if (iphoneos || iphonesim)
 
+		#else
+		#if (iphoneos || iphonesim || macos)
+
+			// find path to bundle then use normal stdlib file read
 			var bundle = if (bundleIdentifier != null) {
 				asset.native.CFBundle.getBundleWithIdentifier(asset.native.CFBundle.CFStringRef.create(bundleIdentifier));
 			} else {
@@ -104,15 +110,15 @@ class Assets {
 			// but best thing is probably AAssetManager externs
 			// https://stackoverflow.com/questions/18090483/fopen-fread-apk-assets-from-nativeactivity-on-android
 			// https://stackoverflow.com/questions/23372819/android-ndk-read-file-from-assets-inside-of-shared-library
+			return nullCancellationToken;
 		#else
+	
 			// local file read
 			var filePath = Path.join([Sys.executablePath(), bundleName, path]);
 			return readFileStdLib(filePath, onComplete, onError, onProgress);
-		#end
-		#end
 
-		// @! remove
-		return nullCancellationToken;
+		#end
+		#end
 	}
 
 	#if cpp
