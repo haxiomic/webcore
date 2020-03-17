@@ -11,12 +11,12 @@
 		BE4331572325743100C9A45D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BE4331552325743100C9A45D /* Main.storyboard */; };
 		BE4331592325743200C9A45D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE4331582325743200C9A45D /* Assets.xcassets */; };
 		BE43315C2325743200C9A45D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BE43315A2325743200C9A45D /* LaunchScreen.storyboard */; };
-		BEBB8EC523EF6A2A00574F6A /* HaxeAppFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEBB8EC423EF6A2500574F6A /* HaxeAppFramework.framework */; };
-		BEBB8EC623EF6A2A00574F6A /* HaxeAppFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BEBB8EC423EF6A2500574F6A /* HaxeAppFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		BE9C73EC24216619008825E0 /* HaxeAppFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE9C73EB242164C2008825E0 /* HaxeAppFramework.framework */; };
+		BE9C73ED24216619008825E0 /* HaxeAppFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BE9C73EB242164C2008825E0 /* HaxeAppFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		BEBB8EC323EF6A2500574F6A /* PBXContainerItemProxy */ = {
+		BE9C73EA242164C2008825E0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BEBB8EBF23EF6A2500574F6A /* HaxeAppFramework.xcodeproj */;
 			proxyType = 2;
@@ -32,7 +32,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				BEBB8EC623EF6A2A00574F6A /* HaxeAppFramework.framework in Embed Frameworks */,
+				BE9C73ED24216619008825E0 /* HaxeAppFramework.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -46,7 +46,7 @@
 		BE4331582325743200C9A45D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BE43315B2325743200C9A45D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		BE43315D2325743200C9A45D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		BEBB8EBF23EF6A2500574F6A /* HaxeAppFramework.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = HaxeAppFramework.xcodeproj; path = "../../../_hxcpp-bin/ios/HaxeAppFramework.xcodeproj"; sourceTree = "<group>"; };
+		BEBB8EBF23EF6A2500574F6A /* HaxeAppFramework.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = HaxeAppFramework.xcodeproj; path = "../_hxcpp-bin/HaxeAppFramework.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,7 +54,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BEBB8EC523EF6A2A00574F6A /* HaxeAppFramework.framework in Frameworks */,
+				BE9C73EC24216619008825E0 /* HaxeAppFramework.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -90,10 +90,10 @@
 			path = MinimalGLApp;
 			sourceTree = "<group>";
 		};
-		BEBB8EC023EF6A2500574F6A /* Products */ = {
+		BE9C73E7242164C2008825E0 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				BEBB8EC423EF6A2500574F6A /* HaxeAppFramework.framework */,
+				BE9C73EB242164C2008825E0 /* HaxeAppFramework.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -155,7 +155,7 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = BEBB8EC023EF6A2500574F6A /* Products */;
+					ProductGroup = BE9C73E7242164C2008825E0 /* Products */;
 					ProjectRef = BEBB8EBF23EF6A2500574F6A /* HaxeAppFramework.xcodeproj */;
 				},
 			);
@@ -167,11 +167,11 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		BEBB8EC423EF6A2500574F6A /* HaxeAppFramework.framework */ = {
+		BE9C73EB242164C2008825E0 /* HaxeAppFramework.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
 			path = HaxeAppFramework.framework;
-			remoteRef = BEBB8EC323EF6A2500574F6A /* PBXContainerItemProxy */;
+			remoteRef = BE9C73EA242164C2008825E0 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -341,7 +341,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 8U5TB3BU5A;
+				DEVELOPMENT_TEAM = D69828E29K;
 				INFOPLIST_FILE = MinimalGLApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -360,7 +360,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 8U5TB3BU5A;
+				DEVELOPMENT_TEAM = D69828E29K;
 				INFOPLIST_FILE = MinimalGLApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
