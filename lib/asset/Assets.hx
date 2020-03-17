@@ -49,13 +49,8 @@ class Assets {
 		Read bytes from platform's native file store
 
 		Either one of the callbacks `onComplete` or `onError` will always be called when the file request resolves, including `onError` when the cancellation token is used.
-		The onError callback message will always be the string 'canceled' if the cancel token is used before completion
-
-		**Implementations**
-		- iOS: read file from mainBundle
-		- Android: read file from APK assets using the AssetManager
-		- Desktop: read file relative to executable
-		- Web: read file relative to current page path
+		The onError callback message will always be the string 'canceled' if the cancel token is used before completion.
+		If there are no errors then `onProgress` is called at least once before `onComplete`
 	**/
 	public static function readBundleFile(
 		bundleName: String,
