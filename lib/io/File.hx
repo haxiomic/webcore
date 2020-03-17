@@ -1,4 +1,4 @@
-package asset;
+package io;
 
 import haxe.io.Path;
 
@@ -7,11 +7,11 @@ import haxe.io.Path;
 
 	For example:
 	```haxe
-	var cancellationToken = Assets.readBundleFile("songs/theme.mp3", (bytes) => {...});
+	var cancellationToken = File.readBundleFile("songs/theme.mp3", (bytes) => {...});
 	```
 	
 **/
-class Assets {
+class File {
 	
 	/**
 		Read bytes from platform's native file store
@@ -23,8 +23,8 @@ class Assets {
 		**Implementations**
 		- iphoneos: read from local app or framework bundle
 		- macos: read from local app or framework bundle
-		- default: read from a directory called 'assets' adjacent to the executable
 		- android: read from APK resources use AAssetManager
+		- default: read from a directory adjacent to the executable
 	**/
 	public static function readBundleFile(
 		bundleIdentifier: String,

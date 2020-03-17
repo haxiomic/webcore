@@ -72,7 +72,7 @@ class AssetPackMacro {
 				?onError: (String) -> Void,
 				?onProgress: (bytesLoaded: Int, bytesTotal: Int) -> Void
 			) {
-				return asset.Assets.readBundleFile('haxeapp.Framework', 'asset-pack/' + $v{classAssetDirectory} + '/' + path, onComplete, onError, onProgress);
+				return io.File.readBundleFile('haxeapp.Framework', 'asset-pack/' + $v{classAssetDirectory} + '/' + path, onComplete, onError, onProgress);
 			}
 
 		}).fields;
