@@ -57,9 +57,9 @@ class File {
 
 			// find path to bundle then use normal stdlib file read
 			var bundle = if (bundleIdentifier != null) {
-				asset.native.CFBundle.getBundleWithIdentifier(asset.native.CFBundle.CFStringRef.create(bundleIdentifier));
+				io.native.CFBundle.getBundleWithIdentifier(io.native.CFBundle.CFStringRef.create(bundleIdentifier));
 			} else {
-				asset.native.CFBundle.getMainBundle();
+				io.native.CFBundle.getMainBundle();
 			}
 
 			if (bundle == null) {
@@ -67,8 +67,8 @@ class File {
 				return nullCancellationToken;
 			}
 
-			var url = asset.native.CFBundle.copyResourcesDirectoryURL(bundle);
-			var bundleResourceDirectory: String = asset.native.CFBundle.CFStringRef.getCStr(asset.native.CFBundle.CFURLRef.copyPath(url));
+			var url = io.native.CFBundle.copyResourcesDirectoryURL(bundle);
+			var bundleResourceDirectory: String = io.native.CFBundle.CFStringRef.getCStr(io.native.CFBundle.CFURLRef.copyPath(url));
 			var filePath = Path.join([bundleResourceDirectory, path]);
 
 			return readFileStdLib(filePath, onComplete, onError, onProgress);

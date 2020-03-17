@@ -1,4 +1,4 @@
-package asset.native;
+package io.native;
 
 import cpp.*;
 
