@@ -9,7 +9,7 @@ import haxe.io.Path;
 
 	For example:
 	```haxe
-	var cancellationToken = Assets.readBundleFile("asset-bundle", "songs/theme.mp3", (bytes) => {...});
+	var cancellationToken = Assets.readBundleFile("songs/theme.mp3", (bytes) => {...});
 	```
 
 	Paths should be assumed to be case-sensitive, however some platforms will be case-insensitive so you should have filename that differ only by case
@@ -25,9 +25,6 @@ import haxe.io.Path;
 
 		For example: a directory can be copied with `@:copyToBundle('../game-assets')` and files in that directory read from the bundle with
 		`Assets.readBundleFile('game-assets/theme.mp3', (bytes) -> {...})`.
-
-	- `@:bundleName(name: String)`
-		Overrides the bundle name. By default, the bundle name is the same as the class name
 
 	**Paths in metadata are evaluated relative to the extending class file path**
 	
@@ -47,16 +44,22 @@ class Assets {
 		If the platform uses a bundle system (iOS, macOS), this variables sets the bundle identifer to find assets in
 	**/
 	static public var bundleIdentifier: String = null;
+	static public var assetsDirectory = 'assets';
 	
 	/**
 		Read bytes from platform's native file store
 
 		Either one of the callbacks `onComplete` or `onError` will always be called when the file request resolves, including `onError` when the cancellation token is used.
 		The onError callback message will always be the string 'canceled' if the cancel token is used before completion.
-		If there are no errors then `onProgress` is called at least once before `onComplete`
+		If there are no errors then `onProgress` is called at least once before `onComplete`.
+
+		**Implementations**
+		- iphoneos: read from local app or framework bundle
+		- macos: read from local app or framework bundle
+		- default: read from a directory called 'assets' adjacent to the executable
+		- android: read from APK resources use AAssetManager
 	**/
 	public static function readBundleFile(
-		bundleName: String,
 		path: String,
 		?onComplete: (typedarray.ArrayBuffer) -> Void,
 		?onError: (String) -> Void,
@@ -79,7 +82,7 @@ class Assets {
 
 		#if js
 
-			var filePath = '$bundleName/$path'; // avoid Path.join on web to keep output smaller
+			var filePath = '$assetsDirectory/$path'; // avoid Path.join on web to keep output smaller
 			return readFileWeb(filePath, onComplete, onError, onProgress);
 
 		#else
@@ -98,8 +101,8 @@ class Assets {
 			}
 
 			var url = asset.native.CFBundle.copyResourcesDirectoryURL(bundle);
-			var resourceDirectory: String = asset.native.CFBundle.CFStringRef.getCStr(asset.native.CFBundle.CFURLRef.copyPath(url));
-			var filePath = Path.join([resourceDirectory, bundleName, path]);
+			var bundleResourceDirectory: String = asset.native.CFBundle.CFStringRef.getCStr(asset.native.CFBundle.CFURLRef.copyPath(url));
+			var filePath = Path.join([bundleResourceDirectory, assetsDirectory, path]);
 
 			return readFileStdLib(filePath, onComplete, onError, onProgress);
 
@@ -114,7 +117,7 @@ class Assets {
 		#else
 	
 			// local file read
-			var filePath = Path.join([Sys.executablePath(), bundleName, path]);
+			var filePath = Path.join([Sys.executablePath(), assetsDirectory, path]);
 			return readFileStdLib(filePath, onComplete, onError, onProgress);
 
 		#end

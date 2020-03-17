@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BE008B9124201C0100C80521 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = BE008B9024201C0100C80521 /* assets */; };
 		BE0BCEC723E60ECD004AF3C6 /* HaxeAppC.h in Headers */ = {isa = PBXBuildFile; fileRef = BE0BCEC623E60ECD004AF3C6 /* HaxeAppC.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BE0BCED223E61118004AF3C6 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BE0BCED123E61118004AF3C6 /* libc++.tbd */; };
 		BE24799923E5C91800D9F118 /* HaxeAppFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = BE24799723E5C91800D9F118 /* HaxeAppFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		BE008B9024201C0100C80521 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = "<group>"; };
 		BE0BCEC623E60ECD004AF3C6 /* HaxeAppC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HaxeAppC.h; path = include/HaxeAppC.h; sourceTree = SOURCE_ROOT; };
 		BE0BCED123E61118004AF3C6 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		BE24799423E5C91800D9F118 /* HaxeAppFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = HaxeAppFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -61,6 +63,7 @@
 				BEFF39D923EF671900454EB5 /* Info.plist */,
 				BE24799623E5C91800D9F118 /* HaxeAppFramework */,
 				BE6FC30623E884C900E2FAF6 /* lib */,
+				BE008B9024201C0100C80521 /* assets */,
 				BE24799523E5C91800D9F118 /* Products */,
 				BE0BCECB23E610E9004AF3C6 /* Frameworks */,
 			);
@@ -156,6 +159,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE008B9124201C0100C80521 /* assets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
