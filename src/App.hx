@@ -1,4 +1,4 @@
-import haxe.io.Path;
+import webgl.GLContextAttributes;
 import app.HaxeAppInterface.KeyboardEvent;
 import app.HaxeAppInterface.WheelEvent;
 import audio.AudioContext;
@@ -13,39 +13,12 @@ import webgl.GLContext;
 import typedarray.Float32Array;
 import typedarray.Uint8Array;
 
-@:embedFile('../assets/my-triangle.mp3')
-// @:embedFile('../assets/multi-channel-test.mp3')
-@:embedFile('../assets/testcase.mp3')
-@:embedFile('../assets/red-panda.jpg')
-@:embedFile('../assets/pnggrad16rgb.png')
-@:copyToBundle('../assets')
-class Assets extends asset.Assets {
-
-	static public final embededFiles = {
-		triangle_mp3: Assets.my_triangle_mp3
-	}
-
-	static public final bundlePaths = {
-		songs: {
-			example_mp3: "song/example.mp3"
-		},
-	}
-
-	// @! this is a macro that checks if if the file exists in the bundle and warns if not at compile-time
-	// calls into
-	public static function readBundleFile(
-		path: String,
-		?onComplete: (typedarray.ArrayBuffer) -> Void,
-		?onError: (String) -> Void
-	): {
-		cancel: () -> Void,
-	} {
-		var cancellationToken = {
-			cancel: () -> {}
-		}
-		return cancellationToken;
-	}
-
+@:embedFile('../assets/image/red-panda.jpg')
+@:embedFile('../assets/image/pnggrad16rgb.png')
+@:copyToBundle('../assets/audio/my-triangle.mp3')
+@:copyToBundle('../assets/audio/highroad.mp3')
+@:copyToBundle('../assets/image')
+class DemoAssets implements app.AssetPack {
 }
 
 #if debug
@@ -58,7 +31,15 @@ class Assets extends asset.Assets {
 	// <compilerflag value="-fsanitize=address" />
 // </target>
 #end
+@:expose
 class App implements app.HaxeAppInterface {
+
+	#if js
+	static public function create(?canvas: js.html.CanvasElement, ?webglContextAttributes: GLContextAttributes) {
+		var appInstance = new App();
+		return new app.web.HaxeAppCanvas(appInstance, canvas, webglContextAttributes);
+	}
+	#end
 
 	var width: Float = 0;
 	var height: Float = 0;
@@ -83,10 +64,6 @@ class App implements app.HaxeAppInterface {
 	public function new() {
 		trace('App instance created');
 
-		#if cpp
-		cpp.vm.Gc.setFinalizer(this, cpp.Function.fromStaticFunction(finalizer));
-		#end
-
 		// test the haxe event loop
 		function helloLoop() {
 			haxe.Timer.delay(helloLoop, 50);
@@ -96,7 +73,7 @@ class App implements app.HaxeAppInterface {
 			#end
 		}
 
-		helloLoop();
+		// helloLoop();
 
 		// play a song
 		trace('about to create audio context');
@@ -109,15 +86,19 @@ class App implements app.HaxeAppInterface {
 
 		var node = audioContext.createBufferSource();
 		node.connect(volumeNode);
+		
 
 		var t0 = haxe.Timer.stamp();
-		asset.Assets.readBundleFile('', 'multi-channel-test.mp3', (arraybuffer) -> {
+		DemoAssets.readFile('my-triangle.mp3', (arraybuffer) -> {
 			audioContext.decodeAudioData(arraybuffer, (audioBuffer) -> {
 				trace('Trying to play audio', audioBuffer, haxe.Timer.stamp() - t0);
 				node.buffer = audioBuffer;
 				node.onended = () -> trace('Song ended');
 				node.start();
 			});
+		},
+		(error) -> {
+			trace('Error loading audio file: $error');
 		});
 	}
 
@@ -168,7 +149,7 @@ class App implements app.HaxeAppInterface {
 		gl.texImage2D(TEXTURE_2D, 0, RGBA, 1, 1, 0, RGBA, UNSIGNED_BYTE, new typedarray.Uint8Array([0, 0, 255, 255]));
 
 		var t0 = haxe.Timer.stamp();
-		image.Image.decodeImageData(Assets.red_panda_jpg,
+		image.Image.decodeImageData(DemoAssets.embedded.red_panda_jpg,
 			(image) -> {
 				trace('decodeImageData complete! ${image.naturalWidth}x${image.naturalHeight}', haxe.Timer.stamp() - t0);
 				gl.activeTexture(TEXTURE0);
@@ -418,11 +399,5 @@ class App implements app.HaxeAppInterface {
 			gl_FragColor = mix(sample, vec4(1., 0., 0., 1.), uIsPrimary);
 		}
 	';
-
-	static function finalizer(instance: App) {
-		#if (debug && cpp)
-		cpp.Stdio.printf("%s\n", "[debug] App.finalizer()");
-		#end
-	}
 
 }
