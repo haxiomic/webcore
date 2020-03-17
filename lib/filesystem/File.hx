@@ -1,4 +1,4 @@
-package io;
+package filesystem;
 
 import haxe.io.Path;
 
@@ -57,9 +57,9 @@ class File {
 
 			// find path to bundle then use normal stdlib file read
 			var bundle = if (bundleIdentifier != null) {
-				io.native.CFBundle.getBundleWithIdentifier(io.native.CFBundle.CFStringRef.create(bundleIdentifier));
+				filesystem.native.CFBundle.getBundleWithIdentifier(filesystem.native.CFBundle.CFStringRef.create(bundleIdentifier));
 			} else {
-				io.native.CFBundle.getMainBundle();
+				filesystem.native.CFBundle.getMainBundle();
 			}
 
 			if (bundle == null) {
@@ -67,8 +67,8 @@ class File {
 				return nullCancellationToken;
 			}
 
-			var url = io.native.CFBundle.copyResourcesDirectoryURL(bundle);
-			var bundleResourceDirectory: String = io.native.CFBundle.CFStringRef.getCStr(io.native.CFBundle.CFURLRef.copyPath(url));
+			var url = filesystem.native.CFBundle.copyResourcesDirectoryURL(bundle);
+			var bundleResourceDirectory: String = filesystem.native.CFBundle.CFStringRef.getCStr(filesystem.native.CFBundle.CFURLRef.copyPath(url));
 			var filePath = Path.join([bundleResourceDirectory, path]);
 
 			return readFileStdLib(filePath, onComplete, onError, onProgress);
