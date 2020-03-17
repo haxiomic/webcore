@@ -5,7 +5,7 @@ import GLKit
  */
 public class HaxeAppViewController: GLKViewController {
     
-    // set the desired haxe class path from interface builder
+    /// set the desired haxe class path from interface builder
     @IBInspectable var haxeClassPath: String?
     
     public var haxeAppInstance: HaxeApp!
