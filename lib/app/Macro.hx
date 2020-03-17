@@ -6,6 +6,7 @@ import haxe.macro.TypeTools;
 import haxe.macro.Expr.TypePath;
 import haxe.macro.ComplexTypeTools;
 import haxe.macro.Compiler;
+import haxe.macro.Type.ClassType;
 import haxe.io.Path;
 import sys.FileSystem;
 using Lambda;
@@ -25,16 +26,9 @@ class Macro {
 
 		if (localClass.meta.has(':notDefault')) return fields;
 
+		var localTypePath: TypePath = classPath(localClass);
+
 		var printer = new haxe.macro.Printer();
-
-		var moduleName = localClass.module.split('.').pop();
-
-		var localTypePath: TypePath = {
-			pack: localClass.pack,
-			name: moduleName,
-			sub: localClass.name != moduleName ? localClass.name : null,
-		}
-
 		var localTypePathIdent = printer.printTypePath(localTypePath);
 		
 		var initExpr = if (isCpp) {
@@ -206,11 +200,11 @@ class Macro {
 
 		touchDirectoryPath(outputDirectory);
 
-		for (filename in FileSystem.readDirectory(frameworkProjectPath)) {
-			var outputPath = Path.join([outputDirectory, filename]);
+		for (name in FileSystem.readDirectory(frameworkProjectPath)) {
+			var outputPath = Path.join([outputDirectory, name]);
 			// Xcode doesn't like sub-projects being changed during a build so only copy if the file doesn't already exist
 			var overwrite = false;
-			copyToDirectory(Path.join([frameworkProjectPath, filename]), outputDirectory, overwrite);
+			copyToDirectory(Path.join([frameworkProjectPath, name]), outputDirectory, overwrite);
 		}
 
 		// when hxcpp completes, we need to link the output binaries to a hardcoded name so the Xcode project can find them
@@ -272,7 +266,7 @@ class Macro {
 		Files in the target directory are overwritten
 		When overwriting directories, their contents are merged
 	**/
-	static function copyToDirectory(sourcePath: String, targetDirectoryPath: String, overwrite: Bool) {
+	static public function copyToDirectory(sourcePath: String, targetDirectoryPath: String, overwrite: Bool) {
 		var filename = Path.withoutDirectory(sourcePath);
 		var targetFilePath = Path.join([targetDirectoryPath, filename]);
 
@@ -283,12 +277,13 @@ class Macro {
 			}
 
 			// recursive file copy
-			for (filename in FileSystem.readDirectory(sourcePath)) {
-				copyToDirectory(Path.join([sourcePath, filename]), targetFilePath, overwrite);
+			for (name in FileSystem.readDirectory(sourcePath)) {
+				copyToDirectory(Path.join([sourcePath, name]), targetFilePath, overwrite);
 			}
 		} else {
 			// copy single file
 			if (!overwrite && FileSystem.exists(targetFilePath)) return;
+			try delete(targetFilePath) catch (e: Any) {};
 			sys.io.File.copy(sourcePath, targetFilePath);
 		}
 	}
@@ -298,7 +293,7 @@ class Macro {
 		(Same behavior as mkdir -p)
 		@throws Any
 	**/
-	static function touchDirectoryPath(path: String) {
+	static public function touchDirectoryPath(path: String) {
 		var directories = Path.normalize(path).split('/');
 		var currentDirectories = [];
 		for (directory in directories) {
@@ -318,27 +313,53 @@ class Macro {
 		Return the directory of the Context's current position
 		For a @:build macro, this is the directory of the haxe file it's added to
 	**/
-	static function getPosDirectory(pos: haxe.macro.Expr.Position) {
+	static public function getPosDirectory(pos: haxe.macro.Expr.Position) {
 		var classPosInfo = Context.getPosInfos(pos);
 		var classFilePath = Path.isAbsolute(classPosInfo.file) ? classPosInfo.file : Path.join([Sys.getCwd(), classPosInfo.file]);
 		return Path.directory(classFilePath);
 	}
 
-	static function getOutputDirectory() {
+	static public function getOutputDirectory() {
 		var directoryTargets = [ 'as3', 'php', 'cpp', 'cs', 'java' ];
 		return directoryTargets.has(Context.definedValue('target.name')) ? Compiler.getOutput() : Path.directory(Compiler.getOutput());
 	}
 
-	static function executeWithCwd(cwd: String, callback: () -> Void) {
+	static public function executeWithCwd(cwd: String, callback: () -> Void) {
 		var initialCwd = Sys.getCwd();
 		Sys.setCwd(cwd);
 		callback();
 		Sys.setCwd(initialCwd);
 	}
 
-	static function echoCommand(cmd: String) {
+	static public function echoCommand(cmd: String) {
 		Sys.println(cmd);
 		return Sys.command(cmd);
+	}
+
+	/**
+		Deletes a file or directory at a a given path
+	**/
+	static public function delete(path: String) {
+		if (Path.normalize(path) == '/') throw 'Trying to delete the root directory';
+		if (FileSystem.isDirectory(path)) {
+			for (name in FileSystem.readDirectory(path)) {
+				delete(Path.join([path, name]));
+			}
+			FileSystem.deleteDirectory(path);
+		} else {
+			FileSystem.deleteFile(path);
+		}
+	}
+
+	static public function classPath(classType: ClassType): TypePath {
+		var moduleParts = classType.module.split('.');
+		var moduleName = moduleParts[moduleParts.length - 1];
+
+		return {
+			pack: classType.pack,
+			name: moduleName,
+			sub: classType.name != moduleName ? classType.name : null,
+		}
 	}
 
 }
