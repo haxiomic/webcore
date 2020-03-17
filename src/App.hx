@@ -13,11 +13,7 @@ import webgl.GLContext;
 import typedarray.Float32Array;
 import typedarray.Uint8Array;
 
-@:embedFile('../assets/image/red-panda.jpg')
-@:embedFile('../assets/image/pnggrad16rgb.png')
-@:copyToBundle('../assets/audio/my-triangle.mp3')
-@:copyToBundle('../assets/audio/highroad.mp3')
-@:copyToBundle('../assets/image')
+@:copyToBundle('../assets')
 class DemoAssets implements app.AssetPack {
 }
 
@@ -149,34 +145,37 @@ class App implements app.HaxeAppInterface {
 		gl.texImage2D(TEXTURE_2D, 0, RGBA, 1, 1, 0, RGBA, UNSIGNED_BYTE, new typedarray.Uint8Array([0, 0, 255, 255]));
 
 		var t0 = haxe.Timer.stamp();
-		image.Image.decodeImageData(DemoAssets.embedded.red_panda_jpg,
-			(image) -> {
-				trace('decodeImageData complete! ${image.naturalWidth}x${image.naturalHeight}', haxe.Timer.stamp() - t0);
-				gl.activeTexture(TEXTURE0);
-				gl.bindTexture(TEXTURE_2D, texture);
+		
+		DemoAssets.readFile(DemoAssets.paths.assets.image.red_panda_jpg, (arraybuffer) -> {	
+			image.Image.decodeImageData(arraybuffer,
+				(image) -> {
+					trace('decodeImageData complete! ${image.naturalWidth}x${image.naturalHeight}', haxe.Timer.stamp() - t0);
+					gl.activeTexture(TEXTURE0);
+					gl.bindTexture(TEXTURE_2D, texture);
 
-				var t0 = haxe.Timer.stamp();
-				gl.texImage2DImageSource(TEXTURE_2D, 0, RGBA, RGBA, UNSIGNED_BYTE, image);
+					var t0 = haxe.Timer.stamp();
+					gl.texImage2DImageSource(TEXTURE_2D, 0, RGBA, RGBA, UNSIGNED_BYTE, image);
 
-				if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
-					gl.generateMipmap(TEXTURE_2D);
-				} else {
-					// for non-power-of-2 images we need to set clamp wrapping and disable mip filtering
-					gl.texParameteri(TEXTURE_2D, TEXTURE_WRAP_S, CLAMP_TO_EDGE);
-					gl.texParameteri(TEXTURE_2D, TEXTURE_WRAP_T, CLAMP_TO_EDGE);
-					gl.texParameteri(TEXTURE_2D, TEXTURE_MIN_FILTER, LINEAR);
+					if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+						gl.generateMipmap(TEXTURE_2D);
+					} else {
+						// for non-power-of-2 images we need to set clamp wrapping and disable mip filtering
+						gl.texParameteri(TEXTURE_2D, TEXTURE_WRAP_S, CLAMP_TO_EDGE);
+						gl.texParameteri(TEXTURE_2D, TEXTURE_WRAP_T, CLAMP_TO_EDGE);
+						gl.texParameteri(TEXTURE_2D, TEXTURE_MIN_FILTER, LINEAR);
+					}
+
+					trace('Uploaded texture', texture, haxe.Timer.stamp() - t0);
+				},
+				(error) -> {
+					trace('decodeImageData failed: "$error"');
+				},
+				{
+					nChannels: 4,
+					dataType: UNSIGNED_BYTE,
 				}
-
-				trace('Uploaded texture', texture, haxe.Timer.stamp() - t0);
-			},
-			(error) -> {
-				trace('decodeImageData failed: "$error"');
-			},
-			{
-				nChannels: 4,
-				dataType: UNSIGNED_BYTE,
-			}
-		);
+			);
+		});
 
 		// create a circle
 		var sides = 30;
