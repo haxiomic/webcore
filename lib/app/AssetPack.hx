@@ -64,7 +64,7 @@ class AssetPackMacro {
 		var newFields = (macro class X {
 
 			static public final embedded = ${handleEmbedMeta(localClass.meta, classDir)};
-			static public final paths = ${handleCopyToBundleMeta('assets/$classAssetDirectory', localClass.meta, classDir)};
+			static public final paths = ${handleCopyToBundleMeta('asset-pack/$classAssetDirectory', localClass.meta, classDir)};
 
 			static public inline function readFile(
 				path: String,
@@ -72,7 +72,7 @@ class AssetPackMacro {
 				?onError: (String) -> Void,
 				?onProgress: (bytesLoaded: Int, bytesTotal: Int) -> Void
 			) {
-				return asset.Assets.readBundleFile('haxeapp.Framework', 'assets/' + $v{classAssetDirectory} + '/' + path, onComplete, onError, onProgress);
+				return asset.Assets.readBundleFile('haxeapp.Framework', 'asset-pack/' + $v{classAssetDirectory} + '/' + path, onComplete, onError, onProgress);
 			}
 
 		}).fields;
@@ -114,7 +114,9 @@ class AssetPackMacro {
 							#end
 							var targetDirectory = Path.directory(targetPath);
 							app.Macro.touchDirectoryPath(targetDirectory);
-							app.Macro.copyToDirectory(sourcePath, targetDirectory, true);
+
+							try app.Macro.delete(targetPath) catch (e: Any) {};
+							sys.io.File.copy(sourcePath, targetPath);
 						}
 
 						newFileManifest.set(targetPathRelativeToOutputDirectory, {ctime_ms: ctime_ms});
