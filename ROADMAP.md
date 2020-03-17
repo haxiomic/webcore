@@ -1,12 +1,11 @@
+- Message Jonathan
+
 - [ ] Asset system
     - [ ] Platform native code
-        - [ ] Read from native bundle
-            - [ ] js
-            - [ ] desktop
-            - [ ] ios
         - [ ] macro, move to embedded
-        - [ ] support copyToBundle
+        - [ ] support @:copyToBundle
             - bundles are named after the class and the name overridden with metadata
+        - [ ] macro for readBundleFile that checks for file existence
 
 - [ ] Device info
     - Screen size
@@ -17,6 +16,14 @@
     - [ ] iOS settings
     - [ ] Android settings
     - [ ] Desktop to file? Or Windows/mac settings?
+
+- [ ] Cursor setting
+    Need a way to set the current cursor for the view
+    Maybe: HaxeApp.setCursor(appInstance)?
+    - [ ] Pointer
+    - [ ] Hand
+    - [ ] Hidden
+    - [ ] *other css pointers
 
 - [ ] Pass arbitrary message to haxe
     - What should the signature look like?
@@ -74,3 +81,7 @@
 
 - Assets
     - Partial file reads
+    - Chunk file load so we can cancel mid-load
+
+- 2D UI via platform WebView
+    - Compile UI code to js via a bridge class (uses macro to compile that portion of the codebase to js)
