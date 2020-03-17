@@ -246,7 +246,7 @@ class Macro {
 				?onError: (String) -> Void,
 				?onProgress: (bytesLoaded: Int, bytesTotal: Int) -> Void
 			) {
-				return asset.Assets.readBundleFile(path, onComplete, onError, onProgress);
+				return asset.Assets.readBundleFile($v{classAssetDirectory} + '/' + path, onComplete, onError, onProgress);
 			}
 
 		}).fields;
