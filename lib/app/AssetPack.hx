@@ -25,7 +25,7 @@ import haxe.io.Path;
 	For example:
 	```
 	@:copyToBundle(".../game-files/audio")
-	class Songs extends AssetPack { }
+	class Songs implements AssetPack { }
 
 	Songs.readFile(Songs.paths.audio.theme_mp3, (bytes) -> {...})
 	```
