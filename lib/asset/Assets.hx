@@ -2,7 +2,6 @@ package asset;
 
 import haxe.io.Path;
 
-
 #if !macro
 
 /**
@@ -43,11 +42,14 @@ import haxe.io.Path;
 **/
 @:autoBuild(asset.Assets.Macro.build())
 class Assets {
+
+	static public var bundleIdentifier: String = null;
 	
 	/**
 		Read bytes from platform's native file store
 
 		Either one of the callbacks `onComplete` or `onError` will always be called when the file request resolves, including `onError` when the cancellation token is used.
+		The onError callback message will always be the string 'canceled' if the cancel token is used before completion
 
 		**Implementations**
 		- iOS: read file from mainBundle
@@ -83,8 +85,34 @@ class Assets {
 		#else
 		#if (iphoneos || iphonesim)
 
+			var bundle = if (bundleIdentifier != null) {
+				asset.native.CFBundle.getBundleWithIdentifier(asset.native.CFBundle.CFStringRef.create(bundleIdentifier));
+			} else {
+				asset.native.CFBundle.getMainBundle();
+			}
+
+			if (bundle == null) {
+				onError('Could not find bundle with identifier "$bundleIdentifier"');
+				return nullCancellationToken;
+			}
+
+			var url = asset.native.CFBundle.copyResourcesDirectoryURL(bundle);
+			var resourceDirectory: String = asset.native.CFBundle.CFStringRef.getCStr(asset.native.CFBundle.CFURLRef.copyPath(url));
+			var filePath = Path.join([resourceDirectory, bundleName, path]);
+
+			return readFileStdLib(filePath, onComplete, onError, onProgress);
+
+		#elseif android
+			// in android _maaaybe_ we can use hx stdlib zip
+			// http://www.anddev.org/ndk_opengl_-_loading_resources_and_assets_from_native_code-t11978.html
+			// https://stackoverflow.com/questions/13827639/accessing-a-compressed-file-in-an-apk-from-native-code-read-a-zip-from-inside-a
+			// but best thing is probably AAssetManager externs
+			// https://stackoverflow.com/questions/18090483/fopen-fread-apk-assets-from-nativeactivity-on-android
+			// https://stackoverflow.com/questions/23372819/android-ndk-read-file-from-assets-inside-of-shared-library
 		#else
-		// local file read
+			// local file read
+			var filePath = Path.join([Sys.executablePath(), bundleName, path]);
+			return readFileStdLib(filePath, onComplete, onError, onProgress);
 		#end
 		#end
 
@@ -92,30 +120,44 @@ class Assets {
 		return nullCancellationToken;
 	}
 
+	#if cpp
 	static inline function readFileStdLib(
-		bundleName: String,
-		path: String,
+		filePath: String,
 		onComplete: (typedarray.ArrayBuffer) -> Void,
 		onError: (String) -> Void,
 		onProgress: (bytesLoaded: Int, bytesTotal: Int) -> Void
 	): {
 		cancel: () -> Void,
 	} {
-		// should we spawn a thread?
-		// NSData *fileData = [NSData dataWithContentsOfURL:fileUrl];
-		// C-level api
-		// https://stackoverflow.com/questions/18436311/how-to-get-byte-data-from-file-in-object-c
-		// maybe fopen will work
-		// that way we can reuse code between iOS and android ~~ actually this doesn't work for android and we need to use AAssetManager https://stackoverflow.com/questions/18090483/fopen-fread-apk-assets-from-nativeactivity-on-android
-		//		https://stackoverflow.com/questions/23372819/android-ndk-read-file-from-assets-inside-of-shared-library
-		// https://stackoverflow.com/questions/26746062/open-file-in-bundle-using-fopen
-		// that impiles the haxe std lib might work since that uses fopen (File.cpp:355)
+		var threadHandle = sys.thread.Thread.create(() -> {
+			try {
+				if (sys.thread.Thread.readMessage(false) == 'cancel') {
+					haxe.EntryPoint.runInMainThread(() -> onError('canceled'));
+					return;
+				}
 
-		// in android _maaaybe_ we can use hx stdlib zip
-		// http://www.anddev.org/ndk_opengl_-_loading_resources_and_assets_from_native_code-t11978.html
-		// https://stackoverflow.com/questions/13827639/accessing-a-compressed-file-in-an-apk-from-native-code-read-a-zip-from-inside-a
-		return null;
+				// we could split the read into chunks to enable canceling during load
+				var bytes = sys.io.File.getBytes(filePath);
+
+				// if canceled during load, check after to prevent onComplete firing
+				if (sys.thread.Thread.readMessage(false) == 'cancel') {
+					haxe.EntryPoint.runInMainThread(() -> onError('canceled'));
+					return;
+				}
+
+				haxe.EntryPoint.runInMainThread(() -> {
+					onProgress(bytes.length, bytes.length);
+					onComplete(bytes);
+				});
+			} catch (e: Any) {
+				haxe.EntryPoint.runInMainThread(() -> onError(e));
+			}
+		});
+		return {
+			cancel: () -> threadHandle.sendMessage('cancel'),
+		};
 	}
+	#end
 
 	#if js
 	static inline function readFileWeb(
@@ -126,22 +168,29 @@ class Assets {
 	): {
 		cancel: () -> Void,
 	} {
+		var userCanceled = false;
 		// we use XMLHttpRequest because fetch doesn't yet have reliably available aborting
 		var req = new js.html.XMLHttpRequest();
 		req.open('GET', filePath, true);
 		req.responseType = ARRAYBUFFER;
-		req.onloadend = (e) -> switch req.status {
-			case 0: // aborted
-				onError('HTTP request ended with no status. This indicates the request was aborted');
-			case code if (code >= 200 && code < 300):
-				// success generally, check response type
-				if (req.response != null && js.Syntax.instanceof(req.response, js.lib.ArrayBuffer)) {
-					onComplete((req.response: js.lib.ArrayBuffer));
-				} else {
-					onError('HTTP request was successful but response was not an ArrayBuffer. HTTP status: ${req.statusText} (${req.status})');
-				}
-			default:
-				onError('HTTP request ended with status: ${req.statusText} (${req.status})');
+		req.onloadend = (e) -> {
+			if (userCanceled) {
+				onError('canceled');
+				return;
+			}
+			switch req.status {
+				case 0: // aborted
+					onError('HTTP request ended with no status. This may indicate the request was aborted');
+				case code if (code >= 200 && code < 300):
+					// success generally, check response type
+					if (req.response != null && js.Syntax.instanceof(req.response, js.lib.ArrayBuffer)) {
+						onComplete((req.response: js.lib.ArrayBuffer));
+					} else {
+						onError('HTTP request was successful but response was not an ArrayBuffer. HTTP status: ${req.statusText} (${req.status})');
+					}
+				default:
+					onError('HTTP request ended with status: ${req.statusText} (${req.status})');
+			}
 		}
 		req.onprogress = (e) -> if (req.status >= 200 && req.status < 300 && e.lengthComputable) {
 			onProgress(e.loaded, e.total);
@@ -149,7 +198,10 @@ class Assets {
 		req.send();
 
 		return {
-			cancel: () -> req.abort()
+			cancel: () -> {
+				userCanceled = true;
+				req.abort();
+			}
 		}
 	}
 	#end

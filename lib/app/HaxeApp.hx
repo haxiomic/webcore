@@ -69,6 +69,8 @@ class HaxeApp {
 				Internal.initialized = true;
 				Internal.nativeTickOnMainThread = tickOnMainThread;
 				Internal.startEventLoopThread();
+				// set native platform's bundle identifier
+				asset.Assets.bundleIdentifier = 'haxeapp.Framework';
 			}
 			return result;
 		}
