@@ -200,7 +200,6 @@ class Macro {
 
 		var pos = Context.currentPos();
 
-
 		// copy Xcode project files to generate framework
 		// using resolvePath allows user overriding
 		var frameworkProjectPath = Context.resolvePath('app/ios');

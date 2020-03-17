@@ -15,7 +15,7 @@ import webgl.GLContext;
 
 	**Input**
 
-	Generally input events follow the latest browser input specs, however there are small differences, for example: to prevent the platform's default handling for an event, return `true` from an event handling method
+	Generally input events follow the latest browser input event specifications, however there are small differences, for example: to prevent the platform's default handling for an event, return `true` from an event handling method
 	- For mouse, touch and pen input, an interface that closely follows the PointerEvent API is used
 	- Wheel events mirror browser [WheelEvent](https://developer.mozilla.org/en-US/docs/Web/API/WheelEvent) where all deltas are in units of **points**, normalizing for `deltaMode`
 	- KeyboardEvents mirror browser [KeyboardEvent](https://w3c.github.io/uievents/#idl-keyboardevent) with an extra parameter `hasFocus` to detect if the view is focused for the event
@@ -89,14 +89,14 @@ interface HaxeAppInterface {
 	/**
 		Called when a key is pressed down with the view focused.
 		Return true to prevent default behavior.
-		`hasFocus` is true if our view has input focus for the event
+		`hasFocus` is true if our view has input focus for the event. For `hasFocus` to be correct the canvas needs to be focusable. This requires setting the `tabIndex` attribute on the canvas
 	**/
 	function onKeyDown(event: KeyboardEvent, hasFocus: Bool): Bool;
 
 	/**
 		Called when a key is released with the view focused.
 		Return true to prevent default behavior.
-		`hasFocus` is true if our view has input focus for the event
+		`hasFocus` is true if our view has input focus for the event. For `hasFocus` to be correct the canvas needs to be focusable. This requires setting the `tabIndex` attribute on the canvas
 	**/
 	function onKeyUp(event: KeyboardEvent, hasFocus: Bool): Bool;
 
