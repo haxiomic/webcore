@@ -14,8 +14,7 @@ import typedarray.Float32Array;
 import typedarray.Uint8Array;
 
 @:copyToBundle('../assets')
-class DemoAssets implements app.AssetPack {
-}
+class DemoAssets implements app.AssetPack { }
 
 #if debug
 // In debug mode we enable sanitizers to help validate correctness (at a performance cost)
@@ -85,7 +84,7 @@ class App implements app.HaxeAppInterface {
 		
 
 		var t0 = haxe.Timer.stamp();
-		DemoAssets.readFile('my-triangle.mp3', (arraybuffer) -> {
+		DemoAssets.readFile(DemoAssets.paths.assets.audio.my_triangle_mp3, (arraybuffer) -> {
 			audioContext.decodeAudioData(arraybuffer, (audioBuffer) -> {
 				trace('Trying to play audio', audioBuffer, haxe.Timer.stamp() - t0);
 				node.buffer = audioBuffer;

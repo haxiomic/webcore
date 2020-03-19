@@ -18,6 +18,7 @@ package app;
 class HaxeApp {
 
 	#if cpp
+
 	/**
 		Create an instance of a class that implements `HaxeAppInterface`.
 		If `classPath` is `null`, an instance of the first class that implements `HaxeAppInterface` will be returned
@@ -129,6 +130,14 @@ class HaxeApp {
 	}
 	#end
 
+	static public inline function getBundleIdentifier() {
+		return Internal.bundleIdentifier;
+	}
+
+	static public inline function setBundleIdentifier(v: String) {
+		return Internal.bundleIdentifier = v;
+	}
+
 }
 
 #if cpp
@@ -142,6 +151,8 @@ typedef MainThreadTick = cpp.Callable<() -> Void>;
 @:allow(app.HaxeApp)
 @:unreflective
 class Internal {
+
+	static public var bundleIdentifier = 'haxeapp.Framework';
 	
 	#if cpp
 	// these are intentionally _not_ assigned initial values
