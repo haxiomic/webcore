@@ -14,21 +14,21 @@ public class HaxeAppViewController: GLKViewController {
     var haxeGraphicsContextReady = false
     var isVisible: Bool?
     
-    public init(view: GLKView? = nil, haxeClassPath: String? = nil) {
+    public init(glkView: GLKView? = nil, haxeClassPath: String? = nil) {
         super.init(nibName: nil, bundle: nil)
-        self.view = view
-
-        if self.view == nil {
-            // create a glkView
-            let glkView = GLKView()
-            glkView.drawableMultisample = .multisample4X
-            glkView.drawableColorFormat = .RGBA8888
-            glkView.drawableDepthFormat = .format24
-            glkView.drawableStencilFormat = .format8
-            glkView.isMultipleTouchEnabled = true
-            self.view = glkView
-        }
         
+        if let glkView = glkView {
+            self.view = glkView
+        } else {
+            let defaultGLKView = GLKView()
+            defaultGLKView.isMultipleTouchEnabled = true
+            defaultGLKView.drawableMultisample = .multisample4X
+            defaultGLKView.drawableColorFormat = .RGBA8888
+            defaultGLKView.drawableDepthFormat = .format24
+            defaultGLKView.drawableStencilFormat = .format8
+            self.view = defaultGLKView
+        }
+
         self.haxeClassPath = haxeClassPath
         initializeView()
     }
