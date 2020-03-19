@@ -3,7 +3,7 @@
  */
 
 #include <jni.h>
-#include <HaxeMainAppC.h>
+#include <HaxeAppC.h>
 
 /*
 

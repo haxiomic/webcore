@@ -5,13 +5,13 @@ package;
 public class AppInstance {
 
     static {
-        System.loadLibrary("HaxeMainApp");
+        System.loadLibrary("HaxeApp");
     }
 
     long ptr;
 
     public AppInstance() {
-        ptr = JNIHaxeMainApp_createInstance();
+        ptr = JNIHaxeApp_createInstance();
     }
 
     public void onGraphicsContextReady() {
@@ -29,13 +29,13 @@ public class AppInstance {
     }
 
     public void destroy() {
-        JNIHaxeMainApp_releaseInstance(ptr);
+        JNIHaxeApp_releaseInstance(ptr);
     }
 
     // JNI Methods
-    static native String HaxeMainApp_haxeInitializeAndRun();
-    static native long JNIHaxeMainApp_createInstance();
-    static native void JNIHaxeMainApp_releaseInstance(long appHandle);
+    static native String HaxeApp_haxeInitializeAndRun();
+    static native long JNIHaxeApp_createInstance();
+    static native void JNIHaxeApp_releaseInstance(long appHandle);
 
     static native void JNIAppInterface_onGraphicsContextReady(long appHandle);
     static native void JNIAppInterface_onGraphicsContextLost(long appHandle);

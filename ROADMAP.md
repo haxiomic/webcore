@@ -1,9 +1,12 @@
-- Message Jonathan
-
-
 - [ ] Device info
     - Screen size
     - systemLanguage
+
+- [ ] Settings files per system
+    - [ ] local storage?
+    - [ ] iOS settings
+    - [ ] Android settings
+    - [ ] Desktop to file? Or Windows/mac settings?
 
 - AssetPack
     - [ ] Error if safe var names conflict
@@ -11,13 +14,6 @@
 
 - Generate an .aar for easy Android integration
     https://medium.com/@yushulx/how-to-build-so-library-files-into-aar-bundle-in-android-studio-a44387c9a012
-
-
-- [ ] Settings files per system
-    - [ ] local storage?
-    - [ ] iOS settings
-    - [ ] Android settings
-    - [ ] Desktop to file? Or Windows/mac settings?
 
 - API renaming
     -> Is 'HaxeApp' clear enough? Should it be renamed to reflect it's a native-facing interface?
@@ -46,7 +42,7 @@
 
 - WebGL
     - Implement extensions
-    - Enable support for flipY and premultiply alpha
+    - Support for flipY and premultiply alpha
 
 - Image.src
     - Loading images from `src` requires supporting event listeners so you can catch load complete
@@ -54,10 +50,6 @@
 - Haxe's MainLoop doesn't appear thread safe X_X
     - Also we should sort _while inserting_
     - We should probably redefine so it wakes the event loop when a new event is added
-
-- Maybe rename HaxeApp -> HaxeAppView or similar
-
-- Maybe Switch to dynamic libraries so we can link with system libraries during haxe compile (and not platform compile). Or add metadata to add flags to platform projects
 
 - EventLoop per thread
     - We should use an event loop per thread so async code returns to the same thread for async callbacks and promises. For example
@@ -86,3 +78,5 @@
 
 - 2D UI via platform WebView
     - Compile UI code to js via a bridge class (uses macro to compile that portion of the codebase to js)
+
+- Maybe Switch to dynamic libraries so we can link with system libraries during haxe compile (and not platform compile). Or add metadata to add flags to platform projects

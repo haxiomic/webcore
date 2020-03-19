@@ -7,18 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		BE4331522325743100C9A45D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4331512325743100C9A45D /* AppDelegate.swift */; };
-		BE4331572325743100C9A45D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BE4331552325743100C9A45D /* Main.storyboard */; };
-		BE4331592325743200C9A45D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE4331582325743200C9A45D /* Assets.xcassets */; };
-		BE43315C2325743200C9A45D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BE43315A2325743200C9A45D /* LaunchScreen.storyboard */; };
-		BE9C73EC24216619008825E0 /* HaxeAppFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE9C73EB242164C2008825E0 /* HaxeAppFramework.framework */; };
-		BE9C73ED24216619008825E0 /* HaxeAppFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BE9C73EB242164C2008825E0 /* HaxeAppFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		BE87518D2423E18D00E87748 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE87518C2423E18D00E87748 /* AppDelegate.swift */; };
+		BE87518F2423E18D00E87748 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE87518E2423E18D00E87748 /* SceneDelegate.swift */; };
+		BE8751912423E18D00E87748 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8751902423E18D00E87748 /* ContentView.swift */; };
+		BE8751932423E18F00E87748 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE8751922423E18F00E87748 /* Assets.xcassets */; };
+		BE8751962423E18F00E87748 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE8751952423E18F00E87748 /* Preview Assets.xcassets */; };
+		BE8751992423E18F00E87748 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BE8751972423E18F00E87748 /* LaunchScreen.storyboard */; };
+		BE8751A72423E19B00E87748 /* HaxeAppFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE8751A52423E19400E87748 /* HaxeAppFramework.framework */; };
+		BE8751A82423E19B00E87748 /* HaxeAppFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BE8751A52423E19400E87748 /* HaxeAppFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		BE9C73EA242164C2008825E0 /* PBXContainerItemProxy */ = {
+		BE8751A42423E19400E87748 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = BEBB8EBF23EF6A2500574F6A /* HaxeAppFramework.xcodeproj */;
+			containerPortal = BE8751A02423E19400E87748 /* HaxeAppFramework.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = BE24799423E5C91800D9F118;
 			remoteInfo = HaxeAppFramework;
@@ -26,13 +28,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		BE43316F2325748D00C9A45D /* Embed Frameworks */ = {
+		BE8751A92423E19B00E87748 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				BE9C73ED24216619008825E0 /* HaxeAppFramework.framework in Embed Frameworks */,
+				BE8751A82423E19B00E87748 /* HaxeAppFramework.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -40,68 +42,80 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		BE43314E2325743100C9A45D /* MinimalGLApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MinimalGLApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		BE4331512325743100C9A45D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		BE4331562325743100C9A45D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		BE4331582325743200C9A45D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		BE43315B2325743200C9A45D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		BE43315D2325743200C9A45D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		BEBB8EBF23EF6A2500574F6A /* HaxeAppFramework.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = HaxeAppFramework.xcodeproj; path = "../_hxcpp-bin/HaxeAppFramework.xcodeproj"; sourceTree = "<group>"; };
+		BE8751892423E18C00E87748 /* DemoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DemoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BE87518C2423E18D00E87748 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		BE87518E2423E18D00E87748 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		BE8751902423E18D00E87748 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		BE8751922423E18F00E87748 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		BE8751952423E18F00E87748 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		BE8751982423E18F00E87748 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		BE87519A2423E18F00E87748 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BE8751A02423E19400E87748 /* HaxeAppFramework.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = HaxeAppFramework.xcodeproj; path = "../_hxcpp-bin/HaxeAppFramework.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		BE43314B2325743100C9A45D /* Frameworks */ = {
+		BE8751862423E18C00E87748 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BE9C73EC24216619008825E0 /* HaxeAppFramework.framework in Frameworks */,
+				BE8751A72423E19B00E87748 /* HaxeAppFramework.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		BE4331452325743100C9A45D = {
+		BE8751802423E18C00E87748 = {
 			isa = PBXGroup;
 			children = (
-				BE4331502325743100C9A45D /* MinimalGLApp */,
-				BE43314F2325743100C9A45D /* Products */,
-				BEC88F7223E759C4005C1AD9 /* Frameworks */,
+				BE87518B2423E18D00E87748 /* DemoApp */,
+				BE87518A2423E18C00E87748 /* Products */,
+				BE8751A02423E19400E87748 /* HaxeAppFramework.xcodeproj */,
+				BE8751A62423E19B00E87748 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
-		BE43314F2325743100C9A45D /* Products */ = {
+		BE87518A2423E18C00E87748 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				BE43314E2325743100C9A45D /* MinimalGLApp.app */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		BE4331502325743100C9A45D /* MinimalGLApp */ = {
-			isa = PBXGroup;
-			children = (
-				BE4331512325743100C9A45D /* AppDelegate.swift */,
-				BE4331552325743100C9A45D /* Main.storyboard */,
-				BE4331582325743200C9A45D /* Assets.xcassets */,
-				BE43315A2325743200C9A45D /* LaunchScreen.storyboard */,
-				BE43315D2325743200C9A45D /* Info.plist */,
-			);
-			path = MinimalGLApp;
-			sourceTree = "<group>";
-		};
-		BE9C73E7242164C2008825E0 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				BE9C73EB242164C2008825E0 /* HaxeAppFramework.framework */,
+				BE8751892423E18C00E87748 /* DemoApp.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		BEC88F7223E759C4005C1AD9 /* Frameworks */ = {
+		BE87518B2423E18D00E87748 /* DemoApp */ = {
 			isa = PBXGroup;
 			children = (
-				BEBB8EBF23EF6A2500574F6A /* HaxeAppFramework.xcodeproj */,
+				BE87518C2423E18D00E87748 /* AppDelegate.swift */,
+				BE87518E2423E18D00E87748 /* SceneDelegate.swift */,
+				BE8751902423E18D00E87748 /* ContentView.swift */,
+				BE8751922423E18F00E87748 /* Assets.xcassets */,
+				BE8751972423E18F00E87748 /* LaunchScreen.storyboard */,
+				BE87519A2423E18F00E87748 /* Info.plist */,
+				BE8751942423E18F00E87748 /* Preview Content */,
+			);
+			path = DemoApp;
+			sourceTree = "<group>";
+		};
+		BE8751942423E18F00E87748 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				BE8751952423E18F00E87748 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		BE8751A12423E19400E87748 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BE8751A52423E19400E87748 /* HaxeAppFramework.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BE8751A62423E19B00E87748 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -109,40 +123,40 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		BE43314D2325743100C9A45D /* MinimalGLApp */ = {
+		BE8751882423E18C00E87748 /* DemoApp */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BE4331602325743200C9A45D /* Build configuration list for PBXNativeTarget "MinimalGLApp" */;
+			buildConfigurationList = BE87519D2423E18F00E87748 /* Build configuration list for PBXNativeTarget "DemoApp" */;
 			buildPhases = (
-				BE43314A2325743100C9A45D /* Sources */,
-				BE43314B2325743100C9A45D /* Frameworks */,
-				BE43314C2325743100C9A45D /* Resources */,
-				BE43316F2325748D00C9A45D /* Embed Frameworks */,
+				BE8751852423E18C00E87748 /* Sources */,
+				BE8751862423E18C00E87748 /* Frameworks */,
+				BE8751872423E18C00E87748 /* Resources */,
+				BE8751A92423E19B00E87748 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = MinimalGLApp;
-			productName = MinimalGLApp;
-			productReference = BE43314E2325743100C9A45D /* MinimalGLApp.app */;
+			name = DemoApp;
+			productName = DemoApp;
+			productReference = BE8751892423E18C00E87748 /* DemoApp.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		BE4331462325743100C9A45D /* Project object */ = {
+		BE8751812423E18C00E87748 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1030;
-				LastUpgradeCheck = 1030;
-				ORGANIZATIONNAME = Haxiomic;
+				LastSwiftUpdateCheck = 1130;
+				LastUpgradeCheck = 1130;
+				ORGANIZATIONNAME = exampleorg;
 				TargetAttributes = {
-					BE43314D2325743100C9A45D = {
-						CreatedOnToolsVersion = 10.3;
+					BE8751882423E18C00E87748 = {
+						CreatedOnToolsVersion = 11.3.1;
 					};
 				};
 			};
-			buildConfigurationList = BE4331492325743100C9A45D /* Build configuration list for PBXProject "MinimalGLApp" */;
+			buildConfigurationList = BE8751842423E18C00E87748 /* Build configuration list for PBXProject "DemoApp" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -150,69 +164,63 @@
 				en,
 				Base,
 			);
-			mainGroup = BE4331452325743100C9A45D;
-			productRefGroup = BE43314F2325743100C9A45D /* Products */;
+			mainGroup = BE8751802423E18C00E87748;
+			productRefGroup = BE87518A2423E18C00E87748 /* Products */;
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = BE9C73E7242164C2008825E0 /* Products */;
-					ProjectRef = BEBB8EBF23EF6A2500574F6A /* HaxeAppFramework.xcodeproj */;
+					ProductGroup = BE8751A12423E19400E87748 /* Products */;
+					ProjectRef = BE8751A02423E19400E87748 /* HaxeAppFramework.xcodeproj */;
 				},
 			);
 			projectRoot = "";
 			targets = (
-				BE43314D2325743100C9A45D /* MinimalGLApp */,
+				BE8751882423E18C00E87748 /* DemoApp */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		BE9C73EB242164C2008825E0 /* HaxeAppFramework.framework */ = {
+		BE8751A52423E19400E87748 /* HaxeAppFramework.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
 			path = HaxeAppFramework.framework;
-			remoteRef = BE9C73EA242164C2008825E0 /* PBXContainerItemProxy */;
+			remoteRef = BE8751A42423E19400E87748 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
-		BE43314C2325743100C9A45D /* Resources */ = {
+		BE8751872423E18C00E87748 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BE43315C2325743200C9A45D /* LaunchScreen.storyboard in Resources */,
-				BE4331592325743200C9A45D /* Assets.xcassets in Resources */,
-				BE4331572325743100C9A45D /* Main.storyboard in Resources */,
+				BE8751992423E18F00E87748 /* LaunchScreen.storyboard in Resources */,
+				BE8751962423E18F00E87748 /* Preview Assets.xcassets in Resources */,
+				BE8751932423E18F00E87748 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		BE43314A2325743100C9A45D /* Sources */ = {
+		BE8751852423E18C00E87748 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BE4331522325743100C9A45D /* AppDelegate.swift in Sources */,
+				BE87518D2423E18D00E87748 /* AppDelegate.swift in Sources */,
+				BE87518F2423E18D00E87748 /* SceneDelegate.swift in Sources */,
+				BE8751912423E18D00E87748 /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		BE4331552325743100C9A45D /* Main.storyboard */ = {
+		BE8751972423E18F00E87748 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				BE4331562325743100C9A45D /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		BE43315A2325743200C9A45D /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				BE43315B2325743200C9A45D /* Base */,
+				BE8751982423E18F00E87748 /* Base */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
@@ -220,7 +228,7 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		BE43315E2325743200C9A45D /* Debug */ = {
+		BE87519B2423E18F00E87748 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -252,7 +260,6 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -271,7 +278,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -281,7 +288,7 @@
 			};
 			name = Debug;
 		};
-		BE43315F2325743200C9A45D /* Release */ = {
+		BE87519C2423E18F00E87748 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -313,7 +320,6 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -326,7 +332,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -336,38 +342,40 @@
 			};
 			name = Release;
 		};
-		BE4331612325743200C9A45D /* Debug */ = {
+		BE87519E2423E18F00E87748 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = D69828E29K;
-				INFOPLIST_FILE = MinimalGLApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				DEVELOPMENT_ASSET_PATHS = "\"DemoApp/Preview Content\"";
+				DEVELOPMENT_TEAM = 8U5TB3BU5A;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = DemoApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = haxiomic.MinimalGLApp;
+				PRODUCT_BUNDLE_IDENTIFIER = exampleorg.DemoApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		BE4331622325743200C9A45D /* Release */ = {
+		BE87519F2423E18F00E87748 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = D69828E29K;
-				INFOPLIST_FILE = MinimalGLApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				DEVELOPMENT_ASSET_PATHS = "\"DemoApp/Preview Content\"";
+				DEVELOPMENT_TEAM = 8U5TB3BU5A;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = DemoApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = haxiomic.MinimalGLApp;
+				PRODUCT_BUNDLE_IDENTIFIER = exampleorg.DemoApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -377,25 +385,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		BE4331492325743100C9A45D /* Build configuration list for PBXProject "MinimalGLApp" */ = {
+		BE8751842423E18C00E87748 /* Build configuration list for PBXProject "DemoApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				BE43315E2325743200C9A45D /* Debug */,
-				BE43315F2325743200C9A45D /* Release */,
+				BE87519B2423E18F00E87748 /* Debug */,
+				BE87519C2423E18F00E87748 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		BE4331602325743200C9A45D /* Build configuration list for PBXNativeTarget "MinimalGLApp" */ = {
+		BE87519D2423E18F00E87748 /* Build configuration list for PBXNativeTarget "DemoApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				BE4331612325743200C9A45D /* Debug */,
-				BE4331622325743200C9A45D /* Release */,
+				BE87519E2423E18F00E87748 /* Debug */,
+				BE87519F2423E18F00E87748 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = BE4331462325743100C9A45D /* Project object */;
+	rootObject = BE8751812423E18C00E87748 /* Project object */;
 }
