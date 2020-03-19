@@ -1,19 +1,26 @@
 - Message Jonathan
 
-- API renaming
-    -> HaxeApp seems to be only cpp
-    -> Maybe rename to HaxeApi?
-    -> Maybe move into sub folder?
 
 - [ ] Device info
     - Screen size
     - systemLanguage
+
+- AssetPack
+    - [ ] Error if safe var names conflict
+    - [ ] Support embedding directories
+
+- Generate an .aar for easy Android integration
+    https://medium.com/@yushulx/how-to-build-so-library-files-into-aar-bundle-in-android-studio-a44387c9a012
+
 
 - [ ] Settings files per system
     - [ ] local storage?
     - [ ] iOS settings
     - [ ] Android settings
     - [ ] Desktop to file? Or Windows/mac settings?
+
+- API renaming
+    -> Is 'HaxeApp' clear enough? Should it be renamed to reflect it's a native-facing interface?
 
 - [ ] Cursor setting
     Need a way to set the current cursor for the view
@@ -27,9 +34,6 @@
     - What should the signature look like?
     - Allow native payload?
     - Require JSON?
-
-- Generate an .aar for easy Android integration
-    https://medium.com/@yushulx/how-to-build-so-library-files-into-aar-bundle-in-android-studio-a44387c9a012
 
 - [ ] New desktop demo
 
