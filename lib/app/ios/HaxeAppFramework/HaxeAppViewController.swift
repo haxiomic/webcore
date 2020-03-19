@@ -14,13 +14,40 @@ public class HaxeAppViewController: GLKViewController {
     var haxeGraphicsContextReady = false
     var isVisible: Bool?
     
+    public init(view: GLKView? = nil, haxeClassPath: String? = nil) {
+        super.init(nibName: nil, bundle: nil)
+        self.view = view
+
+        if self.view == nil {
+            // create a glkView
+            let glkView = GLKView()
+            glkView.drawableMultisample = .multisample4X
+            glkView.drawableColorFormat = .RGBA8888
+            glkView.drawableDepthFormat = .format24
+            glkView.drawableStencilFormat = .format8
+            glkView.isMultipleTouchEnabled = true
+            self.view = glkView
+        }
+        
+        self.haxeClassPath = haxeClassPath
+        initializeView()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     deinit {
         releaseGraphicsContext()
     }
     
     override public func awakeFromNib() {
         super.awakeFromNib()
-        
+        initializeView()
+    }
+    
+    /// Should be called when interface builder fields have been set (awakeFromNib)
+    func initializeView() {
         haxeAppInstance = HaxeApp(classPath: haxeClassPath ?? nil)
 
         // catch application events
