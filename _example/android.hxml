@@ -1,7 +1,7 @@
 main.hxml
 
 --library hxcpp:4.0.52
---cpp _hxcpp-bin/android
+--cpp platform/android/_hxcpp-bin
 
 # Compile for multiple architectures
 -D android
