@@ -57,7 +57,7 @@ class App implements app.HaxeAppInterface {
 	var activePointerTypes = new Map<String, Map<Int, PointerEvent>>();
 
 	public function new() {
-		trace('App instance created');
+		trace('App instance created. Language: ${device.DeviceInfo.getSystemLanguageIsoCode()}');
 
 		// test the haxe event loop
 		function helloLoop() {
