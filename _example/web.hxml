@@ -1,3 +1,3 @@
 main.hxml
 
--js platform/web/app/app.js
+-js platform/web/bin/app.js
