@@ -1,7 +1,3 @@
-- [ ] Device info
-    - Screen size
-    - systemLanguage
-
 - [ ] Settings files per system
     - [ ] local storage?
     - [ ] iOS settings
@@ -72,7 +68,11 @@
     ```
     - Could also use thread pooling here
 
+- hxcpp bug fixes
+    - Replace usage of `gettimeofday` https://github.com/HaxeFoundation/hxcpp/issues/887
+
 - Assets
+    - support @:embed('directory') in AssetPack
     - Partial file reads
     - Chunk file load so we can cancel mid-load
 
