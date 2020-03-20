@@ -27,8 +27,8 @@ class HaxeAppCanvas {
 		if (webglContextAttributes == null) {
 			webglContextAttributes = {
 				antialias: true,
-				stencil: false,
-				depth: false,
+				stencil: true,
+				depth: true,
 				alpha: false,
 				premultipliedAlpha: false,
 				preserveDrawingBuffer: false,
