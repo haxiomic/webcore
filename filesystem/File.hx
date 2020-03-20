@@ -79,8 +79,7 @@ class File {
 				return nullCancellationToken;
 			}
 
-			var url = filesystem.native.CFBundle.copyResourcesDirectoryURL(bundle);
-			var bundleResourceDirectory: String = filesystem.native.CFBundle.CFStringRef.getCStr(filesystem.native.CFBundle.CFURLRef.copyPath(url));
+			var bundleResourceDirectory: String = filesystem.native.CFBundle.getResourceDirectory(bundle);
 			var filePath = Path.join([bundleResourceDirectory, path]);
 
 			return readFileStdLib(filePath, onComplete, onError, onProgress);
