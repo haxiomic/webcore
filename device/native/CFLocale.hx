@@ -12,7 +12,7 @@ extern class CFLocale {
 	static function copyPreferredLanguages(): CFArrayRef;
 
 	@:keep
-	static inline function preferredLanguagesFirst(): String {
+	static inline function preferredLanguagesFirst(): Null<String> {
 		var languageCodes = copyPreferredLanguages();
 		var languageCodesCount = CFArrayRef.getCount(languageCodes);
 
@@ -37,8 +37,6 @@ extern class CFLocale {
 			untyped __cpp__('
 				free({0})
 			', cStrPtr);
-		} else {
-			languageCodeHxStr = 'en';
 		}
 
 		untyped __cpp__('CFRelease({0})', languageCodes);
