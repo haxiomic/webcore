@@ -14,14 +14,13 @@ import haxe.io.Path;
 class File {
 
 	#if js
-	static final rootDirectory: String =
-		{
-			// the asset pack is emitted adjacent to the output js file
-			// we determine the location of the js file by reading the src attribute of the script tag it was executed from
-			// this must be executed at initialization time
-			var scriptSrc = (cast js.Browser.document.currentScript : js.html.ScriptElement).src;
-			scriptSrc.substr(0, scriptSrc.lastIndexOf('/'));
-		}
+	static final rootDirectory: String = {
+		// the asset pack is emitted adjacent to the output js file
+		// we determine the location of the js file by reading the src attribute of the script tag it was executed from
+		// this must be executed at initialization time
+		var scriptSrc = (cast js.Browser.document.currentScript : js.html.ScriptElement).src;
+		scriptSrc.substr(0, scriptSrc.lastIndexOf('/'));
+	}
 	#end
 
 	
