@@ -5,15 +5,10 @@ package app;
 #end
 @:nativeGen // cpp
 @:keep
-#if !display
-
 @:build(app.Macro.hxcppAddNativeCode('./HaxeAppC.h', './HaxeAppC.cpp'))
-
 #if (iphoneos || iphonesim)
 @:build(app.Macro.generateHaxeCompileScript())
 @:build(app.Macro.copyHaxeAppFramework())
-#end
-
 #end
 class HaxeApp {
 

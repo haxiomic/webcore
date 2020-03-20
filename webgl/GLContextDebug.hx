@@ -7,9 +7,12 @@ import haxe.macro.Context;
 
 class GLContextDebug {
 
+	static final isDisplay = Context.defined('display') || Context.defined('display-details');
+
 	#if macro
 	static function addErrorChecking() {
 		var fields = Context.getBuildFields();
+		if (isDisplay) return fields;
 
 		fields = fields.map(field -> {
 
@@ -58,7 +61,7 @@ class GLContextDebug {
 
 		// add report errors method
 		fields.push((macro class ReportErrors {
-			public function reportErrors(fnName: String) {
+			@:noCompletion public function reportErrors(fnName: String) {
 				var result: ErrorCode = NO_ERROR;
 				while ((result = getError()) != NO_ERROR) {
 

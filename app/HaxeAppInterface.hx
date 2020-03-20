@@ -22,9 +22,7 @@ import webgl.GLContext;
 **/
 @:nativeGen
 @:keep
-#if !display
 @:autoBuild(app.Macro.registerAppClass())
-#end
 interface HaxeAppInterface {
 
 	/**

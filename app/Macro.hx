@@ -13,6 +13,9 @@ using Lambda;
 
 class Macro {
 
+	static final isDisplay = Context.defined('display') || Context.defined('display-details');
+	static final noOutput = Sys.args().has('--no-output');
+
 	/**
 		Adds code to register the class in the class' __init__ method.
 		This enables `HaxeAppInterface.Internal.create(classPath)` to construct an instance.
@@ -20,6 +23,7 @@ class Macro {
 	static function registerAppClass() {
 		var localClass = Context.getLocalClass().get();
 		var fields = Context.getBuildFields();
+		if (isDisplay) return fields;
 
 		var isCpp = Context.definedValue('target.name') == 'cpp';
 		if (!isCpp) return fields;
@@ -81,6 +85,8 @@ class Macro {
 		Adds :buildXml metadata that copies native interface code into the hxcpp output directory
 	**/
 	static function hxcppAddNativeCode(headerFilePath: String, implementationFilePath: String) {
+		if (isDisplay) return Context.getBuildFields();
+
 		var classDir = getPosDirectory(Context.currentPos());
 
 		var buildXml = '
@@ -103,10 +109,9 @@ class Macro {
 		Generates a script (`haxe-compile.sh|cmd`) that runs haxe command with the same arguments as the build which called this macro
 	**/
 	static function generateHaxeCompileScript() {
+		if (isDisplay || noOutput) return Context.getBuildFields();
+
 		var haxeArgs = Sys.args();
-		if (haxeArgs.has('--no-output')) {
-			return Context.getBuildFields();
-		}
 
 		// remove arch specific compile defines
 		var stripDefines = [
@@ -186,7 +191,7 @@ class Macro {
 		**Currently only supports iOS frameworks**
 	**/
 	static function copyHaxeAppFramework() {
-		if (Sys.args().has('--no-output')) {
+		if (isDisplay || noOutput) {
 			return Context.getBuildFields();
 		}
 

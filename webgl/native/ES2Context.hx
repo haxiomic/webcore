@@ -8,9 +8,7 @@ import webgl.GLContext;
 @:native('')
 @:include('./ES2Context.h')
 @:unreflective
-#if !display
 @:build(webgl.native.ES2Context.ES2ContextMacro.addBuildConfig())
-#end
 extern class ES2Context {
 
 	@:native('glActiveTexture') static function glActiveTexture(texture: GLenum): Void;
@@ -166,7 +164,11 @@ import haxe.io.Path;
 
 class ES2ContextMacro {
 
-	 static function addBuildConfig() {
+	static final isDisplay = Context.defined('display') || Context.defined('display-details');
+
+	static function addBuildConfig() {
+		if (isDisplay) return Context.getBuildFields();
+
 		var classPosInfo = Context.getPosInfos(Context.currentPos());
 		var classFilePath = sys.FileSystem.absolutePath(Context.resolvePath(classPosInfo.file));
 		var classDir = Path.directory(classFilePath);

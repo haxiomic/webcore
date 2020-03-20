@@ -84,9 +84,7 @@ private typedef InternalConstGLContext =
 	#end
 
 #if debug
-#if !display
 @:build(webgl.GLContextDebug.addErrorChecking())
-#end
 #end
 // @:nullSafety (cannot enable null safety because webgl externs are missing nullablity in certain cases)
 @:forward(

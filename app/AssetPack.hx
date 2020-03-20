@@ -48,7 +48,7 @@ import haxe.DynamicAccess;
 
 class AssetPackMacro {
 
-	static final isDisplay = Context.defined('display');
+	static final isDisplay = Context.defined('display') || Context.defined('display-details');
 
 	static function build() {
 		var localClass = Context.getLocalClass().get();
@@ -158,7 +158,7 @@ class AssetPackMacro {
 			// write a file manifest
 			if (newFileManifest.keys().length > 0) {
 				var manifestJson = haxe.Json.stringify(newFileManifest);
-				sys.io.File.saveContent(Path.join([outputDirectory, fileManifestName]), manifestJson);
+				sys.io.File.saveContent(fileManifestPath, manifestJson);
 			}
 		}
 
