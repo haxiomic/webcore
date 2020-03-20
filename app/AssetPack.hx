@@ -165,21 +165,6 @@ class AssetPackMacro {
 		// create an object that contains all the copied paths
 		var allPathsObj: DynamicAccess<Dynamic> = {};
 
-		function getSubObject(obj: DynamicAccess<Dynamic>, path: Array<String>): DynamicAccess<Dynamic> {
-			var first = path[0];
-			var remaining = path.slice(1);
-			if (first == "") {
-				return obj;
-			}
-			var fieldName = safeVariableName(first);
-			var subObj = obj.get(fieldName);
-			if (subObj == null) {
-				subObj = {};
-				obj.set(fieldName, subObj);
-			}
-			return remaining.length > 0 ? getSubObject(subObj, remaining) : subObj;
-		}
-
 		// add all paths
 		for (filePath in newFileManifest.keys()) {
 			var directories = Path.directory(filePath).split('/');
@@ -248,6 +233,21 @@ class AssetPackMacro {
 			wordCharacters = '_' + wordCharacters;
 		}
 		return wordCharacters;
+	}
+
+	static function getSubObject(obj: DynamicAccess<Dynamic>, path: Array<String>): DynamicAccess<Dynamic> {
+		var first = path[0];
+		var remaining = path.slice(1);
+		if (first == "") {
+			return obj;
+		}
+		var fieldName = safeVariableName(first);
+		var subObj = obj.get(fieldName);
+		if (subObj == null) {
+			subObj = {};
+			obj.set(fieldName, subObj);
+		}
+		return remaining.length > 0 ? getSubObject(subObj, remaining) : subObj;
 	}
 
 }
