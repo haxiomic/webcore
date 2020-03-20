@@ -100,6 +100,10 @@ class AssetPackMacro {
 					var pathAbsolute = sys.FileSystem.absolutePath(Path.join([classDir, path]));
 
 					function copyFileToBundle(sourcePath: String, targetPathRelativeToOutputDirectory: String) {
+						// skip certain files based on their filename
+						var filename = Path.withoutDirectory(sourcePath);
+						if (isIgnoredFilename(filename)) return;
+
 						var ctime_ms = isDisplay ? -1 : try sys.FileSystem.stat(sourcePath).ctime.getTime() catch(e: Any) -1;
 						// handle as file
 						var targetPath = Path.join([outputDirectory, targetPathRelativeToOutputDirectory]);
@@ -168,9 +172,12 @@ class AssetPackMacro {
 		// add all paths
 		for (filePath in newFileManifest.keys()) {
 			var directories = Path.directory(filePath).split('/');
-			var directoryObj = getSubObject(allPathsObj, directories);
+			var directoryObj = getSubObject(allPathsObj, directories.map(safeVariableName));
 			var filename = Path.withoutDirectory(filePath);
 			var fieldName = safeVariableName(filename);
+			if (directoryObj.exists(fieldName)) {
+				Context.warning('Field "$fieldName" already exists. This means two files map to the same name after converting to safe variable names.', Context.currentPos());
+			}
 			directoryObj.set(fieldName, filePath);
 		}
 
@@ -225,6 +232,23 @@ class AssetPackMacro {
 		}
 	}
 
+	static function isIgnoredFilename(filename: String) {
+		return switch filename {
+			// macOS
+			case '.DS_Store',
+			     '.AppleDouble',
+			     '.LSOverride',
+			     '.DocumentRevisions-V100',
+			     '.fseventsd',
+			     '.Spotlight-V100',
+			     '.TemporaryItems',
+			     '.Trashes',
+			     '.VolumeIcon.icns',
+			     '.com.apple.timemachine.donotpresent': true;
+			default: false;
+		};
+	}
+
 	static function safeVariableName(str: String) {
 		// replace non-ascii characters with '_'
 		var wordCharacters = ~/[^\w]/g.replace(str, '_');
@@ -241,11 +265,10 @@ class AssetPackMacro {
 		if (first == "") {
 			return obj;
 		}
-		var fieldName = safeVariableName(first);
-		var subObj = obj.get(fieldName);
+		var subObj = obj.get(first);
 		if (subObj == null) {
 			subObj = {};
-			obj.set(fieldName, subObj);
+			obj.set(first, subObj);
 		}
 		return remaining.length > 0 ? getSubObject(subObj, remaining) : subObj;
 	}
