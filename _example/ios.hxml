@@ -7,10 +7,7 @@ main.hxml
 # if you have errors about missing SDK then explicitly set the SDK version on your system (e.g. -D IPHONE_VER=12.2)
 -D IPHONE_VER=
 
-# Build libs for multiple architectures: iOS (arm64) and simulator (x86_64)
-# --each
-# -D iphoneos
-# -D HXCPP_ARM64
-# --next
+# Compile for ios simulator by default
+# The generated Xcode project will compile for iphoneos when a real device is targeted
 -D iphonesim
 -D HXCPP_M64
