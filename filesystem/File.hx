@@ -12,6 +12,18 @@ import haxe.io.Path;
 	
 **/
 class File {
+
+	#if js
+	static final rootDirectory: String =
+		{
+			// the asset pack is emitted adjacent to the output js file
+			// we determine the location of the js file by reading the src attribute of the script tag it was executed from
+			// this must be executed at initialization time
+			var scriptSrc = (cast js.Browser.document.currentScript : js.html.ScriptElement).src;
+			scriptSrc.substr(0, scriptSrc.lastIndexOf('/'));
+		}
+	#end
+
 	
 	/**
 		Read bytes from platform's native file store
@@ -24,6 +36,7 @@ class File {
 		- iphoneos: read from local app or framework bundle
 		- macos: read from local app or framework bundle
 		- android: read from APK resources use AAssetManager
+		- web: read a file _relative_ to the compiled .js file (rather than the web page where it is executed)
 		- default: read from a directory adjacent to the executable
 	**/
 	public static function readBundleFile(
@@ -50,7 +63,7 @@ class File {
 
 		#if js
 
-			return readFileWeb(path, onComplete, onError, onProgress);
+			return readFileWeb(rootDirectory + '/' + path, onComplete, onError, onProgress);
 
 		#else
 		#if (iphoneos || iphonesim || macos)
@@ -84,7 +97,7 @@ class File {
 		#else
 	
 			// local file read
-			var filePath = Path.join([Sys.executablePath(), assetsDirectory, path]);
+			var filePath = Path.join([Sys.programPath(), assetsDirectory, path]);
 			return readFileStdLib(filePath, onComplete, onError, onProgress);
 
 		#end
