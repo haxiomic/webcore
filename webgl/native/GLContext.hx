@@ -10,6 +10,7 @@ import typedarray.BufferSource;
 import webgl.native.ES2Context.*;
 
 @:nullSafety
+@:noCompletion
 class GLContext {
 	
 	// set this variable to null whenever it is possible that the current graphics context has been changed externally
