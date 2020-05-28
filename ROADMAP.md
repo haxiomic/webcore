@@ -1,15 +1,37 @@
+- Rename: App -> View, View/Window is the right abstraction, rather than 'App'
+- HaxeAppInterface -> Should be HaxeViewInterface or HaxeAppWindow
+- HaxeApp Canvas -> HaxeCanvasView
+
+
+- [ ] Get lib loaded and call haxeInitialize()
+    - Maybe following this is simplest
+
+- Android build
+    - What about having no java and doing everything in the C++ JNI wrapper?
+        - Need quite a bit of glue probably for the OpenGLView
+        - Would be nice to have a ready made touch setup
+            - Maybe we can do this via C++ too?
+        - We can do a fully native app
+            - But then you can't easily embed in a java app
+        ! Assets?
+    - aar https://medium.com/@yushulx/how-to-build-so-library-files-into-aar-bundle-in-android-studio-a44387c9a012
+        - https://developer.android.com/studio/projects/android-library.html#aar-contents
+        - I don't like this if it requires android studio to compile stuff to .jar
+        - aar files are zipped
+    - What about some kind of subproject (library module)
+        - This is stupid too because android _copies_ the library module
+        - Maybe this https://stackoverflow.com/questions/24658422/android-studio-creating-modules-without-copying-files
+
+
+- iOS Keyboard events
+
 - [ ] Settings files per system
-    - [ ] local storage?
-    - [ ] iOS settings
+    - [ ] local storage
+    - [ ] iOS/macOS settings CFPreferences
     - [ ] Android settings
-    - [ ] Desktop to file? Or Windows/mac settings?
+    - [ ] Windows - Registry or local file?
+    - [ ] Default, save to local file
 
-- AssetPack
-    - [ ] Error if safe var names conflict
-    - [ ] Support embedding directories
-
-- Generate an .aar for easy Android integration
-    https://medium.com/@yushulx/how-to-build-so-library-files-into-aar-bundle-in-android-studio-a44387c9a012
 
 - API renaming
     -> Is 'HaxeApp' clear enough? Should it be renamed to reflect it's a native-facing interface?
