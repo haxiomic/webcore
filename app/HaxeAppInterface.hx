@@ -1,6 +1,7 @@
 package app;
 
 import webgl.GLContext;
+import app.event.*;
 
 /**
 	Implement this interface to set the main app class.
@@ -101,7 +102,7 @@ interface HaxeAppInterface {
 	/**
 		Called when the haxe view goes from a deactivated state (hidden view, minimized tab, background-mode app) to a foreground active state.
 		For example, you should use this event to resume activities and connect to sensor events.
-		This method is called as early as possible in the transition and may not yet be visible.
+		This method is called as early as possible in the transition and the view may not yet be visible.
 		**It is called once at startup.**
 	**/
 	function onActivate(): Void;
@@ -109,204 +110,8 @@ interface HaxeAppInterface {
 	/**
 		Called before the app transitions into a deactivated state (hidden view, minimized tab, background-mode app).
 		For example you should use this event to suspend activities to save power, pause a game, save state or disconnect from sensors.
-		This method is called as early as possible in the transition and may still be visible.
+		This method is called as early as possible in the transition and the view may still be visible.
 	**/
 	function onDeactivate(): Void;
-
-}
-
-/**
-	See https://developer.mozilla.org/en-US/docs/Web/API/WheelEvent
-**/
-@:publicFields
-@:structInit
-@:unreflective
-#if cpp @:keep #end
-class WheelEvent {
-
-	/**
-		The horizontal scroll amount in **points**, if scrolling a page this corresponds to the horizontal scroll distance that would be applied
-	**/
-	final deltaX: Float;
-
-	/**
-		The vertical scroll amount in **points**, if scrolling a page this corresponds to the vertical scroll distance that would be applied
-	**/
-	final deltaY: Float;
-
-	/**
-		Z-axis scroll amount (and 0 when unsupported)
-	**/
-	final deltaZ: Float;
-
-	/**
-		Horizontal position in units of **points** where 0 corresponds to the left of the view
-	**/
-	final x: Float;
-
-	/**
-		Vertical position in units of **points** where 0 corresponds to the top of the view
-	**/
-	final y: Float;
-
-	// The motivation for supplying special-key state with the wheel event (when it can also be obtained from keyboard events) is to catch state when the document is not focused
-	// for example, you mouse wheel on a page without the document focused keyboard events will not fire but special-key state will still be available in this event
-
-	final altKey: Bool;
-	final ctrlKey: Bool;
-	final metaKey: Bool;
-	final shiftKey: Bool;
-
-}
-
-enum abstract PointerType(String) to String from String {
-	var MOUSE = "mouse";
-	var PEN = "pen";
-	var TOUCH = "touch";
-}
-
-/**
-	See https://www.w3.org/TR/pointerevents
-**/
-@:publicFields
-@:structInit
-@:unreflective
-#if cpp @:keep #end
-class PointerEvent {
-
-	/**
-		Unique identifier for the pointer.
-		See https://www.w3.org/TR/pointerevents/#dom-pointerevent-pointerid
-	**/
-	final pointerId: Int;
-
-	/**
-		See https://www.w3.org/TR/pointerevents/#dom-pointerevent-pointertype
-	**/
-	final pointerType: PointerType;
-
-	/**
-		See https://www.w3.org/TR/pointerevents/#dfn-primary-pointer
-	**/
-	final isPrimary: Bool;
-
-	/**
-		Indicates button who's state-change caused the event
-		- `-1` - no buttons changed since the last event
-		- `0` - left mouse button or touch/pen contact
-		- `1` - middle mouse button
-		- `2` - right mouse button or pen barrel button
-		- `3` - mouse back button
-		- `4` - mouse forward button
-		- `5` - pen eraser button
-
-		See https://www.w3.org/TR/pointerevents/#the-button-property
-	**/
-	final button: Int;
-
-	/**
-		Current state of the pointer's buttons as a bitmask.
-		See https://www.w3.org/TR/pointerevents/#the-buttons-property
-	**/
-	final buttons: Int;
-
-	/**
-		Horizontal position in units of **points** where 0 corresponds to the left of the view
-	**/
-	final x: Float;
-
-	/**
-		Vertical position in units of **points** where 0 corresponds to the top of the view
-	**/
-	final y: Float;
-	
-	/**
-		Horizontal dimension in units of **points** For inputs with a contact size (defaults to 1 for point-like inputs)
-	**/
-	final width: Float;
-
-	/**
-		Vertical dimension in units of **points** For inputs with a contact size (defaults to 1 for point-like inputs)
-	**/
-	final height: Float;
-
-	/**
-		Normalized pressure ranging from 0 to 1. For hardware that does not support pressure this value will be 0.5.
-		See https://www.w3.org/TR/pointerevents/#dom-pointerevent-pressure
-	**/
-	final pressure: Float;
-
-	/**
-		See https://www.w3.org/TR/pointerevents/#dom-pointerevent-tangentialpressure
-	**/
-	final tangentialPressure: Float;
-
-	/**
-		Pen tilt in the horizontal direction in units of **degrees**, ranging from -90 to 90.
-		See https://www.w3.org/TR/pointerevents/#dom-pointerevent-tiltx
-	**/
-	final tiltX: Float;
-
-	/**
-		Pen tilt in the vertical direction in units of **degrees**, ranging from -90 to 90.
-		See https://www.w3.org/TR/pointerevents/#dom-pointerevent-tilty
-	**/
-	final tiltY: Float;
-
-	/**
-		Clockwise rotation in units of **degrees** (see `rotationAngle` for touches https://w3c.github.io/touch-events/#dom-touch-rotationangle)
-	**/
-	final twist: Float;
-
-}
-
-/**
-	See https://w3c.github.io/uievents/#dom-keyboardevent-dom_key_location_standard
-**/
-enum abstract KeyLocation(Int) to Int from Int {
-	var STANDARD = 0;
-	var LEFT = 1;
-	var RIGHT = 2;
-	var NUMPAD = 3;
-}
-
-/**
-	See https://w3c.github.io/uievents/#idl-keyboardevent
-**/
-@:publicFields
-@:structInit
-@:unreflective
-#if cpp @:keep #end
-class KeyboardEvent {
-
-	/**
-		Locale-aware key
-
-		Either a
-		- A key string that corresponds to the character typed (accounting for the user's current locale and mappings), e.g. `"a"`
-		- A named key mapping to the values in the [specification](https://www.w3.org/TR/uievents-key/#named-key-attribute-value) e.g. `"ArrowDown"`
-
-		Example use-cases include detecting keyboard shortcuts
-
-		See https://www.w3.org/TR/uievents-key/#key-attribute-value
-	**/
-	final key: String;
-
-	/**
-		A string that identifies the physical key being pressed, it differs from the `key` field in that it **doesn't** account for the user's current locale and mappings.
-		The list of possible codes and their mappings to physical keys is given here https://www.w3.org/TR/uievents-code/.
-
-		Example use-cases include detecting WASD keys for moving controls in a game
-
-		See https://w3c.github.io/uievents/#keys-codevalues
-	**/
-	final code: String;
-
-	final location: KeyLocation;
-
-	final altKey: Bool;
-	final ctrlKey: Bool;
-	final metaKey: Bool;
-	final shiftKey: Bool;
 
 }
