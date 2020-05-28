@@ -1,6 +1,7 @@
 package webgl.native;
 
 @:allow(webgl.native.GLContext)
+@:noCompletion
 final class GLBuffer extends GLObject {
 
 	@:noCompletion

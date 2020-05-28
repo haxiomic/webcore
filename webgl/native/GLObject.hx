@@ -4,6 +4,7 @@ import cpp.NativeGc;
 import webgl.GLContext.GLuint;
 
 @:allow(webgl.native.GLContext)
+@:noCompletion
 class GLObject {
 
 	final context: GLContext;
