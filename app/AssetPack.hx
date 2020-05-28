@@ -30,7 +30,7 @@ import haxe.io.Path;
 	Songs.readFile(Songs.paths.audio.theme_mp3, (bytes) -> {...})
 	```
 
-	Paths should be assumed to be case-sensitive, however some platforms will be case-insensitive so you should have filename that differ only by case
+	Paths should be assumed to be case-sensitive, however some platforms will be case-insensitive so you should avoid filename that differ only by case
 	
 **/
 @:autoBuild(app.AssetPack.AssetPackMacro.build())
