@@ -20,9 +20,9 @@
 // include hxcpp generated classes
 #include <app/HaxeApp.h>
 #include <app/HaxeAppInterface.h>
-#include <app/PointerEvent.h>
-#include <app/WheelEvent.h>
-#include <app/KeyboardEvent.h>
+#include <app/event/PointerEvent.h>
+#include <app/event/WheelEvent.h>
+#include <app/event/KeyboardEvent.h>
 #include <webgl/native/GLContext.h>
 
 using namespace app;
@@ -155,7 +155,7 @@ bool HaxeApp_onPointerDown(void* ptr, int32_t pointerId, const char* pointerType
     AppHandle* appHandle = (AppHandle*) ptr;
     HX_JUST_GC_STACKFRAME
     // construct a PointerEvent object
-    app::PointerEvent pointerEvent = app::PointerEvent_obj::__alloc(HX_CTX, pointerId, ::String(pointerType), isPrimary, button, buttons, x, y, width, height, pressure, tangentialPressure, tiltX, tiltY, twist);
+    app::event::PointerEvent pointerEvent = app::event::PointerEvent_obj::__alloc(HX_CTX, pointerId, ::String(pointerType), isPrimary, button, buttons, x, y, width, height, pressure, tangentialPressure, tiltX, tiltY, twist);
     bool preventDefault = appHandle->haxeRef->onPointerDown(pointerEvent);
     postHaxeExecution();
     return preventDefault;
@@ -166,7 +166,7 @@ bool HaxeApp_onPointerMove(void* ptr, int32_t pointerId, const char* pointerType
     AppHandle* appHandle = (AppHandle*) ptr;
     HX_JUST_GC_STACKFRAME
     // construct a PointerEvent object
-    app::PointerEvent pointerEvent = app::PointerEvent_obj::__alloc(HX_CTX, pointerId, ::String(pointerType), isPrimary, button, buttons, x, y, width, height, pressure, tangentialPressure, tiltX, tiltY, twist);
+    app::event::PointerEvent pointerEvent = app::event::PointerEvent_obj::__alloc(HX_CTX, pointerId, ::String(pointerType), isPrimary, button, buttons, x, y, width, height, pressure, tangentialPressure, tiltX, tiltY, twist);
     bool preventDefault = appHandle->haxeRef->onPointerMove(pointerEvent);
     postHaxeExecution();
     return preventDefault;
@@ -177,7 +177,7 @@ bool HaxeApp_onPointerUp(void* ptr, int32_t pointerId, const char* pointerType, 
     AppHandle* appHandle = (AppHandle*) ptr;
     HX_JUST_GC_STACKFRAME
     // construct a PointerEvent object
-    app::PointerEvent pointerEvent = app::PointerEvent_obj::__alloc(HX_CTX, pointerId, ::String(pointerType), isPrimary, button, buttons, x, y, width, height, pressure, tangentialPressure, tiltX, tiltY, twist);
+    app::event::PointerEvent pointerEvent = app::event::PointerEvent_obj::__alloc(HX_CTX, pointerId, ::String(pointerType), isPrimary, button, buttons, x, y, width, height, pressure, tangentialPressure, tiltX, tiltY, twist);
     bool preventDefault = appHandle->haxeRef->onPointerUp(pointerEvent);
     postHaxeExecution();
     return preventDefault;
@@ -188,7 +188,7 @@ bool HaxeApp_onPointerCancel(void* ptr, int32_t pointerId, const char* pointerTy
     AppHandle* appHandle = (AppHandle*) ptr;
     HX_JUST_GC_STACKFRAME
     // construct a PointerEvent object
-    app::PointerEvent pointerEvent = app::PointerEvent_obj::__alloc(HX_CTX, pointerId, ::String(pointerType), isPrimary, button, buttons, x, y, width, height, pressure, tangentialPressure, tiltX, tiltY, twist);
+    app::event::PointerEvent pointerEvent = app::event::PointerEvent_obj::__alloc(HX_CTX, pointerId, ::String(pointerType), isPrimary, button, buttons, x, y, width, height, pressure, tangentialPressure, tiltX, tiltY, twist);
     bool preventDefault = appHandle->haxeRef->onPointerCancel(pointerEvent);
     postHaxeExecution();
     return preventDefault;
@@ -201,7 +201,7 @@ bool HaxeApp_onWheel(void* ptr, double deltaX, double deltaY, double deltaZ, dou
     hx::NativeAttach haxeGcScope;
     AppHandle* appHandle = (AppHandle*) ptr;
     HX_JUST_GC_STACKFRAME
-    app::WheelEvent wheelEvent = app::WheelEvent_obj::__alloc(HX_CTX, deltaX, deltaY, deltaZ, x, y, altKey, ctrlKey, metaKey, shiftKey);
+    app::event::WheelEvent wheelEvent = app::event::WheelEvent_obj::__alloc(HX_CTX, deltaX, deltaY, deltaZ, x, y, altKey, ctrlKey, metaKey, shiftKey);
     bool preventDefault = appHandle->haxeRef->onWheel(wheelEvent);
     postHaxeExecution();
     return preventDefault;
@@ -214,7 +214,7 @@ bool HaxeApp_onKeyDown(void* ptr, const char* key, const char* code, KeyLocation
     hx::NativeAttach haxeGcScope;
     AppHandle* appHandle = (AppHandle*) ptr;
     HX_JUST_GC_STACKFRAME
-    app::KeyboardEvent keyboardEvent = app::KeyboardEvent_obj::__alloc(HX_CTX, ::String(key), ::String(code), (int)location, altKey, ctrlKey, metaKey, shiftKey);
+    app::event::KeyboardEvent keyboardEvent = app::event::KeyboardEvent_obj::__alloc(HX_CTX, ::String(key), ::String(code), (int)location, altKey, ctrlKey, metaKey, shiftKey);
     bool preventDefault = appHandle->haxeRef->onKeyDown(keyboardEvent, hasFocus);
     postHaxeExecution();
     return preventDefault;
@@ -224,7 +224,7 @@ bool HaxeApp_onKeyUp(void* ptr, const char* key, const char* code, KeyLocation l
     hx::NativeAttach haxeGcScope;
     AppHandle* appHandle = (AppHandle*) ptr;
     HX_JUST_GC_STACKFRAME
-    app::KeyboardEvent keyboardEvent = app::KeyboardEvent_obj::__alloc(HX_CTX, ::String(key), ::String(code), (int)location, altKey, ctrlKey, metaKey, shiftKey);
+    app::event::KeyboardEvent keyboardEvent = app::event::KeyboardEvent_obj::__alloc(HX_CTX, ::String(key), ::String(code), (int)location, altKey, ctrlKey, metaKey, shiftKey);
     bool preventDefault = appHandle->haxeRef->onKeyUp(keyboardEvent, hasFocus);
     postHaxeExecution();
     return preventDefault;
