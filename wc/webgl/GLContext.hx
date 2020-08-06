@@ -1,5 +1,4 @@
 package wc.webgl;
-
 import wc.typedarray.ArrayBufferView;
 
 #if cpp
@@ -54,7 +53,7 @@ abstract TexImageSource(Dynamic)
 	from js.html.CanvasElement to js.html.CanvasElement
 	from js.html.VideoElement  to js.html.VideoElement
 #else
-abstract TexImageSource(image.Image)
+abstract TexImageSource(wc.image.Image)
 	from wc.image.Image to wc.image.Image
 #end
 {
@@ -84,7 +83,7 @@ private typedef InternalConstGLContext =
 	#end
 
 #if debug
-@:build(webgl.GLContextDebug.addErrorChecking())
+@:build(wc.webgl.GLContextDebug.addErrorChecking())
 #end
 // @:nullSafety (cannot enable null safety because webgl externs are missing nullablity in certain cases)
 @:forward(

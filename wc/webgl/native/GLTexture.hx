@@ -1,6 +1,6 @@
 package wc.webgl.native;
 
-@:allow(webgl.native.GLContext)
+@:allow(wc.webgl.native.GLContext)
 @:noCompletion
 final class GLTexture extends GLObject {
 

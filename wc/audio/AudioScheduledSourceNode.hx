@@ -8,7 +8,7 @@ typedef AudioScheduledSourceNode = js.html.audio.AudioScheduledSourceNode;
 
 import wc.audio.native.AudioDecoder;
 
-@:allow(audio.native.AudioContext)
+@:allow(wc.audio.native.AudioContext)
 class AudioScheduledSourceNode extends AudioNode {
 
 	public var onended: Null<haxe.Constraints.Function>;

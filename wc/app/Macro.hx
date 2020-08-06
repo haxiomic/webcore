@@ -201,7 +201,7 @@ class Macro {
 
 		// copy Xcode project files to generate framework
 		// using resolvePath allows user overriding
-		var frameworkProjectPath = Context.resolvePath('app/ios');
+		var frameworkProjectPath = Context.resolvePath('wc/app/ios');
 
 		touchDirectoryPath(outputDirectory);
 

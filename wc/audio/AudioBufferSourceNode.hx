@@ -8,7 +8,7 @@ typedef AudioBufferSourceNode = js.html.audio.AudioBufferSourceNode;
 
 import wc.audio.native.AudioDecoder;
 
-@:allow(audio.AudioContext)
+@:allow(wc.audio.AudioContext)
 class AudioBufferSourceNode extends AudioScheduledSourceNode {
 
 	function new(context: AudioContext, ?decoder: AudioDecoder) {

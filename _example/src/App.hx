@@ -1,20 +1,17 @@
-import webgl.GLContextAttributes;
-import app.HaxeAppInterface.KeyboardEvent;
-import app.HaxeAppInterface.WheelEvent;
-import audio.AudioContext;
-import app.HaxeAppInterface.PointerType;
-import app.HaxeAppInterface.PointerEvent;
-import webgl.GLUniformLocation;
-import webgl.GLTexture;
-import webgl.GLBuffer;
-import webgl.GLProgram;
-import webgl.GLShader;
-import webgl.GLContext;
-import typedarray.Float32Array;
-import typedarray.Uint8Array;
+import wc.webgl.GLContextAttributes;
+import wc.app.event.*;
+import wc.audio.AudioContext;
+import wc.webgl.GLUniformLocation;
+import wc.webgl.GLTexture;
+import wc.webgl.GLBuffer;
+import wc.webgl.GLProgram;
+import wc.webgl.GLShader;
+import wc.webgl.GLContext;
+import wc.typedarray.Float32Array;
+import wc.typedarray.Uint8Array;
 
 @:copyToBundle('../assets')
-class DemoAssets implements app.AssetPack { }
+class DemoAssets implements wc.app.AssetPack { }
 
 #if debug
 // In debug mode we enable sanitizers to help validate correctness (at a performance cost)
@@ -27,12 +24,12 @@ class DemoAssets implements app.AssetPack { }
 // </target>
 #end
 @:expose
-class App implements app.HaxeAppInterface {
+class App implements wc.app.HaxeAppInterface {
 
 	#if js
 	static public function create(?canvas: js.html.CanvasElement, ?webglContextAttributes: GLContextAttributes) {
 		var appInstance = new App();
-		return new app.web.HaxeAppCanvas(appInstance, canvas, webglContextAttributes);
+		return new wc.app.web.HaxeAppCanvas(appInstance, canvas, webglContextAttributes);
 	}
 	#end
 
@@ -57,7 +54,7 @@ class App implements app.HaxeAppInterface {
 	var activePointerTypes = new Map<String, Map<Int, PointerEvent>>();
 
 	public function new() {
-		trace('App instance created. Language: ${device.DeviceInfo.getSystemLanguageIsoCode()}');
+		trace('App instance created. Language: ${wc.device.DeviceInfo.getSystemLanguageIsoCode()}');
 
 		// test the haxe event loop
 		function helloLoop() {
@@ -141,12 +138,12 @@ class App implements app.HaxeAppInterface {
 		gl.activeTexture(TEXTURE0);
 		gl.bindTexture(TEXTURE_2D, texture);
 		// null texture
-		gl.texImage2D(TEXTURE_2D, 0, RGBA, 1, 1, 0, RGBA, UNSIGNED_BYTE, new typedarray.Uint8Array([0, 0, 255, 255]));
+		gl.texImage2D(TEXTURE_2D, 0, RGBA, 1, 1, 0, RGBA, UNSIGNED_BYTE, new wc.typedarray.Uint8Array([0, 0, 255, 255]));
 
 		var t0 = haxe.Timer.stamp();
 		
 		DemoAssets.readFile(DemoAssets.paths.assets.image.red_panda_jpg, (arraybuffer) -> {	
-			image.Image.decodeImageData(arraybuffer,
+			wc.image.Image.decodeImageData(arraybuffer,
 				(image) -> {
 					trace('decodeImageData complete! ${image.naturalWidth}x${image.naturalHeight}', haxe.Timer.stamp() - t0);
 					gl.activeTexture(TEXTURE0);

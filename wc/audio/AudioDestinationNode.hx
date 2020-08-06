@@ -8,7 +8,7 @@ typedef AudioDestinationNode  = js.html.audio.AudioDestinationNode ;
 
 import wc.audio.native.AudioDecoder;
 
-@:allow(audio.AudioContext)
+@:allow(wc.audio.AudioContext)
 class AudioDestinationNode extends AudioNode {
 
 	function new(context: AudioContext, ?decoder: AudioDecoder) {

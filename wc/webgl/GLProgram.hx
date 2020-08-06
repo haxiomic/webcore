@@ -1,5 +1,4 @@
 package wc.webgl;
-
 #if js
 typedef GLProgram = js.html.webgl.Program;
 #else

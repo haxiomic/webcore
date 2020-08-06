@@ -20,7 +20,7 @@ private typedef UInt16 = Int;
 @:nullSafety
 @:forward
 #if !macro
-@:build(typedarray.macro.BuildArrayBufferView.build(UInt16))
+@:build(wc.typedarray.macro.BuildArrayBufferView.build(UInt16))
 #end
 abstract Uint16Array(Uint16ArrayImpl)
 	to Uint16ArrayImpl from Uint16ArrayImpl

@@ -10,7 +10,7 @@ import cpp.*;
 import wc.audio.native.AudioDecoder;
 import wc.audio.native.NativeAudioNode;
 
-@:allow(audio.AudioContext)
+@:allow(wc.audio.AudioContext)
 @:native('audio.AudioNodeHx')
 class AudioNode {
 
@@ -141,7 +141,7 @@ class AudioNode {
 
 private typedef PcmTransformFunction<T> = Callable<(data: Star<T>, nChannels: UInt32, frameCount: UInt32, schedulingCurrentFrameBlock: Int64, interleavedPcmSamples: RawPointer<Float32>) -> Void>;
 
-@:access(audio.AudioContext)
+@:access(wc.audio.AudioContext)
 private class PcmTransform {
 	
 	/**

@@ -8,7 +8,7 @@ import wc.webgl.GLContext;
 @:native('')
 @:include('./ES2Context.h')
 @:unreflective
-@:build(webgl.native.ES2Context.ES2ContextMacro.addBuildConfig())
+@:build(wc.webgl.native.ES2Context.ES2ContextMacro.addBuildConfig())
 extern class ES2Context {
 
 	@:native('glActiveTexture') static function glActiveTexture(texture: GLenum): Void;

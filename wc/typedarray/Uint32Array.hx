@@ -20,7 +20,7 @@ private typedef UInt32 = Int;
 @:nullSafety
 @:forward
 #if !macro
-@:build(typedarray.macro.BuildArrayBufferView.build(UInt32))
+@:build(wc.typedarray.macro.BuildArrayBufferView.build(UInt32))
 #end
 abstract Uint32Array(Uint32ArrayImpl)
 	to Uint32ArrayImpl from Uint32ArrayImpl

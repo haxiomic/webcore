@@ -1,5 +1,4 @@
 package wc.webgl;
-
 #if macro
 import haxe.macro.Expr.FieldType;
 import haxe.macro.Context;

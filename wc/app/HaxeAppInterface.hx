@@ -23,7 +23,7 @@ import wc.app.event.*;
 **/
 @:nativeGen
 @:keep
-@:autoBuild(app.Macro.registerAppClass())
+@:autoBuild(wc.app.Macro.registerAppClass())
 interface HaxeAppInterface {
 
 	/**

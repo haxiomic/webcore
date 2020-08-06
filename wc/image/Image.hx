@@ -53,7 +53,7 @@ abstract Image(js.html.Image) from js.html.Image to js.html.Image {
 
 import cpp.*;
 import wc.typedarray.ArrayBuffer;
-import image.native.StbImage;
+import wc.image.native.StbImage;
 
 /**
     Native Implementation of HTMLImageElement

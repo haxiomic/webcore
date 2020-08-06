@@ -33,7 +33,7 @@ import haxe.io.Path;
 	Paths should be assumed to be case-sensitive, however some platforms will be case-insensitive so you should avoid filename that differ only by case
 	
 **/
-@:autoBuild(app.AssetPack.AssetPackMacro.build())
+@:autoBuild(wc.app.AssetPack.AssetPackMacro.build())
 interface AssetPack {
 
 }
@@ -59,7 +59,7 @@ class AssetPackMacro {
 
 		var printer = new haxe.macro.Printer();
 
-		var classAssetDirectory = StringTools.replace(printer.printTypePath(app.Macro.classPath(localClass)), '.', '/').toLowerCase();
+		var classAssetDirectory = StringTools.replace(printer.printTypePath(wc.app.Macro.classPath(localClass)), '.', '/').toLowerCase();
 
 		var newFields = (macro class X {
 
@@ -68,11 +68,11 @@ class AssetPackMacro {
 
 			static public inline function readFile(
 				path: String,
-				?onComplete: (typedarray.ArrayBuffer) -> Void,
+				?onComplete: (wc.typedarray.ArrayBuffer) -> Void,
 				?onError: (String) -> Void,
 				?onProgress: (bytesLoaded: Int, bytesTotal: Int) -> Void
 			) {
-				return wc.filesystem.File.readBundleFile(app.HaxeApp.getBundleIdentifier(), 'asset-pack/' + $v{classAssetDirectory} + '/' + path, onComplete, onError, onProgress);
+				return wc.filesystem.File.readBundleFile(wc.app.HaxeApp.getBundleIdentifier(), 'asset-pack/' + $v{classAssetDirectory} + '/' + path, onComplete, onError, onProgress);
 			}
 
 		}).fields;
@@ -86,7 +86,7 @@ class AssetPackMacro {
 		final fileManifestName = 'file-manifest.json';
 
 		var copyMetas = metaList.extract(':copyToBundle');
-		var outputDirectory = Path.join([app.Macro.getOutputDirectory(), bundleDirectory]);
+		var outputDirectory = Path.join([wc.app.Macro.getOutputDirectory(), bundleDirectory]);
 
 		var fileManifestPath = Path.join([outputDirectory, fileManifestName]);
 

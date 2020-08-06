@@ -12,8 +12,8 @@ import wc.audio.native.MiniAudio;
 	Represents raw PCM frames
 	Internally this is stored as interleaved samples for each channel
 **/
-@:allow(audio.AudioContext)
-@:allow(audio.AudioBufferSourceNode)
+@:allow(wc.audio.AudioContext)
+@:allow(wc.audio.AudioBufferSourceNode)
 class AudioBuffer {
 	
 	// could use ma_deinterleave_pcm_frames to get separate buffers

@@ -1,4 +1,4 @@
-package wc.webgl.el.extension;
+package wc.webgl.extension;
 
 #if js
 typedef OESStandardDerivatives = js.html.webgl.extension.OESStandardDerivatives;

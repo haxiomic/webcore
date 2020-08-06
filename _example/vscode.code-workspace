@@ -4,8 +4,13 @@
 			"path": "."
 		},
 		{
-			// we add the parent directory so we can edit the library while testing the example
 			"path": "../"
+		},
+		{
+			"path": "/Users/geo/Projects/haxe-git"
+		},
+		{
+			"path": "/usr/local/lib/haxe/lib/hxcpp/4,0,52"
 		}
 	],
 	"settings": {

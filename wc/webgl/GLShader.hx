@@ -1,5 +1,4 @@
 package wc.webgl;
-
 #if js
 typedef GLShader = js.html.webgl.Shader;
 #else

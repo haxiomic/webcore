@@ -3,7 +3,7 @@ package wc.webgl.native;
 import cpp.NativeGc;
 import wc.webgl.GLContext.GLuint;
 
-@:allow(webgl.native.GLContext)
+@:allow(wc.webgl.native.GLContext)
 @:noCompletion
 class GLObject {
 

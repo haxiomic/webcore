@@ -9,10 +9,10 @@ typedef ReadFramesCallback = Callable<(sourceUserData: Star<cpp.Void>, nChannels
 @:sourceFile(#if winrt './native.c' #else './native.m' #end)
 @:native('AudioNode') @:unreflective
 @:structAccess
-@:access(audio.AudioContext)
+@:access(wc.audio.AudioContext)
 extern class NativeAudioNode {
 
-	var lock: Star<audio.native.MiniAudio.Mutex>;
+	var lock: Star<wc.audio.native.MiniAudio.Mutex>;
 	private var readFramesCallback: ReadFramesCallback;
 	private var decoder: Star<NativeAudioDecoder>;
 	private var active: Bool;
@@ -87,7 +87,7 @@ extern class NativeAudioNode {
 	}
 
 	@:native('AudioNode_create')
-	static function create(maContext: Star<audio.native.MiniAudio.Context>): Star<NativeAudioNode>;
+	static function create(maContext: Star<wc.audio.native.MiniAudio.Context>): Star<NativeAudioNode>;
 
 	@:native('AudioNode_destroy')
 	static function destroy(instance: Star<NativeAudioNode>): Void;
@@ -109,7 +109,7 @@ extern class NativeAudioNodeList {
 	}
 
 	@:native('AudioNodeList_create')
-	static function create(maContext: Star<audio.native.MiniAudio.Context>): Star<NativeAudioNodeList>;
+	static function create(maContext: Star<wc.audio.native.MiniAudio.Context>): Star<NativeAudioNodeList>;
 
 	@:native('AudioNodeList_destroy')
 	static function destroy(instance: Star<NativeAudioNodeList>): Void;

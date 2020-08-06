@@ -1,5 +1,4 @@
 package wc.webgl;
-
 private typedef InternalGLUniformLocation =
 	#if js
 		js.html.webgl.UniformLocation;

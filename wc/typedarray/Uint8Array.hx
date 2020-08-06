@@ -20,7 +20,7 @@ private typedef UInt8 = Int;
 @:nullSafety
 @:forward
 #if !macro
-@:build(typedarray.macro.BuildArrayBufferView.build(UInt8))
+@:build(wc.typedarray.macro.BuildArrayBufferView.build(UInt8))
 #end
 abstract Uint8Array(Uint8ArrayImpl)
 	to Uint8ArrayImpl from Uint8ArrayImpl

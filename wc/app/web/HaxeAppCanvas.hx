@@ -112,7 +112,7 @@ class HaxeAppCanvas {
 
 	function addPointerEventListeners() {
 		// Pointer Input
-		function executePointerMethodFromMouseEvent(mouseEvent: MouseEvent, pointerMethod: (app.event.PointerEvent) -> Bool) {
+		function executePointerMethodFromMouseEvent(mouseEvent: MouseEvent, pointerMethod: (wc.app.event.PointerEvent) -> Bool) {
 			// trackpad force
 			// var force = mouseEvent.force || mouseEvent.webkitForce;
 			var force: Float = if (js.Syntax.field(mouseEvent, 'force') != null) {
@@ -160,7 +160,7 @@ class HaxeAppCanvas {
 			return touchInfo;
 		}
 
-		function executePointerMethodFromTouchEvent(touchEvent: TouchEvent, pointerMethod: (app.event.PointerEvent) -> Bool) {
+		function executePointerMethodFromTouchEvent(touchEvent: TouchEvent, pointerMethod: (wc.app.event.PointerEvent) -> Bool) {
 			var buttonStates: {
 				button: Int,
 				buttons: Int,

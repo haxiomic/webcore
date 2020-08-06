@@ -5,10 +5,10 @@ package wc.app;
 #end
 @:nativeGen // cpp
 @:keep
-@:build(app.Macro.hxcppAddNativeCode('./HaxeAppC.h', './HaxeAppC.cpp'))
+@:build(wc.app.Macro.hxcppAddNativeCode('./HaxeAppC.h', './HaxeAppC.cpp'))
 #if (iphoneos || iphonesim)
-@:build(app.Macro.generateHaxeCompileScript())
-@:build(app.Macro.copyHaxeAppFramework())
+@:build(wc.app.Macro.generateHaxeCompileScript())
+@:build(wc.app.Macro.copyHaxeAppFramework())
 #end
 class HaxeApp {
 
@@ -143,7 +143,7 @@ typedef MainThreadTick = cpp.Callable<() -> Void>;
 	We have to use a separate class to store data because `@:nativeGen` doesn't properly handle all references;
 	If the `@:nativeGen` class is added to __boot__.cpp to initialize fields, it will be incorrectly referenced
 **/
-@:allow(app.HaxeApp)
+@:allow(wc.app.HaxeApp)
 @:unreflective
 class Internal {
 

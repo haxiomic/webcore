@@ -6,7 +6,7 @@ import cpp.*;
 	Guards a value behind an mutex lock
 	If the value is not primitive (and therefore not copied on return) you should keep read/write to the `acquire()` callback rather than using `get()` and `set()`
 **/
-@:access(audio.AudioContext)
+@:access(wc.audio.AudioContext)
 @:generic class LockedValue<T> {
 
 	public final mutex: Star<MiniAudio.Mutex>;
@@ -43,7 +43,7 @@ import cpp.*;
 
 }
 
-@:access(audio.native.LockedValue)
+@:access(wc.audio.native.LockedValue)
 private class LockedValueFinalizer {
 	static public function finalizer<T>(instance: LockedValue<T>) {
 		#if debug

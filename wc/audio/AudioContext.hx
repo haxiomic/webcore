@@ -31,8 +31,8 @@ import wc.audio.native.LockedValue;
 
 @:include('./native.h')
 @:sourceFile(#if winrt './native.c' #else './native.m' #end)
-@:allow(audio.AudioNode)
-@:allow(audio.native.AudioDecoder)
+@:allow(wc.audio.AudioNode)
+@:allow(wc.audio.native.AudioDecoder)
 class AudioContext {
 
     public final destination: AudioDestinationNode;

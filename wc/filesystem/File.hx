@@ -41,7 +41,7 @@ class File {
 	public static function readBundleFile(
 		bundleIdentifier: String,
 		path: String,
-		?onComplete: (typedarray.ArrayBuffer) -> Void,
+		?onComplete: (wc.typedarray.ArrayBuffer) -> Void,
 		?onError: (String) -> Void,
 		?onProgress: (bytesLoaded: Int, bytesTotal: Int) -> Void
 	): {
@@ -69,7 +69,7 @@ class File {
 
 			// find path to bundle then use normal stdlib file read
 			var bundle = if (bundleIdentifier != null) {
-				wc.filesystem.native.CFBundle.getBundleWithIdentifier(filesystem.native.CFBundle.CFStringRef.create(bundleIdentifier));
+				wc.filesystem.native.CFBundle.getBundleWithIdentifier(wc.filesystem.native.CFBundle.CFStringRef.create(bundleIdentifier));
 			} else {
 				wc.filesystem.native.CFBundle.getMainBundle();
 			}
@@ -105,7 +105,7 @@ class File {
 	#if cpp
 	static inline function readFileStdLib(
 		filePath: String,
-		onComplete: (typedarray.ArrayBuffer) -> Void,
+		onComplete: (wc.typedarray.ArrayBuffer) -> Void,
 		onError: (String) -> Void,
 		onProgress: (bytesLoaded: Int, bytesTotal: Int) -> Void
 	): {
@@ -144,7 +144,7 @@ class File {
 	#if js
 	static inline function readFileWeb(
 		filePath: String,
-		onComplete: (typedarray.ArrayBuffer) -> Void,
+		onComplete: (wc.typedarray.ArrayBuffer) -> Void,
 		onError: (String) -> Void,
 		onProgress: (bytesLoaded: Int, bytesTotal: Int) -> Void
 	): {

@@ -178,7 +178,7 @@ class BuildArrayBufferView {
 		if (haxe.macro.Context.getDefines().exists('cpp')) {
 			newFields = newFields.concat((macro class CppFields {
 				@:pure
-				@:access(typedarray.ArrayBufferViewBase)
+				@:access(wc.typedarray.ArrayBufferViewBase)
 				public inline function toCPointer(): cpp.Star<$ArrayTypeT> {
 					var address = cpp.NativeArray.address(this.nativeBytes, this.byteOffset).raw;
 					return cast address;
