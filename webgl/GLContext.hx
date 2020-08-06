@@ -1,6 +1,6 @@
 package webgl;
 
-import typedarray.BufferSource;
+import typedarray.ArrayBufferView;
 
 #if cpp
 typedef GLenum     = cpp.UInt32;
@@ -141,7 +141,7 @@ abstract GLContext(InternalGLContext) from InternalGLContext to InternalGLContex
 	public inline function blendFuncSeparate(srcRGB:BlendFactor, dstRGB:BlendFactor, srcAlpha:BlendFactor, dstAlpha:BlendFactor):Void
 		this.blendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
 
-	public inline function bufferData(target:BufferTarget, data:BufferSource, usage:BufferUsage)
+	public inline function bufferData(target:BufferTarget, data:ArrayBufferView, usage:BufferUsage)
 		this.bufferData(target, data, usage);
 	
 	public inline function bufferDataOfSize(target:BufferTarget, size:Int, usage:BufferUsage) {
@@ -152,7 +152,7 @@ abstract GLContext(InternalGLContext) from InternalGLContext to InternalGLContex
 		#end
 	}
 
-	public inline function bufferSubData(target:BufferTarget, offset:GLintptr, data:BufferSource)
+	public inline function bufferSubData(target:BufferTarget, offset:GLintptr, data:ArrayBufferView)
 		this.bufferSubData(target, offset, data);
 
 	public inline function checkFramebufferStatus(target:FramebufferTarget):FramebufferStatus

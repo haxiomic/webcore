@@ -6,7 +6,7 @@ import typedarray.Uint32Array;
 import typedarray.Int32Array;
 import typedarray.Float32Array;
 import typedarray.Uint8Array;
-import typedarray.BufferSource;
+import typedarray.ArrayBufferView;
 import webgl.native.ES2Context.*;
 
 @:nullSafety
@@ -200,7 +200,7 @@ class GLContext {
 		glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
 	}
 
-	public inline function bufferData(target:BufferTarget, data:BufferSource, usage:BufferUsage) {
+	public inline function bufferData(target:BufferTarget, data:ArrayBufferView, usage:BufferUsage) {
 		setContext();
 		glBufferData(target, data.byteLength, cast data.toCPointer(), usage);
 	}
@@ -210,7 +210,7 @@ class GLContext {
 		glBufferData(target, size, null, usage);
 	}
 
-	public inline function bufferSubData(target:BufferTarget, offset:GLintptr, data:BufferSource) {
+	public inline function bufferSubData(target:BufferTarget, offset:GLintptr, data:ArrayBufferView) {
 		setContext();
 		glBufferSubData(target, offset, data.byteLength, cast data.toCPointer());
 	}
