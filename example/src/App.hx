@@ -54,7 +54,7 @@ class App implements wc.app.HaxeAppInterface {
 	var activePointerTypes = new Map<String, Map<Int, PointerEvent>>();
 
 	public function new() {
-		trace('App instance created. Language: ${wc.device.DeviceInfo.getSystemLanguageIsoCode()}');
+		trace('App instance created. Language: ${wc.device.Device.getSystemLanguageIsoCode()}');
 
 		// test the haxe event loop
 		function helloLoop() {
