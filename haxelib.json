@@ -3,7 +3,7 @@
   "url": "https://github.com/haxiomic",
   "license": "MIT",
   "tags": [],
-  "description": "WIP, name is likely to change",
+  "description": "hxcpp implementation of major web media APIs like webgl and webaudio",
   "version": "0.0.0",
   "releasenote": "",
   "contributors": []
