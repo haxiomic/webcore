@@ -1,6 +1,6 @@
 package wc.device;
 
-class DeviceInfo {
+class Device {
 
 	/**
 		Returns a two letter [ISO 639-1 code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) for the device's preferred language setting
