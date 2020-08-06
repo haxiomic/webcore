@@ -1,4 +1,4 @@
-package audio;
+package wc.audio;
 
 #if js
 
@@ -6,7 +6,7 @@ typedef AudioBufferSourceNode = js.html.audio.AudioBufferSourceNode;
 
 #else
 
-import audio.native.AudioDecoder;
+import wc.audio.native.AudioDecoder;
 
 @:allow(audio.AudioContext)
 class AudioBufferSourceNode extends AudioScheduledSourceNode {

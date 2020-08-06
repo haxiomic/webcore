@@ -1,4 +1,4 @@
-package audio;
+package wc.audio;
 
 #if js
 

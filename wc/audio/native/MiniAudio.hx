@@ -4,7 +4,7 @@
 	@version miniaudio.h v0.9.9, commit #1916f3
 	@author George Corney (haxiomic)
 **/
-package audio.native;
+package wc.audio.native;
 
 import cpp.*;
 

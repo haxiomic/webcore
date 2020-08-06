@@ -1,4 +1,4 @@
-package audio;
+package wc.audio;
 
 #if js
 
@@ -6,7 +6,7 @@ typedef AudioParam = js.html.audio.AudioParam;
 
 #else
 
-import audio.native.LockedValue;
+import wc.audio.native.LockedValue;
 
 /**
 	Basic thread-safe AudioParam

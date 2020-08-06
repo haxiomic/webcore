@@ -1,4 +1,4 @@
-package audio;
+package wc.audio;
 
 #if js
 
@@ -7,8 +7,8 @@ typedef AudioNode = js.html.audio.AudioNode;
 #else
 
 import cpp.*;
-import audio.native.AudioDecoder;
-import audio.native.NativeAudioNode;
+import wc.audio.native.AudioDecoder;
+import wc.audio.native.NativeAudioNode;
 
 @:allow(audio.AudioContext)
 @:native('audio.AudioNodeHx')

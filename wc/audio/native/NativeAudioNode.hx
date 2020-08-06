@@ -1,7 +1,7 @@
-package audio.native;
+package wc.audio.native;
 
 import cpp.*;
-import audio.native.AudioDecoder;
+import wc.audio.native.AudioDecoder;
 
 typedef ReadFramesCallback = Callable<(sourceUserData: Star<cpp.Void>, nChannels: UInt32, frameCount: UInt64, schedulingCurrentFrameBlock: Int64, interleavedSamples: Star<Float32>) -> UInt64>;
 

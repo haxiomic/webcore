@@ -1,4 +1,4 @@
-package audio.native;
+package wc.audio.native;
 
 import cpp.*;
 

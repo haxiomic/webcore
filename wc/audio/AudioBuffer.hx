@@ -1,4 +1,4 @@
-package audio;
+package wc.audio;
 
 #if js
 
@@ -6,7 +6,7 @@ typedef AudioBuffer = js.html.audio.AudioBuffer;
 
 #else
 import cpp.*;
-import audio.native.MiniAudio;
+import wc.audio.native.MiniAudio;
 
 /**
 	Represents raw PCM frames

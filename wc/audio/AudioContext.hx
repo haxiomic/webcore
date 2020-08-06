@@ -1,4 +1,4 @@
-package audio;
+package wc.audio;
 
 #if js
 
@@ -23,11 +23,11 @@ abstract AudioContext(js.html.audio.AudioContext) {
 
 import cpp.*;
 
-import typedarray.ArrayBuffer;
-import audio.native.AudioDecoder;
-import audio.native.NativeAudioNode.NativeAudioNodeList;
-import audio.native.MiniAudio;
-import audio.native.LockedValue;
+import wc.typedarray.ArrayBuffer;
+import wc.audio.native.AudioDecoder;
+import wc.audio.native.NativeAudioNode.NativeAudioNodeList;
+import wc.audio.native.MiniAudio;
+import wc.audio.native.LockedValue;
 
 @:include('./native.h')
 @:sourceFile(#if winrt './native.c' #else './native.m' #end)
@@ -234,7 +234,7 @@ class AudioContext {
 class DeviceUserData {
 
     public final nativeNodeList: Star<NativeAudioNodeList>;
-    public final schedulingCurrentFrameBlock: audio.native.LockedValue<Int64>;
+    public final schedulingCurrentFrameBlock: wc.audio.native.LockedValue<Int64>;
 
     public function new(context: AudioContext, nativeNodeList: Pointer<NativeAudioNodeList>) {
         this.nativeNodeList = nativeNodeList.ptr;
