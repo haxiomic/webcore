@@ -1,18 +1,4 @@
 {
-	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "../"
-		},
-		{
-			"path": "/Users/geo/Projects/haxe-git"
-		},
-		{
-			"path": "/usr/local/lib/haxe/lib/hxcpp/4,0,52"
-		}
-	],
 	"settings": {
 		"triggerTaskOnSave.selectedTask": "web.hxml",
 		"triggerTaskOnSave.tasks": {

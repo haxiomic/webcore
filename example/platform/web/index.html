@@ -17,6 +17,13 @@
 	<body>
 		<script src="bin/app.js"></script>
 		<script>
+			var e = new Example2();
+			e.nativeView.style.width = '100%';
+			e.nativeView.style.height = '100%';
+			document.body.appendChild(e.nativeView);
+		</script>
+		<script>
+			/*
 			let pixelRatio = window.devicePixelRatio != null ? window.devicePixelRatio : 1;
 
 			// create a canvas to provide the OpenGL context
@@ -40,6 +47,7 @@
 			canvasFillWindow();
 
 			let haxeAppCanvas = App.create(canvas);
+			*/
 		</script>
 	</body>
 </html>

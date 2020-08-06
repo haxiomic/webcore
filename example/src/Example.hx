@@ -1,5 +1,5 @@
 import wc.webgl.GLContextAttributes;
-import wc.app.event.*;
+import wc.event.*;
 import wc.audio.AudioContext;
 import wc.webgl.GLUniformLocation;
 import wc.webgl.GLTexture;
@@ -24,17 +24,7 @@ class DemoAssets implements wc.app.AssetPack { }
 // </target>
 #end
 @:expose
-class App implements wc.app.HaxeAppInterface {
-
-	#if js
-	static public function create(?canvas: js.html.CanvasElement, ?webglContextAttributes: GLContextAttributes) {
-		var appInstance = new App();
-		return new wc.app.web.HaxeAppCanvas(appInstance, canvas, webglContextAttributes);
-	}
-	#end
-
-	var width: Float = 0;
-	var height: Float = 0;
+class Example extends wc.WebGLView {
 
 	var gl: Null<GLContext>;
 	var audioContext: AudioContext;
@@ -54,6 +44,7 @@ class App implements wc.app.HaxeAppInterface {
 	var activePointerTypes = new Map<String, Map<Int, PointerEvent>>();
 
 	public function new() {
+		super();
 		trace('App instance created. Language: ${wc.device.Device.getSystemLanguageIsoCode()}');
 
 		// test the haxe event loop
@@ -94,14 +85,7 @@ class App implements wc.app.HaxeAppInterface {
 		});
 	}
 
-	public function onResize(width: Float, height: Float) {
-		this.width = width;
-		this.height = height;
-
-		trace('onResize', width, height);
-	}
-
-	public function onGraphicsContextReady(gl: GLContext) {
+	override function onGraphicsContextReady(gl: GLContext) {
 		this.gl = gl;
 
 		trace(gl.getContextAttributes());
@@ -207,12 +191,12 @@ class App implements wc.app.HaxeAppInterface {
 		gl.disable(CULL_FACE);
 	}
 
-	public function onGraphicsContextLost() {
+	override function onGraphicsContextLost() {
 		trace('Graphics context lost');
 		gl = null;
 	}
 
-	public function onDrawFrame(drawingBufferWidth: Int, drawingBufferHeight: Int) {
+	override function onDrawFrame(drawingBufferWidth: Int, drawingBufferHeight: Int) {
 		var t_s = haxe.Timer.stamp();
 
 		gl.viewport(0, 0, drawingBufferWidth, drawingBufferHeight);
@@ -251,7 +235,7 @@ class App implements wc.app.HaxeAppInterface {
 		}
 	}
 
-	public function onPointerDown(event: PointerEvent) {
+	override function onPointerDown(event: PointerEvent) {
 		trace('down', event.pointerId, event.button, event.buttons);
 		audioContext.resume();
 		// ignore right mouse click
@@ -260,7 +244,7 @@ class App implements wc.app.HaxeAppInterface {
 		return false;
 	}
 
-	public function onPointerMove(event: PointerEvent) {
+	override function onPointerMove(event: PointerEvent) {
 		var activePointers = getActivePointers(event.pointerType);
 		if (activePointers.exists(event.pointerId)) {
 			activePointers.set(event.pointerId, event);
@@ -268,36 +252,36 @@ class App implements wc.app.HaxeAppInterface {
 		return false;
 	}
 
-	public function onPointerUp(event: PointerEvent) {
+	override function onPointerUp(event: PointerEvent) {
 		trace('up', event.pointerId, event.button, event.buttons);
 		getActivePointers(event.pointerType).remove(event.pointerId);
 		return false;
 	}
 
-	public function onPointerCancel(event: PointerEvent) {
+	override function onPointerCancel(event: PointerEvent) {
 		return onPointerUp(event);
 	}
 
-	public function onWheel(event: WheelEvent) {
+	override function onWheel(event: WheelEvent) {
 		trace('wheel', event);
 		return true;
 	}
 
-	public function onKeyDown(event: KeyboardEvent, hasFocus: Bool) {
+	override function onKeyDown(event: KeyboardEvent, hasFocus: Bool) {
 		trace('keydown', hasFocus, event.key, event.code, event.location);
 		return false;
 	}
 
-	public function onKeyUp(event: KeyboardEvent, hasFocus: Bool) {
+	override function onKeyUp(event: KeyboardEvent, hasFocus: Bool) {
 		trace('keyup', hasFocus, event.key, event.code, event.location);
 		return false;
 	}
 
-	public function onActivate() {
+	override function onActivate() {
 		trace('onActivate');
 	}
 
-	public function onDeactivate() {
+	override function onDeactivate() {
 		trace('onDeactivate');
 	}
 
