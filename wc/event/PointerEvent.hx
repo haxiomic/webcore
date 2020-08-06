@@ -1,4 +1,4 @@
-package wc.app.event;
+package wc.event;
 
 /**
 	See https://www.w3.org/TR/pointerevents
