@@ -37,11 +37,13 @@ abstract BufferSource(BufferSourceType) from BufferSourceType {
 		}
 	}
 
-	@:from @:pure public static inline function fromBuffer(buffer: ArrayBuffer): BufferSource {
+	@:from @:pure
+	public static inline function fromBuffer(buffer: ArrayBuffer): BufferSource {
 		return Buffer(buffer);
 	}
 
-	@:from @:pure public static inline function fromBufferView(bufferView: ArrayBufferView): BufferSource {
+	@:from @:pure
+	public static inline function fromBufferView(bufferView: ArrayBufferView): BufferSource {
 		return BufferView(bufferView);
 	}
 
