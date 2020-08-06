@@ -1,4 +1,4 @@
-package app.event;
+package wc.app.event;
 
 /**
 	See https://w3c.github.io/uievents/#idl-keyboardevent

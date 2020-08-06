@@ -1,4 +1,4 @@
-package webgl.extension;
+package wc.webgl.el.extension;
 
 #if js
 typedef EXTColorBufferFloat = js.html.webgl.extension.EXTColorBufferFloat;

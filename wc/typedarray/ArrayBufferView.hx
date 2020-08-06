@@ -1,4 +1,4 @@
-package typedarray;
+package wc.typedarray;
 
 #if js
 

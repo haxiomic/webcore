@@ -1,4 +1,4 @@
-package webgl.extension;
+package wc.webgl.extension;
 
 #if js
 typedef OESTextureHalfFloatLinear = js.html.webgl.extension.OESTextureHalfFloatLinear;

@@ -1,4 +1,4 @@
-package filesystem;
+package wc.filesystem;
 
 import haxe.io.Path;
 
@@ -69,9 +69,9 @@ class File {
 
 			// find path to bundle then use normal stdlib file read
 			var bundle = if (bundleIdentifier != null) {
-				filesystem.native.CFBundle.getBundleWithIdentifier(filesystem.native.CFBundle.CFStringRef.create(bundleIdentifier));
+				wc.filesystem.native.CFBundle.getBundleWithIdentifier(filesystem.native.CFBundle.CFStringRef.create(bundleIdentifier));
 			} else {
-				filesystem.native.CFBundle.getMainBundle();
+				wc.filesystem.native.CFBundle.getMainBundle();
 			}
 
 			if (bundle == null) {
@@ -79,7 +79,7 @@ class File {
 				return nullCancellationToken;
 			}
 
-			var bundleResourceDirectory: String = filesystem.native.CFBundle.getResourceDirectory(bundle);
+			var bundleResourceDirectory: String = wc.filesystem.native.CFBundle.getResourceDirectory(bundle);
 			var filePath = Path.join([bundleResourceDirectory, path]);
 
 			return readFileStdLib(filePath, onComplete, onError, onProgress);

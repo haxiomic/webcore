@@ -1,10 +1,10 @@
-package image;
+package wc.image;
 
 #if js
 
 import js.html.Blob;
 import js.html.URL;
-import typedarray.ArrayBuffer;
+import wc.typedarray.ArrayBuffer;
 
 /**
     HTMLImageElement extended to add `decodeImageData()`
@@ -52,7 +52,7 @@ abstract Image(js.html.Image) from js.html.Image to js.html.Image {
 #else
 
 import cpp.*;
-import typedarray.ArrayBuffer;
+import wc.typedarray.ArrayBuffer;
 import image.native.StbImage;
 
 /**

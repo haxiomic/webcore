@@ -1,4 +1,4 @@
-package app.event;
+package wc.app.event;
 
 enum abstract PointerType(String) to String from String {
 	var MOUSE = "mouse";

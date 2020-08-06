@@ -1,7 +1,7 @@
-package webgl;
+package wc.webgl;
 
 #if js
 typedef GLShader = js.html.webgl.Shader;
 #else
-typedef GLShader = webgl.native.GLShader;
+typedef GLShader = wc.webgl.native.GLShader;
 #end

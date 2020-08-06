@@ -1,4 +1,4 @@
-package typedarray;
+package wc.typedarray;
 
 #if js
 
@@ -6,9 +6,9 @@ typedef Int32Array = js.lib.Int32Array;
 
 #else
 
-import typedarray.ArrayBufferView.ArrayBufferViewBase;
-import typedarray.ArrayBufferView.ArrayLike;
-import typedarray.ArrayBufferView.ArrayBufferViewImplIterator;
+import wc.typedarray.ArrayBufferView.ArrayBufferViewBase;
+import wc.typedarray.ArrayBufferView.ArrayLike;
+import wc.typedarray.ArrayBufferView.ArrayBufferViewImplIterator;
 
 #if (!macro && cpp)
 private typedef Int32 = cpp.Int32;

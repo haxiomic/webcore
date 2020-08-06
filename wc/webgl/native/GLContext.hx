@@ -1,13 +1,13 @@
-package webgl.native;
+package wc.webgl.native;
 
 import cpp.*;
-import webgl.GLContext;
-import typedarray.Uint32Array;
-import typedarray.Int32Array;
-import typedarray.Float32Array;
-import typedarray.Uint8Array;
-import typedarray.ArrayBufferView;
-import webgl.native.ES2Context.*;
+import wc.webgl.GLContext;
+import wc.typedarray.Uint32Array;
+import wc.typedarray.Int32Array;
+import wc.typedarray.Float32Array;
+import wc.typedarray.Uint8Array;
+import wc.typedarray.ArrayBufferView;
+import wc.webgl.native.ES2Context.*;
 
 @:nullSafety
 @:noCompletion
@@ -1002,7 +1002,7 @@ class GLContext {
 		setContext();
 		@:privateAccess {
 			// currently on C++ TexImageSource can only be an Image
-			var imageSource: image.Image = source;
+			var imageSource: wc.image.Image = source;
 
 			var nChannels = switch format {
 				case RGB: 3;
@@ -1019,8 +1019,8 @@ class GLContext {
 			}
 
 			var dataType = switch type {
-				case FLOAT: image.Image.PixelDataType.FLOAT;
-				case UNSIGNED_BYTE: image.Image.PixelDataType.UNSIGNED_BYTE;
+				case FLOAT: wc.image.Image.PixelDataType.FLOAT;
+				case UNSIGNED_BYTE: wc.image.Image.PixelDataType.UNSIGNED_BYTE;
 				default: null;
 			}
 
@@ -1067,7 +1067,7 @@ class GLContext {
 		setContext();
 		@:privateAccess {
 			// currently on C++ TexImageSource can only be an Image
-			var imageSource: image.Image = source;
+			var imageSource: wc.image.Image = source;
 
 			var nChannels = switch format {
 				case RGB: 3;
@@ -1084,8 +1084,8 @@ class GLContext {
 			}
 
 			var dataType = switch type {
-				case FLOAT: image.Image.PixelDataType.FLOAT;
-				case UNSIGNED_BYTE: image.Image.PixelDataType.UNSIGNED_BYTE;
+				case FLOAT: wc.image.Image.PixelDataType.FLOAT;
+				case UNSIGNED_BYTE: wc.image.Image.PixelDataType.UNSIGNED_BYTE;
 				default: null;
 			}
 

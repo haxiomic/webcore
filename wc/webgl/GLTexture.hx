@@ -1,7 +1,7 @@
-package webgl;
+package wc.webgl;
 
 #if js
 typedef GLTexture = js.html.webgl.Texture;
 #else
-typedef GLTexture = webgl.native.GLTexture;
+typedef GLTexture = wc.webgl.native.GLTexture;
 #end

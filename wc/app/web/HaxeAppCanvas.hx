@@ -1,4 +1,4 @@
-package app.web;
+package wc.app.web;
 
 import js.Browser.*;
 import js.html.CanvasElement;
@@ -7,7 +7,7 @@ import js.html.MouseEvent;
 import js.html.TouchEvent;
 import js.html.WheelEvent;
 import js.html.webgl.RenderingContext;
-import webgl.GLContextAttributes;
+import wc.webgl.GLContextAttributes;
 
 @:keep
 class HaxeAppCanvas {

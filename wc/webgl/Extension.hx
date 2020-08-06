@@ -1,6 +1,6 @@
-package webgl;
+package wc.webgl;
 
-import webgl.extension.*;
+import wc.webgl.extension.*;
 
 enum abstract Extension<T>(String) from String to String {
 	var ANGLE_instanced_arrays: Extension<ANGLEInstancedArrays> = 'ANGLE_instanced_arrays';

@@ -1,4 +1,4 @@
-package device.native;
+package wc.device.native;
 
 import cpp.*;
 

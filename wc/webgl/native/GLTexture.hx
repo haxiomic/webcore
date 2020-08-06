@@ -1,4 +1,4 @@
-package webgl.native;
+package wc.webgl.native;
 
 @:allow(webgl.native.GLContext)
 @:noCompletion

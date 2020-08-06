@@ -1,4 +1,4 @@
-package app.event;
+package wc.app.event;
 
 /**
 	See https://developer.mozilla.org/en-US/docs/Web/API/WheelEvent

@@ -1,9 +1,9 @@
-package webgl.native;
+package wc.webgl.native;
 
 #if !macro
 
 import cpp.*;
-import webgl.GLContext;
+import wc.webgl.GLContext;
 
 @:native('')
 @:include('./ES2Context.h')

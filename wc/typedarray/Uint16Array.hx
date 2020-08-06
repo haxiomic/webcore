@@ -1,4 +1,4 @@
-package typedarray;
+package wc.typedarray;
 
 #if js
 
@@ -6,9 +6,9 @@ typedef Uint16Array = js.lib.Uint16Array;
 
 #else
 
-import typedarray.ArrayBufferView.ArrayBufferViewBase;
-import typedarray.ArrayBufferView.ArrayLike;
-import typedarray.ArrayBufferView.ArrayBufferViewImplIterator;
+import wc.typedarray.ArrayBufferView.ArrayBufferViewBase;
+import wc.typedarray.ArrayBufferView.ArrayLike;
+import wc.typedarray.ArrayBufferView.ArrayBufferViewImplIterator;
 
 #if (!macro && cpp)
 private typedef UInt16 = cpp.UInt16;

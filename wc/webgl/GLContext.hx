@@ -1,6 +1,6 @@
-package webgl;
+package wc.webgl;
 
-import typedarray.ArrayBufferView;
+import wc.typedarray.ArrayBufferView;
 
 #if cpp
 typedef GLenum     = cpp.UInt32;
@@ -33,21 +33,21 @@ typedef GLclampf   = Float;
 #end
 
 
-typedef GLArrayBuffer       = typedarray.ArrayBuffer;
-typedef GLArrayBufferView   = typedarray.ArrayBufferView;
-typedef GLInt8Array         = typedarray.Int8Array;
-typedef GLUint8Array        = typedarray.Uint8Array;
-typedef GLUint8ClampedArray = typedarray.Uint8ClampedArray;
-typedef GLInt16Array        = typedarray.Int16Array;
-typedef GLUint16Array       = typedarray.Uint16Array;
-typedef GLInt32Array        = typedarray.Int32Array;
-typedef GLUint32Array       = typedarray.Uint32Array;
-typedef GLFloat32Array      = typedarray.Float32Array;
-typedef GLFloat64Array      = typedarray.Float64Array;
+typedef GLArrayBuffer       = wc.typedarray.ArrayBuffer;
+typedef GLArrayBufferView   = wc.typedarray.ArrayBufferView;
+typedef GLInt8Array         = wc.typedarray.Int8Array;
+typedef GLUint8Array        = wc.typedarray.Uint8Array;
+typedef GLUint8ClampedArray = wc.typedarray.Uint8ClampedArray;
+typedef GLInt16Array        = wc.typedarray.Int16Array;
+typedef GLUint16Array       = wc.typedarray.Uint16Array;
+typedef GLInt32Array        = wc.typedarray.Int32Array;
+typedef GLUint32Array       = wc.typedarray.Uint32Array;
+typedef GLFloat32Array      = wc.typedarray.Float32Array;
+typedef GLFloat64Array      = wc.typedarray.Float64Array;
 
 #if js
 abstract TexImageSource(Dynamic)
-	from image.Image           to image.Image
+	from wc.image.Image        to wc.image.Image
 	from js.html.ImageBitmap   to js.html.ImageBitmap
 	from js.html.ImageData     to js.html.ImageData
 	from js.html.ImageElement  to js.html.ImageElement
@@ -55,7 +55,7 @@ abstract TexImageSource(Dynamic)
 	from js.html.VideoElement  to js.html.VideoElement
 #else
 abstract TexImageSource(image.Image)
-	from image.Image to image.Image
+	from wc.image.Image to wc.image.Image
 #end
 {
 	public var width (get, never): Int;
@@ -69,7 +69,7 @@ private typedef InternalGLContext =
 	#if js
 		js.html.webgl.RenderingContext;
 	#elseif cpp
-		webgl.native.GLContext;
+		wc.webgl.native.GLContext;
 	#else
 		Dynamic;
 	#end
@@ -78,7 +78,7 @@ private typedef InternalConstGLContext =
 	#if js
 		js.html.webgl.RenderingContext;
 	#elseif cpp
-		webgl.native.GLContext;
+		wc.webgl.native.GLContext;
 	#else
 		Dynamic;
 	#end

@@ -1,4 +1,4 @@
-package webgl;
+package wc.webgl;
 
 typedef GLContextAttributes = {
 	var alpha: Bool;

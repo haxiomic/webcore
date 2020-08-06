@@ -1,4 +1,4 @@
-package typedarray;
+package wc.typedarray;
 
 typedef DataView =
 	#if js

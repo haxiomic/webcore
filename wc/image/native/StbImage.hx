@@ -1,4 +1,4 @@
-package image.native;
+package wc.image.native;
 
 import cpp.*;
 

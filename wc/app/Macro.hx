@@ -1,4 +1,4 @@
-package app;
+package wc.app;
 
 #if macro
 import haxe.macro.Context;
@@ -38,16 +38,16 @@ class Macro {
 		var initExpr = if (isCpp) {
 			// add static constructor function
 			fields = fields.concat((macro class X {
-				@:noDebug static function __construct__(): app.HaxeAppInterface {
+				@:noDebug static function __construct__(): wc.app.HaxeAppInterface {
 					return new $localTypePath();
 				}
 			}).fields);
 			macro {
-				@:privateAccess app.HaxeApp.Internal.registerConstructor($v{localTypePathIdent}, cpp.Function.fromStaticFunction(__construct__));
+				@:privateAccess wc.app.HaxeApp.Internal.registerConstructor($v{localTypePathIdent}, cpp.Function.fromStaticFunction(__construct__));
 			}
 		} else {
 			macro {
-				@:privateAccess app.HaxeApp.Internal.registerConstructor($v{localTypePathIdent}, () -> new $localTypePath());
+				@:privateAccess wc.app.HaxeApp.Internal.registerConstructor($v{localTypePathIdent}, () -> new $localTypePath());
 			}
 		}
 

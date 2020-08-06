@@ -1,4 +1,4 @@
-package webgl.extension;
+package wc.webgl.extension;
 
 #if js
 typedef EXTSrgb = js.html.webgl.extension.EXTSrgb;

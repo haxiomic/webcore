@@ -1,4 +1,4 @@
-package webgl.extension;
+package wc.webgl.extension;
 
 #if js
 typedef ANGLEInstancedArrays = js.html.webgl.extension.ANGLEInstancedArrays;

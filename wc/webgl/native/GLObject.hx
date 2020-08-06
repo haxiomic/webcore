@@ -1,7 +1,7 @@
-package webgl.native;
+package wc.webgl.native;
 
 import cpp.NativeGc;
-import webgl.GLContext.GLuint;
+import wc.webgl.GLContext.GLuint;
 
 @:allow(webgl.native.GLContext)
 @:noCompletion

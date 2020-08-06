@@ -1,6 +1,6 @@
-package webgl;
+package wc.webgl;
 
-import webgl.GLContext;
+import wc.webgl.GLContext;
 
 typedef GLActiveInfo = {
 	var size(default, null):GLint;

@@ -1,4 +1,4 @@
-package webgl.extension;
+package wc.webgl.extension;
 
 #if js
 typedef WEBGLDrawBuffers = js.html.webgl.extension.WEBGLDrawBuffers;

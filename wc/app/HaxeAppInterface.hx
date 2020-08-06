@@ -1,7 +1,7 @@
-package app;
+package wc.app;
 
-import webgl.GLContext;
-import app.event.*;
+import wc.webgl.GLContext;
+import wc.app.event.*;
 
 /**
 	Implement this interface to set the main app class.

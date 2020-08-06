@@ -1,4 +1,4 @@
-package webgl.extension;
+package wc.webgl.extension;
 
 #if js
 typedef WEBGLCompressedTextureS3tcSrgb = js.html.webgl.extension.WEBGLCompressedTextureS3tcSrgb;

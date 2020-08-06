@@ -1,7 +1,7 @@
-package webgl;
+package wc.webgl;
 
 #if js
 typedef GLProgram = js.html.webgl.Program;
 #else
-typedef GLProgram = webgl.native.GLProgram;
+typedef GLProgram = wc.webgl.native.GLProgram;
 #end

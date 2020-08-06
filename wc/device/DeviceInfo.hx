@@ -1,4 +1,4 @@
-package device;
+package wc.device;
 
 class DeviceInfo {
 
@@ -14,7 +14,7 @@ class DeviceInfo {
 		#else
 		#if (iphoneos || iphonesim || macos)
 
-		return device.native.CFLocale.preferredLanguagesFirst();
+		return wc.device.native.CFLocale.preferredLanguagesFirst();
 
 		#else
 

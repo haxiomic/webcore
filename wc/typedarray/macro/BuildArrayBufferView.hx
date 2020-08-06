@@ -1,4 +1,4 @@
-package typedarray.macro;
+package wc.typedarray.macro;
 
 #if macro
 class BuildArrayBufferView {

@@ -1,4 +1,4 @@
-package filesystem.native;
+package wc.filesystem.native;
 
 import cpp.*;
 

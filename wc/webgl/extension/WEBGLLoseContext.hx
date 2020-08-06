@@ -1,4 +1,4 @@
-package webgl.extension;
+package wc.webgl.el.extension;
 
 #if js
 typedef WEBGLLoseContext = js.html.webgl.extension.WEBGLLoseContext;

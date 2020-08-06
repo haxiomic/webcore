@@ -1,4 +1,4 @@
-package app;
+package wc.app;
 
 import haxe.io.Path;
 
@@ -72,7 +72,7 @@ class AssetPackMacro {
 				?onError: (String) -> Void,
 				?onProgress: (bytesLoaded: Int, bytesTotal: Int) -> Void
 			) {
-				return filesystem.File.readBundleFile(app.HaxeApp.getBundleIdentifier(), 'asset-pack/' + $v{classAssetDirectory} + '/' + path, onComplete, onError, onProgress);
+				return wc.filesystem.File.readBundleFile(app.HaxeApp.getBundleIdentifier(), 'asset-pack/' + $v{classAssetDirectory} + '/' + path, onComplete, onError, onProgress);
 			}
 
 		}).fields;
@@ -117,9 +117,9 @@ class AssetPackMacro {
 							trace('Copying "$path" -> "$targetPath"');
 							#end
 							var targetDirectory = Path.directory(targetPath);
-							app.Macro.touchDirectoryPath(targetDirectory);
+							wc.app.Macro.touchDirectoryPath(targetDirectory);
 
-							try app.Macro.delete(targetPath) catch (e: Any) {};
+							try wc.app.Macro.delete(targetPath) catch (e: Any) {};
 							sys.io.File.copy(sourcePath, targetPath);
 						}
 
@@ -155,7 +155,7 @@ class AssetPackMacro {
 					#if debug
 					trace('Deleting "${Path.join([outputDirectory, path])}"');
 					#end
-					try app.Macro.delete(Path.join([outputDirectory, path])) catch (e: Any) {}
+					try wc.app.Macro.delete(Path.join([outputDirectory, path])) catch (e: Any) {}
 				}
 			}
 
@@ -218,7 +218,7 @@ class AssetPackMacro {
 
 					objectFields.push({
 						field: variableName,
-						expr: isDisplay ? macro new typedarray.ArrayBuffer(0) : macro (haxe.Resource.getBytes($v{resourceId}): typedarray.ArrayBuffer)
+						expr: isDisplay ? macro new wc.typedarray.ArrayBuffer(0) : macro (haxe.Resource.getBytes($v{resourceId}): wc.typedarray.ArrayBuffer)
 					});
 
 				case null, _:

@@ -1,4 +1,4 @@
-package app;
+package wc.app;
 
 #if js
 @:native('HaxeApp')
