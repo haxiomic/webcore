@@ -11,7 +11,7 @@ import wc.audio.native.AudioDecoder;
 import wc.audio.native.NativeAudioNode;
 
 @:allow(wc.audio.AudioContext)
-@:native('audio.AudioNodeHx')
+@:native('wc.audio.AudioNodeHx')
 class AudioNode {
 
 	public final context: AudioContext;

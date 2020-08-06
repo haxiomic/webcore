@@ -2,7 +2,7 @@ package wc.audio.native;
 
 import cpp.*;
 
-@:native('audio.native.AudioDecoderHx')
+@:native('wc.audio.native.AudioDecoderHx')
 class AudioDecoder {
 
 	public final nativeAudioDecoder: Star<NativeAudioDecoder>;
