@@ -1,5 +1,11 @@
 package typedarray;
 
+/**
+	"The BufferSource typedef is used to represent objects that are either themselves an ArrayBuffer or which provide a view on to an ArrayBuffer."
+
+	https://heycam.github.io/webidl/#BufferSource
+**/
+
 #if js
 abstract BufferSource(Dynamic) from ArrayBuffer from ArrayBufferView to ArrayBuffer to ArrayBufferView {
 
@@ -10,12 +16,7 @@ abstract BufferSource(Dynamic) from ArrayBuffer from ArrayBufferView to ArrayBuf
 		return this.byteLength;
 
 }
-#else
-/**
-	"The BufferSource typedef is used to represent objects that are either themselves an ArrayBuffer or which provide a view on to an ArrayBuffer."
-
-	https://heycam.github.io/webidl/#BufferSource
-**/
+#els
 abstract BufferSource(BufferSourceType) from BufferSourceType {
 
 	public var byteLength(get, never): Int;
