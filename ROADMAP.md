@@ -5,6 +5,9 @@ Remapping
 - device.* -> wc.Device
 - filesystem.* -> wc.FileSystem
 
+**! Event issue:**
+Pointer up x is probably relative to window coordinates, not canvas (same for other events)
+
 ---
 
 - wc.View is a UI view that has the standard event interface (pointer, keyboard, resize and activate)

@@ -169,11 +169,8 @@ class View implements IView {
 					switch (touchEvent.type) {
 						case 'touchstart':
 							touchInfo.activeCount++;
-							break;
-						case 'touchend':
-						case 'touchcancel':
+						case 'touchend', 'touchcancel': 
 							touchInfo.activeCount--;
-							break;
 					}
 
 					// convert altitude-azimuth to tilt xy
