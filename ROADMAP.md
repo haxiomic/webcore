@@ -8,6 +8,9 @@ Remapping
 **! Event issue:**
 Pointer up x is probably relative to window coordinates, not canvas (same for other events)
 
+**! Event issue:**
+Pointer up event can occur without a pointer down! we should only pointer up if's associated with a live pointer-down event 
+
 ---
 
 - wc.View is a UI view that has the standard event interface (pointer, keyboard, resize and activate)
