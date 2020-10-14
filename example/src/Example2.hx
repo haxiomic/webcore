@@ -8,8 +8,8 @@ import webcore.filesystem.*;
 import webcore.image.*;
 import webcore.typedarray.*;
 import webcore.view.*;
-import webcore.webgl.*;
-import webcore.webgl.extension.*;
+import webcore.gl.*;
+import webcore.gl.extension.*;
 
 @:expose
 class Example2 extends webcore.view.WebGLView {

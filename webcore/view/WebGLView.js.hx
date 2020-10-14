@@ -1,8 +1,8 @@
 package webcore.view;
 
 import js.Browser.*;
-import webcore.webgl.GLContext;
-import webcore.webgl.GLContextAttributes;
+import webcore.gl.GLContext;
+import webcore.gl.GLContextAttributes;
 
 @:nullSafety
 class WebGLView extends View {

@@ -1,12 +1,12 @@
-import webcore.webgl.GLContextAttributes;
+import webcore.gl.GLContextAttributes;
 import webcore.event.*;
 import webcore.audio.AudioContext;
-import webcore.webgl.GLUniformLocation;
-import webcore.webgl.GLTexture;
-import webcore.webgl.GLBuffer;
-import webcore.webgl.GLProgram;
-import webcore.webgl.GLShader;
-import webcore.webgl.GLContext;
+import webcore.gl.GLUniformLocation;
+import webcore.gl.GLTexture;
+import webcore.gl.GLBuffer;
+import webcore.gl.GLProgram;
+import webcore.gl.GLShader;
+import webcore.gl.GLContext;
 import webcore.typedarray.Float32Array;
 import webcore.typedarray.Uint8Array;
 
@@ -24,7 +24,7 @@ class DemoAssets implements webcore.app.AssetPack { }
 // </target>
 #end
 @:expose
-class Example extends webcore.WebGLView {
+class Example extends webcore.glView {
 
 	var gl: Null<GLContext>;
 	var audioContext: AudioContext;
