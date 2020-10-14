@@ -1,32 +1,26 @@
-Remapping
-- typedarray.* -> wc.*
-- image.* -> wc.Image
-- audio.* -> wc.audio.*
-- device.* -> wc.Device
-- filesystem.* -> wc.FileSystem
-
 **! Event issue:**
 Pointer up x is probably relative to window coordinates, not canvas (same for other events)
 
 **! Event issue:**
 Pointer up event can occur without a pointer down! we should only pointer up if's associated with a live pointer-down event 
 
+Can we get rid of the current context check in native GLContext with the new view based approach?
 ---
 
-- wc.View is a UI view that has the standard event interface (pointer, keyboard, resize and activate)
+- webcore.View is a UI view that has the standard event interface (pointer, keyboard, resize and activate)
     - Views cannot be added as children of other views
     - Uses autoBuild to expose the view
     - Has width and height (which are set externally?)
-- wc.WebGLView extends WCView
+- webcore.WebGLView extends WCView
     - Is a WCView backed by a graphics context
-- wc.GpuView
+- webcore.GpuView
 
 - Users extend one or more of these views
 - When intergrating into the native platform users do
     nativeView = WebCore.createView(className);
     -> This is a native view type that can be added to the native ui tree
 
-- wc.ui.Input -> native input UI`
+- webcore.ui.Input -> native input UI`
 
 
 -----------

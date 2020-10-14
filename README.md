@@ -1,6 +1,6 @@
 To use, extend a webcore view type, for example:
 ```haxe
-class Example extends wc.WebGLView {
+class Example extends webcore.WebGLView {
 
 }
 ```
