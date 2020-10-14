@@ -10,10 +10,8 @@ abstract AudioContext(js.html.audio.AudioContext) {
     public inline function new(?contextOptions: js.html.audio.AudioContextOptions) {
         if (js.Syntax.typeof(js.html.audio.AudioContext) != 'undefined') {
             this = new js.html.audio.AudioContext(contextOptions);
-        } else if (js.Syntax.typeof(untyped webkitAudioContext) != 'undefined') {
-            this = js.Syntax.code('new webkitAudioContext({0})', contextOptions);
         } else {
-            throw 'Browser does not support WebAudio';
+            this = js.Syntax.code('new webkitAudioContext({0})', contextOptions);
         }
     }
 
