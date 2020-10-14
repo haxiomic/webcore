@@ -64,7 +64,7 @@ abstract TexImageSource(webcore.image.Image)
 	inline function get_height() return this.height;
 }
 
-private typedef InternalGLContext = 
+typedef InternalGLContext = 
 	#if js
 		js.html.webgl.RenderingContext;
 	#elseif cpp
@@ -73,7 +73,7 @@ private typedef InternalGLContext =
 		Dynamic;
 	#end
 
-private typedef InternalConstGLContext =
+typedef InternalConstGLContext =
 	#if js
 		js.html.webgl.RenderingContext;
 	#elseif cpp
