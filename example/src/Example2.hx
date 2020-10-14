@@ -23,6 +23,8 @@ class Example2 extends webcore.view.WebGLView {
 			stencil: false,
 			depth: true,
 		});
+
+		var audio = new AudioContext();
 	}
 
 	override function onDrawFrame(t_ms: Float, w: Float, h: Float) {
