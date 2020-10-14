@@ -1,17 +1,17 @@
-import wc.webgl.GLContextAttributes;
-import wc.event.*;
-import wc.audio.AudioContext;
-import wc.webgl.GLUniformLocation;
-import wc.webgl.GLTexture;
-import wc.webgl.GLBuffer;
-import wc.webgl.GLProgram;
-import wc.webgl.GLShader;
-import wc.webgl.GLContext;
-import wc.typedarray.Float32Array;
-import wc.typedarray.Uint8Array;
+import webcore.webgl.GLContextAttributes;
+import webcore.event.*;
+import webcore.audio.AudioContext;
+import webcore.webgl.GLUniformLocation;
+import webcore.webgl.GLTexture;
+import webcore.webgl.GLBuffer;
+import webcore.webgl.GLProgram;
+import webcore.webgl.GLShader;
+import webcore.webgl.GLContext;
+import webcore.typedarray.Float32Array;
+import webcore.typedarray.Uint8Array;
 
 @:copyToBundle('../assets')
-class DemoAssets implements wc.app.AssetPack { }
+class DemoAssets implements webcore.app.AssetPack { }
 
 #if debug
 // In debug mode we enable sanitizers to help validate correctness (at a performance cost)
@@ -24,7 +24,7 @@ class DemoAssets implements wc.app.AssetPack { }
 // </target>
 #end
 @:expose
-class Example extends wc.WebGLView {
+class Example extends webcore.WebGLView {
 
 	var gl: Null<GLContext>;
 	var audioContext: AudioContext;
@@ -45,7 +45,7 @@ class Example extends wc.WebGLView {
 
 	public function new() {
 		super();
-		trace('App instance created. Language: ${wc.device.Device.getSystemLanguageIsoCode()}');
+		trace('App instance created. Language: ${webcore.device.Device.getSystemLanguageIsoCode()}');
 
 		// test the haxe event loop
 		function helloLoop() {
@@ -122,12 +122,12 @@ class Example extends wc.WebGLView {
 		gl.activeTexture(TEXTURE0);
 		gl.bindTexture(TEXTURE_2D, texture);
 		// null texture
-		gl.texImage2D(TEXTURE_2D, 0, RGBA, 1, 1, 0, RGBA, UNSIGNED_BYTE, new wc.typedarray.Uint8Array([0, 0, 255, 255]));
+		gl.texImage2D(TEXTURE_2D, 0, RGBA, 1, 1, 0, RGBA, UNSIGNED_BYTE, new webcore.typedarray.Uint8Array([0, 0, 255, 255]));
 
 		var t0 = haxe.Timer.stamp();
 		
 		DemoAssets.readFile(DemoAssets.paths.assets.image.red_panda_jpg, (arraybuffer) -> {	
-			wc.image.Image.decodeImageData(arraybuffer,
+			webcore.image.Image.decodeImageData(arraybuffer,
 				(image) -> {
 					trace('decodeImageData complete! ${image.naturalWidth}x${image.naturalHeight}', haxe.Timer.stamp() - t0);
 					gl.activeTexture(TEXTURE0);

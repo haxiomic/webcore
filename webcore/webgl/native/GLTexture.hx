@@ -1,0 +1,12 @@
+package webcore.webgl.native;
+
+@:allow(webcore.webgl.native.GLContext)
+@:noCompletion
+final class GLTexture extends GLObject {
+
+	@:noCompletion
+	override public function finalize() {
+		context.deleteTexture(this);
+	}
+
+}

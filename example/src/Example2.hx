@@ -1,7 +1,18 @@
 import js.Browser.*;
 
+import webcore.*;
+import webcore.audio.*;
+import webcore.device.*;
+import webcore.event.*;
+import webcore.filesystem.*;
+import webcore.image.*;
+import webcore.typedarray.*;
+import webcore.view.*;
+import webcore.webgl.*;
+import webcore.webgl.extension.*;
+
 @:expose
-class Example2 extends wc.view.WebGLView {
+class Example2 extends webcore.view.WebGLView {
 
 	public function new() {
 		super({
