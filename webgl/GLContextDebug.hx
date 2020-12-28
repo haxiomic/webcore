@@ -7,9 +7,9 @@ import haxe.macro.Context;
 
 class GLContextDebug {
 
-	static final isDisplay = Context.defined('display') || Context.defined('display-details');
-
 	#if macro
+	static final isDisplay = Context.defined('display') || Context.defined('display-details');
+	
 	static function addErrorChecking() {
 		var fields = Context.getBuildFields();
 		if (isDisplay) return fields;
