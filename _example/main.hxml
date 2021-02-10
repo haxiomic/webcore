@@ -4,4 +4,3 @@ App
 --class-path src
 
 -dce full
--D analyzer-optimize
