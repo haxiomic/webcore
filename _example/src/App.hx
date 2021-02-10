@@ -1,9 +1,9 @@
+import app.event.PointerType;
+import app.event.KeyboardEvent;
+import app.event.WheelEvent;
+import app.event.PointerEvent;
 import webgl.GLContextAttributes;
-import app.HaxeAppInterface.KeyboardEvent;
-import app.HaxeAppInterface.WheelEvent;
 import audio.AudioContext;
-import app.HaxeAppInterface.PointerType;
-import app.HaxeAppInterface.PointerEvent;
 import webgl.GLUniformLocation;
 import webgl.GLTexture;
 import webgl.GLBuffer;
