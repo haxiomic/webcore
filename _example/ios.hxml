@@ -1,6 +1,6 @@
 main.hxml
 
---library hxcpp:4.0.52
+--library hxcpp
 --cpp platform/ios/_hxcpp-bin
 
 # Leaving SDK empty should map to the default
