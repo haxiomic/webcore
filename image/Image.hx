@@ -10,6 +10,7 @@ import typedarray.ArrayBuffer;
     HTMLImageElement extended to add `decodeImageData()`
 **/
 @:forward
+@:forward.new
 abstract Image(js.html.Image) from js.html.Image to js.html.Image {
 
     /**
@@ -66,9 +67,6 @@ class Image {
     public var height: Int;
     public var naturalWidth(default, null): Int = -1;
     public var naturalHeight(default, null): Int = -1;
-
-    // @! todo: we need events before we can enable loading from a `src` path
-    // public var src(default, set): String;
 
     // internal image data
     var sourceFileBytes: Null<ArrayBuffer> = null;
@@ -169,12 +167,6 @@ class Image {
 
         return pixelData;
     }
-    
-    // function set_src(v: String) {
-    //     clearInternalState();
-    //     // load file from filesystem
-    //     return this.src = v;
-    // }
 
     function set_cachedPixelData(v) {
         // free the cached StbImage allocated pixel buffer
