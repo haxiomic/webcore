@@ -66,7 +66,7 @@ abstract ArrayBuffer(haxe.io.Bytes) from haxe.io.Bytes to haxe.io.Bytes {
 	}
 
 	static public inline function isView(value: Dynamic): Bool {
-		return Std.is(value, ArrayBufferView.ArrayBufferViewBase);
+		return Std.isOfType(value, ArrayBufferView.ArrayBufferViewBase);
 	}
 
 	@:from
