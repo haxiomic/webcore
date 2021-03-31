@@ -95,7 +95,7 @@ class File {
 		#else
 	
 			// local file read
-			var filePath = Path.join([Sys.programPath(), assetsDirectory, path]);
+			var filePath = Path.join([Sys.programPath(), path]);
 			return readFileStdLib(filePath, onComplete, onError, onProgress);
 
 		#end
