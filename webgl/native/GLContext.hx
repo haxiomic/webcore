@@ -14,16 +14,16 @@ import webgl.native.ES2Context.*;
 class GLContext {
 	
 	// set this variable to null whenever it is possible that the current graphics context has been changed externally
-	static var knownCurrentReference: Star<cpp.Void> = null;
+	static var knownCurrentReference: ConstStar<cpp.Void> = null;
 
 	public var drawingBufferWidth (get, never): Int;
 	public var drawingBufferHeight (get, never): Int;
 
-	final nativeReference: Star<cpp.Void>;
+	final nativeReference: ConstStar<cpp.Void>;
 	final nativeAttributes: GLContextAttributes;
-	final nativeMakeCurrent: Callable<(nativeReference: Star<cpp.Void>) -> Void>;
-	final nativeGetDrawingBufferWidth: Callable<(nativeReference: Star<cpp.Void>) -> Int32>;
-	final nativeGetDrawingBufferHeight: Callable<(nativeReference: Star<cpp.Void>) -> Int32>;
+	final nativeMakeCurrent: Callable<(nativeReference: ConstStar<cpp.Void>) -> Void>;
+	final nativeGetDrawingBufferWidth: Callable<(nativeReference: ConstStar<cpp.Void>) -> Int32>;
+	final nativeGetDrawingBufferHeight: Callable<(nativeReference: ConstStar<cpp.Void>) -> Int32>;
 	
 	final defaultFramebuffer: GLFramebuffer;
 
@@ -60,7 +60,7 @@ class GLContext {
 	**/
 	@:keep
 	public inline function new(
-		nativeReference: Pointer<cpp.Void>,
+		nativeReference: cpp.ConstPointer<cpp.Void>,
 
 		// context attributes
 		alpha: Bool,
@@ -69,9 +69,9 @@ class GLContext {
 		antialias: Bool,
 
 		// callbacks
-		nativeMakeCurrent: Callable<(nativeReference: Star<cpp.Void>) -> Void>,
-		nativeGetDrawingBufferWidth: Callable<(nativeReference: Star<cpp.Void>) -> Int32>,
-		nativeGetDrawingBufferHeight: Callable<(nativeReference: Star<cpp.Void>) -> Int32>
+		nativeMakeCurrent: Callable<(nativeReference: ConstStar<cpp.Void>) -> Void>,
+		nativeGetDrawingBufferWidth: Callable<(nativeReference: ConstStar<cpp.Void>) -> Int32>,
+		nativeGetDrawingBufferHeight: Callable<(nativeReference: ConstStar<cpp.Void>) -> Int32>
 	) {
 		this.nativeReference = nativeReference.ptr;
 		this.nativeMakeCurrent = nativeMakeCurrent;
