@@ -1,7 +1,0 @@
-App
-
---class-path ../
---class-path src
-
--dce full
--D analyzer-optimize
