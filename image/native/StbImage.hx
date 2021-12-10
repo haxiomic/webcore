@@ -14,11 +14,19 @@ extern class StbImage {
 	// 8-bits-per-channel interface
 	//
 
-	@:native('stbi_load_from_memory')
-	static function stbi_load_from_memory(buffer: ConstStar<UInt8>, len: Int32, x: Star<Int32>, y: Star<Int32>, channels_in_file: Star<Int32>, desired_channels: Int32): Star<UInt8>;
+	static extern inline function stbi_load_from_memory(buffer: ConstStar<UInt8>, len: Int32, x: Star<Int32>, y: Star<Int32>, channels_in_file: Star<Int32>, desired_channels: Int32): Star<UInt8> {
+		cpp.vm.Gc.enterGCFreeZone();
+		var ret = untyped __global__.stbi_load_from_memory(buffer, len, x, y, channels_in_file, desired_channels);
+		cpp.vm.Gc.exitGCFreeZone();
+		return ret;
+	}
 
-	@:native('stbi_load_from_callbacks')
-	static function stbi_load_from_callbacks(callbacks: ConstStar<NativeStbiIoCallbacks>, user: Star<cpp.Void>, x: Star<Int32>, y: Star<Int32>, channels_in_file: Star<Int32>, desired_channels: Int32): Star<UInt8>;
+	static extern inline function stbi_load_from_callbacks(callbacks: ConstStar<NativeStbiIoCallbacks>, user: Star<cpp.Void>, x: Star<Int32>, y: Star<Int32>, channels_in_file: Star<Int32>, desired_channels: Int32): Star<UInt8> {
+		cpp.vm.Gc.enterGCFreeZone();
+		var ret = untyped __global__.stbi_load_from_callbacks(callbacks, user, x, y, channels_in_file, desired_channels);
+		cpp.vm.Gc.exitGCFreeZone();
+		return ret;
+	}
 	
 	////////////////////////////////////
 	//
@@ -26,10 +34,20 @@ extern class StbImage {
 	//
 
 	@:native('stbi_load_16_from_memory')
-	static function stbi_load_16_from_memory(buffer: ConstStar<UInt8>, len: Int32, x: Star<Int32>, y: Star<Int32>, channels_in_file: Star<Int32>, desired_channels: Int32): Star<UInt16>;
+	static extern inline function stbi_load_16_from_memory(buffer: ConstStar<UInt8>, len: Int32, x: Star<Int32>, y: Star<Int32>, channels_in_file: Star<Int32>, desired_channels: Int32): Star<UInt16> {
+		cpp.vm.Gc.enterGCFreeZone();
+		var ret = untyped __global__.stbi_load_16_from_memory(buffer, len, x, y, channels_in_file, desired_channels);
+		cpp.vm.Gc.exitGCFreeZone();
+		return ret;
+	}
 
 	@:native('stbi_load_16_from_callbacks')
-	static function stbi_load_16_from_callbacks(callbacks: ConstStar<NativeStbiIoCallbacks>, user: Star<cpp.Void>, x: Star<Int32>, y: Star<Int32>, channels_in_file: Star<Int32>, desired_channels: Int32): Star<UInt16>;
+	static extern inline function stbi_load_16_from_callbacks(callbacks: ConstStar<NativeStbiIoCallbacks>, user: Star<cpp.Void>, x: Star<Int32>, y: Star<Int32>, channels_in_file: Star<Int32>, desired_channels: Int32): Star<UInt16> {
+		cpp.vm.Gc.enterGCFreeZone();
+		var ret = untyped __global__.stbi_load_16_from_callbacks(callbacks, user, x, y, channels_in_file, desired_channels);
+		cpp.vm.Gc.exitGCFreeZone();
+		return ret;
+	}
 
 	////////////////////////////////////
 	//
@@ -37,10 +55,20 @@ extern class StbImage {
 	//
 
 	@:native('stbi_loadf_from_memory')
-	static function stbi_loadf_from_memory(buffer: ConstStar<UInt8>, len: Int32, x: Star<Int32>, y: Star<Int32>, channels_in_file: Star<Int32>, desired_channels: Int32): Star<Float32>;
+	static extern inline function stbi_loadf_from_memory(buffer: ConstStar<UInt8>, len: Int32, x: Star<Int32>, y: Star<Int32>, channels_in_file: Star<Int32>, desired_channels: Int32): Star<Float32> {
+		cpp.vm.Gc.enterGCFreeZone();
+		var ret = untyped __global__.stbi_loadf_from_memory(buffer, len, x, y, channels_in_file, desired_channels);
+		cpp.vm.Gc.exitGCFreeZone();
+		return ret;
+	}
 
 	@:native('stbi_loadf_from_callbacks')
-	static function stbi_loadf_from_callbacks(callbacks: ConstStar<NativeStbiIoCallbacks>, user: Star<cpp.Void>, x: Star<Int32>, y: Star<Int32>, channels_in_file: Star<Int32>, desired_channels: Int32): Star<Float32>;
+	static extern inline function stbi_loadf_from_callbacks(callbacks: ConstStar<NativeStbiIoCallbacks>, user: Star<cpp.Void>, x: Star<Int32>, y: Star<Int32>, channels_in_file: Star<Int32>, desired_channels: Int32): Star<Float32> {
+		cpp.vm.Gc.enterGCFreeZone();
+		var ret = untyped __global__.stbi_loadf_from_callbacks(callbacks, user, x, y, channels_in_file, desired_channels);
+		cpp.vm.Gc.exitGCFreeZone();
+		return ret;
+	}
 	
 	////////////////////////////////////
 
