@@ -202,15 +202,24 @@ extern class NativeAudioDecoder {
 	private var frameIndex: UInt64;
 
 	inline function readPcmFrames(pFramesOut: Star<cpp.Void>, frameCount: UInt64): UInt64 {
-		return untyped __global__.AudioDecoder_readPcmFrames((this: Star<NativeAudioDecoder>), frameCount, pFramesOut);
+		cpp.vm.Gc.enterGCFreeZone();
+		var ret = untyped __global__.AudioDecoder_readPcmFrames((this: Star<NativeAudioDecoder>), frameCount, pFramesOut);
+		cpp.vm.Gc.exitGCFreeZone();
+		return ret;
 	}
 
 	inline function getLengthInPcmFrames(): UInt64 {
-		return untyped __global__.AudioDecoder_getLengthInPcmFrames((this: Star<NativeAudioDecoder>));
+		cpp.vm.Gc.enterGCFreeZone();
+		var ret = untyped __global__.AudioDecoder_getLengthInPcmFrames((this: Star<NativeAudioDecoder>));
+		cpp.vm.Gc.exitGCFreeZone();
+		return ret;
 	}
 
 	inline function seekToPcmFrame(frameIndex: UInt64): MiniAudio.Result {
-		return untyped __global__.AudioDecoder_seekToPcmFrame((this: Star<NativeAudioDecoder>), frameIndex);
+		cpp.vm.Gc.enterGCFreeZone();
+		var ret = untyped __global__.AudioDecoder_seekToPcmFrame((this: Star<NativeAudioDecoder>), frameIndex);
+		cpp.vm.Gc.exitGCFreeZone();
+		return ret;
 	}
 
 	inline function getFrameIndex(): UInt64 {
