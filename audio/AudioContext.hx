@@ -205,7 +205,8 @@ class AudioContext {
             mixSources(userData.nativeNodeList, maDevice.playback.channels, framesToRead, schedulingCurrentFrameBlock, quantaOutput);
 
             framesRemaining -= framesToRead;
-            schedulingCurrentFrameBlock += (cast framesToRead: Int64);
+            // schedulingCurrentFrameBlock += (cast framesToRead: Int64);
+            schedulingCurrentFrameBlock = untyped __cpp__('{0} + {1}', schedulingCurrentFrameBlock, framesToRead);
 
             // update shared current block variable atomically
             userData.schedulingCurrentFrameBlock.mutex.lock();
